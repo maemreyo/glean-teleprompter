@@ -6,18 +6,24 @@ import { motion } from 'framer-motion';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { FONT_STYLES, TEXT_COLORS } from './Editor';
 import { useTranslations } from 'next-intl';
+
+// Modular Components
+import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
+import { UniversalAudioPlayer } from '@/components/teleprompter/audio/AudioPlayer';
 
 export function Runner() {
     const t = useTranslations('Runner');
     const store = useTeleprompterStore();
     const router = useRouter();
     const textContainerRef = useRef<HTMLDivElement>(null);
-    const audioRef = useRef<HTMLAudioElement>(null);
     
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+    
+    // Auto-start music if URL exists? Or wait for user? 
+    // Usually teleprompter should auto start everything on play?
+    // Let's start music stopped.
 
     // Auto-scroll logic
     useEffect(() => {
@@ -26,7 +32,6 @@ export function Runner() {
           intervalId = setInterval(() => {
             if (textContainerRef.current) {
               textContainerRef.current.scrollTop += 1;
-              // Check end
               if (textContainerRef.current.scrollTop + textContainerRef.current.clientHeight >= textContainerRef.current.scrollHeight - 2) {
                 setIsPlaying(false);
               }
@@ -36,22 +41,17 @@ export function Runner() {
         return () => clearInterval(intervalId);
     }, [isPlaying, store.speed, store.mode]);
 
-    const toggleMusic = () => {
-        if (!audioRef.current) return;
-        if (isMusicPlaying) {
-          audioRef.current.pause();
-        } else {
-          audioRef.current.play();
-        }
-        setIsMusicPlaying(!isMusicPlaying);
-    };
-
     return (
         <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="relative h-screen w-full overflow-hidden font-sans text-white"
         >
-             {store.musicUrl && <audio ref={audioRef} src={store.musicUrl} loop />}
+             {/* Universal Audio Player (Hidden or Managed) */}
+             <UniversalAudioPlayer 
+                url={store.musicUrl} 
+                playing={isMusicPlaying} 
+                volume={0.5} 
+             />
              
              <div className="absolute inset-0 bg-cover bg-center transition-all duration-1000 transform scale-105" style={{ backgroundImage: `url('${store.bgUrl}')` }} />
              <div className="absolute inset-0 bg-black transition-opacity" style={{ opacity: store.overlayOpacity }} />
@@ -69,16 +69,22 @@ export function Runner() {
                 )}
              </div>
 
-             {/* Content */}
+             {/* Content (Refactored to use TeleprompterText) */}
              <div ref={textContainerRef} className="relative z-10 h-full overflow-y-auto scrollbar-hide">
                 <div className="min-h-screen flex flex-col items-center">
                   <div className="h-[45vh]" />
-                  <p 
-                    className={cn("max-w-4xl w-full leading-relaxed p-6 transition-all", FONT_STYLES.find(f => f.name === store.font)?.font, store.align === 'center' ? 'text-center' : 'text-left')}
-                    style={{ fontSize: `${store.fontSize}px`, color: TEXT_COLORS[store.colorIndex].value, textShadow: '0 4px 20px rgba(0,0,0,0.8)' }}
-                  >
-                    {store.text}
-                  </p>
+                  <div className="max-w-4xl w-full p-6">
+                      <TeleprompterText 
+                        text={store.text}
+                        fontName={store.font}
+                        colorIndex={store.colorIndex}
+                        fontSize={store.fontSize}
+                        lineHeight={store.lineHeight}
+                        margin={store.margin}
+                        align={store.align}
+                        style={{ textShadow: '0 4px 20px rgba(0,0,0,0.8)' }}
+                      />
+                  </div>
                   <div className="h-[55vh]" />
                 </div>
              </div>
@@ -104,7 +110,7 @@ export function Runner() {
                   <div className="w-px h-8 bg-white/10 mx-1" />
                   
                   {store.musicUrl && (
-                    <button onClick={toggleMusic} className={cn("p-3 rounded-xl transition-all", isMusicPlaying ? "text-pink-400 bg-pink-500/10" : "text-gray-400 hover:text-white")}>
+                    <button onClick={() => setIsMusicPlaying(!isMusicPlaying)} className={cn("p-3 rounded-xl transition-all", isMusicPlaying ? "text-pink-400 bg-pink-500/10" : "text-gray-400 hover:text-white")}>
                       <Music size={20} />
                     </button>
                   )}

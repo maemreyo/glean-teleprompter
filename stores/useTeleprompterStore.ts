@@ -16,6 +16,9 @@ interface TeleprompterState {
   isReadOnly: boolean;
   mode: 'setup' | 'running';
   
+  lineHeight: number;
+  margin: number;
+  
   // Actions
   setText: (text: string) => void;
   setBgUrl: (url: string) => void;
@@ -25,6 +28,8 @@ interface TeleprompterState {
   setAlign: (align: TextAlign) => void;
   setSpeed: (speed: number) => void;
   setFontSize: (size: number) => void;
+  setLineHeight: (height: number) => void;
+  setMargin: (margin: number) => void;
   setMode: (mode: 'setup' | 'running') => void;
   setIsReadOnly: (api: boolean) => void;
   reset: () => void;
@@ -45,6 +50,8 @@ export const useTeleprompterStore = create<TeleprompterState>((set) => ({
   align: 'center',
   speed: 2,
   fontSize: 48,
+  lineHeight: 1.5,
+  margin: 0,
   overlayOpacity: 0.5,
   isReadOnly: false,
   mode: 'setup',
@@ -57,6 +64,8 @@ export const useTeleprompterStore = create<TeleprompterState>((set) => ({
   setAlign: (align) => set({ align }),
   setSpeed: (speed) => set({ speed }),
   setFontSize: (fontSize) => set({ fontSize }),
+  setLineHeight: (lineHeight) => set({ lineHeight }),
+  setMargin: (margin) => set({ margin }),
   setMode: (mode) => set({ mode }),
   setIsReadOnly: (isReadOnly) => set({ isReadOnly }),
   
@@ -70,6 +79,8 @@ export const useTeleprompterStore = create<TeleprompterState>((set) => ({
     colorIndex: 0,
     align: 'center',
     mode: 'setup',
-    isReadOnly: false
+    isReadOnly: false,
+    lineHeight: 1.5,
+    margin: 0
   })
 }));

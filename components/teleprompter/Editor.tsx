@@ -1,51 +1,26 @@
 "use client";
 
 import React, { useState } from 'react';
-import { UploadCloud, Lock, LogOut, Crown, Play, Save, Share2 } from 'lucide-react';
+import { Play, Save, Share2, LogOut, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
-import { useFileUpload } from '@/hooks/useFileUpload'; // We will create this
 import { saveScriptAction } from '@/actions/scripts';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-import { Inter, Roboto_Mono, Lobster, Merriweather, Oswald } from 'next/font/google';
 import { useTranslations } from 'next-intl';
 
-// Lazy fonts or import them here? 
-// Importing here is fine for now, or centralized config.
-const inter = Inter({ subsets: ['latin'] });
-const robotoMono = Roboto_Mono({ subsets: ['latin'] });
-const lobster = Lobster({ weight: '400', subsets: ['latin'] });
-const merriweather = Merriweather({ weight: ['400', '700'], subsets: ['latin'] });
-const oswald = Oswald({ subsets: ['latin'] });
-
-export const FONT_STYLES = [
-  { name: 'Classic', font: inter.className, label: 'Cổ điển' },
-  { name: 'Modern', font: oswald.className, label: 'Hiện đại' },
-  { name: 'Typewriter', font: robotoMono.className, label: 'Máy chữ' },
-  { name: 'Novel', font: merriweather.className, label: 'Tiểu thuyết' },
-  { name: 'Neon', font: lobster.className, label: 'Bay bổng' },
-];
-
-export const TEXT_COLORS = [
-  { name: 'White', value: '#ffffff' },
-  { name: 'Yellow', value: '#fbbf24' },
-  { name: 'Green', value: '#4ade80' },
-  { name: 'Blue', value: '#60a5fa' },
-  { name: 'Pink', value: '#f472b6' },
-  { name: 'Red', value: '#f87171' },
-];
+// Modular Components
+import { FontSelector } from '@/components/teleprompter/controls/FontSelector';
+import { ColorPicker } from '@/components/teleprompter/controls/ColorPicker';
+import { MediaInput } from '@/components/teleprompter/controls/MediaInput';
+import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
 
 export function Editor() {
   const t = useTranslations('Editor');
   const store = useTeleprompterStore();
   const { user, isPro } = useAuthStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
-  const { uploadFile } = useFileUpload();
-
-  const [inputType, setInputType] = useState<'url' | 'file'>('url');
   
   // Handlers
   const handleSave = async () => {
@@ -64,6 +39,8 @@ export function Editor() {
             color: store.colorIndex,
             speed: store.speed,
             fontSize: store.fontSize,
+            lineHeight: store.lineHeight,
+            margin: store.margin,
             overlayOpacity: store.overlayOpacity,
             align: store.align
         },
@@ -79,9 +56,9 @@ export function Editor() {
   };
 
   const handleShare = () => {
-     // Implement share logic (use existing logic from page.tsx or simpler)
-     // ...
-     toast.success(t('share') + " Copied!");
+    // Basic share logic: Copy current URL
+    navigator.clipboard.writeText(window.location.href);
+    toast.success(t('share') + " Copied!");
   };
 
   return (
@@ -128,58 +105,36 @@ export function Editor() {
                   />
                 </div>
                 
+                {/* Advanced Text Options */}
+                <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Line Height ({store.lineHeight})</label>
+                            <input 
+                                type="range" min="1" max="3" step="0.1"
+                                value={store.lineHeight} onChange={(e) => store.setLineHeight(Number(e.target.value))}
+                                className="w-full h-1 bg-gray-800 rounded-full appearance-none accent-pink-500" 
+                            />
+                        </div>
+                         <div>
+                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Margin ({store.margin}%)</label>
+                            <input 
+                                type="range" min="0" max="30" step="1"
+                                value={store.margin} onChange={(e) => store.setMargin(Number(e.target.value))}
+                                className="w-full h-1 bg-gray-800 rounded-full appearance-none accent-pink-500" 
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 {/* Font & Color */}
                 <div className="space-y-4">
-                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                    {FONT_STYLES.map((style, idx) => (
-                      <button key={style.name} onClick={() => store.setFont(style.name as any)}
-                        className={cn("px-3 py-1.5 rounded-md text-xs border transition-all", store.font === style.name ? "bg-white text-black font-bold" : "border-gray-800 text-gray-500")}
-                      >
-                        {style.name}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex gap-3 items-center">
-                    {TEXT_COLORS.map((color, idx) => (
-                      <button key={color.name} onClick={() => store.setColorIndex(idx)}
-                        className={cn("w-5 h-5 rounded-full transition-transform", store.colorIndex === idx ? "ring-2 ring-white scale-110" : "opacity-60 hover:scale-110")}
-                        style={{ backgroundColor: color.value }}
-                      />
-                    ))}
-                  </div>
+                  <FontSelector selectedFont={store.font} onSelect={(f) => store.setFont(f as any)} />
+                  <ColorPicker selectedIndex={store.colorIndex} onSelect={store.setColorIndex} />
                 </div>
 
-                {/* Media Upload */}
-                <div className="space-y-4 pt-4 border-t border-gray-900">
-                  <div className="flex gap-2 mb-2">
-                     <button onClick={() => setInputType('url')} className={cn("text-xs px-2 py-1 rounded", inputType === 'url' ? "bg-gray-800 text-white" : "text-gray-600")}>{t('useUrl')}</button>
-                     <button onClick={() => setInputType('file')} className={cn("text-xs px-2 py-1 rounded", inputType === 'file' ? "bg-gray-800 text-white" : "text-gray-600")}>{t('uploadPro')}</button>
-                  </div>
-
-                  {inputType === 'url' ? (
-                    <div className="space-y-3">
-                       <input type="text" value={store.bgUrl} onChange={(e) => store.setBgUrl(e.target.value)} placeholder={t('bgUrlPlaceholder')} className="w-full bg-gray-900 p-2 rounded text-xs border border-gray-800 outline-none" />
-                       <input type="text" value={store.musicUrl} onChange={(e) => store.setMusicUrl(e.target.value)} placeholder={t('musicUrlPlaceholder')} className="w-full bg-gray-900 p-2 rounded text-xs border border-gray-800 outline-none" />
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2">
-                       <div className="bg-gray-900 p-3 rounded border border-gray-800 relative group text-center overflow-hidden">
-                          <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadFile(e.target.files[0], 'image').then(url => url && store.setBgUrl(url))} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
-                          <div className="flex flex-col items-center gap-1 text-gray-500 group-hover:text-pink-500 transition-colors">
-                             <UploadCloud size={16} />
-                             <span className="text-[10px]">{t('uploadImage')}</span>
-                          </div>
-                       </div>
-                       <div className={cn("bg-gray-900 p-3 rounded border border-gray-800 relative group text-center overflow-hidden", !isPro && "opacity-60")}>
-                          {isPro && <input type="file" accept="audio/*" onChange={(e) => e.target.files?.[0] && uploadFile(e.target.files[0], 'audio').then(url => url && store.setMusicUrl(url))} className="absolute inset-0 opacity-0 cursor-pointer z-10" />}
-                          <div className="flex flex-col items-center gap-1 text-gray-500 group-hover:text-pink-500 transition-colors">
-                             {isPro ? <UploadCloud size={16} /> : <Lock size={16} />}
-                             <span className="text-[10px]">{t('uploadMusic')}</span>
-                          </div>
-                       </div>
-                    </div>
-                  )}
-                </div>
+                {/* Media Input (Modular) */}
+                <MediaInput />
             </div>
 
             {/* Footer Actions */}
@@ -198,15 +153,22 @@ export function Editor() {
             </div>
         </div>
         
-        {/* Preview Panel (Static) */}
+        {/* WYSIWYG Preview Panel */}
         <div className="hidden md:block w-2/3 relative bg-black overflow-hidden">
                <div className="absolute inset-0 bg-cover bg-center opacity-70" style={{ backgroundImage: `url('${store.bgUrl}')` }} />
                <div className="absolute inset-0 bg-black/30" />
-               <div className="absolute inset-0 flex items-center justify-center p-12">
-                 {/* Match font style logic */}
-                 <h2 className={cn("text-4xl text-center", FONT_STYLES.find(f => f.name === store.font)?.font)} style={{ color: TEXT_COLORS[store.colorIndex].value }}>
-                   {store.text}
-                 </h2>
+               <div className="absolute inset-0 flex items-center justify-center p-12 overflow-hidden">
+                   {/* Reusing TeleprompterText for Exact WYSIWYG */}
+                   <TeleprompterText 
+                        text={store.text}
+                        fontName={store.font}
+                        colorIndex={store.colorIndex}
+                        fontSize={store.fontSize} // Use actual font size or scaled? Let's use actual for true WYSIWYG
+                        lineHeight={store.lineHeight}
+                        margin={store.margin}
+                        align={store.align}
+                        className="max-h-full overflow-hidden text-ellipsis line-clamp-[10]" // Limit lines in preview?
+                   />
                </div>
         </div>
     </motion.div>
