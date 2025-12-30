@@ -15,6 +15,7 @@ import { FontSelector } from '@/components/teleprompter/controls/FontSelector';
 import { ColorPicker } from '@/components/teleprompter/controls/ColorPicker';
 import { MediaInput } from '@/components/teleprompter/controls/MediaInput';
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
+import { FONT_STYLES, TEXT_COLORS } from '@/lib/constants';
 
 export function Editor() {
   const t = useTranslations('Editor');

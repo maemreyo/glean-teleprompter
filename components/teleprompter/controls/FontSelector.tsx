@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { FONT_STYLES } from '@/components/teleprompter/Editor';
+import { FONT_STYLES } from '@/lib/constants';
 
 interface FontSelectorProps {
   selectedFont: string;

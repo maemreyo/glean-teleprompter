@@ -10,6 +10,8 @@ import { AppProvider } from '@/components/AppProvider';
 import { Toaster } from 'sonner';
 import { AnimatePresence } from 'framer-motion';
 
+import { FONT_STYLES } from '@/lib/constants';
+
 function TeleprompterLogic() {
   const searchParams = useSearchParams();
   const store = useTeleprompterStore();
@@ -44,11 +46,6 @@ function TeleprompterLogic() {
     </AnimatePresence>
   );
 }
-
-// Helper for Editor styles to avoid circular deps if defined in Editor
-const FONT_STYLES = [
-    { name: 'Classic' }, { name: 'Modern' }, { name: 'Typewriter' }, { name: 'Novel' }, { name: 'Neon' }
-];
 
 export default function TeleprompterPage() {
   return (

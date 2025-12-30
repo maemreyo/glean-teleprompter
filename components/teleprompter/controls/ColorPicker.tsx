@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { TEXT_COLORS } from '@/components/teleprompter/Editor';
+import { TEXT_COLORS } from '@/lib/constants';
 
 interface ColorPickerProps {
   selectedIndex: number;

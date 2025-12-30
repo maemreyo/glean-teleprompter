@@ -1,7 +1,7 @@
-"use client";
+import React, { useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 
-import React, { useRef, useEffect, useState } from 'react';
-import ReactPlayer from 'react-player/youtube';
+const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
 
 // --- Strategy Interface ---
 // In React, strategies are often Components or Hooks. 
@@ -18,7 +18,7 @@ export const UniversalAudioPlayer: React.FC<AudioPlayerProps> = ({ url, playing,
     if (!url) return null;
 
     // Detect YouTube
-    const isYoutube = ReactPlayer.canPlay(url);
+    const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
 
     if (isYoutube) {
         return <YouTubeStrategy url={url} playing={playing} volume={volume} loop={loop} />;
@@ -46,21 +46,27 @@ const NativeAudioStrategy: React.FC<AudioPlayerProps> = ({ url, playing, volume,
     return <audio ref={audioRef} src={url} loop={loop} />;
 };
 
+const Player = ReactPlayer as any;
+
 const YouTubeStrategy: React.FC<AudioPlayerProps> = ({ url, playing, volume, loop }) => {
     // Note: YouTube iframe API has restrictions on autoplay and background play on mobile.
     // We use ReactPlayer to handle most complexity.
     return (
         <div className="hidden"> 
-            <ReactPlayer 
+            <Player 
                 url={url} 
                 playing={playing} 
                 loop={loop} 
                 volume={volume}
+                controls={false}
                 width="0" 
                 height="0"
                 config={{
                     youtube: {
-                        playerVars: { showinfo: 0, controls: 0, disablekb: 1 }
+                        disablekb: 1,
+                        rel: 0,
+                        iv_load_policy: 3,
+                        cc_load_policy: 1
                     }
                 }}
             />
