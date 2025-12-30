@@ -12,24 +12,16 @@ import { useTranslations } from 'next-intl';
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
 import { UniversalAudioPlayer } from '@/components/teleprompter/audio/AudioPlayer';
 import { DraggableCamera } from '@/components/teleprompter/camera/DraggableCamera';
-import { useCamera } from '@/hooks/useCamera';
 
 export function Runner() {
     const t = useTranslations('Runner');
     const store = useTeleprompterStore();
     const router = useRouter();
     const textContainerRef = useRef<HTMLDivElement>(null);
-    
+
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMusicPlaying, setIsMusicPlaying] = useState(false);
     const [cameraVisible, setCameraVisible] = useState(false);
-    
-    const { requestPermissions, stopCamera } = useCamera({
-        quality: 'standard',
-        includeAudio: true,
-        onPermissionGranted: () => setCameraVisible(true),
-        onPermissionDenied: () => setCameraVisible(false),
-    });
     
     // Auto-start music if URL exists? Or wait for user? 
     // Usually teleprompter should auto start everything on play?
@@ -70,16 +62,7 @@ export function Runner() {
              <div className="absolute top-6 left-6 z-50 flex gap-2">
                 {/* Camera Toggle Button */}
                 <button
-                  onClick={() => {
-                      if (cameraVisible) {
-                          stopCamera();
-                          setCameraVisible(false);
-                      } else {
-                          requestPermissions().then((granted) => {
-                              if (granted) setCameraVisible(true);
-                          });
-                      }
-                  }}
+                  onClick={() => setCameraVisible(!cameraVisible)}
                   className={cn(
                       "p-2 rounded-full transition-all",
                       cameraVisible

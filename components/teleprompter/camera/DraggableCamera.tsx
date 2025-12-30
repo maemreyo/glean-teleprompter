@@ -6,7 +6,7 @@
  * @module components/teleprompter/camera/DraggableCamera
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, useDragControls, PanInfo } from 'framer-motion';
 import { CameraWidget } from './CameraWidget';
 
@@ -29,26 +29,49 @@ export function DraggableCamera({
   onToggle,
   quality = 'standard',
 }: DraggableCameraProps) {
-  const [position, setPosition] = useState(DEFAULT_POSITION);
+  const [position, setPosition] = useState<null | { x: number; y: number }>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragControls = useDragControls();
+  const hasLoadedPosition = useRef(false);
 
-  // Load saved position on mount
+  // Bound position to keep widget on screen
+  const boundPosition = useCallback((x: number, y: number) => {
+    if (typeof window === 'undefined') {
+      return { x: 0, y: 0 };
+    }
+
+    const maxX = window.innerWidth - WIDGET_WIDTH - 20;
+    const maxY = window.innerHeight - WIDGET_HEIGHT - 20;
+
+    return {
+      x: Math.max(20, Math.min(x, maxX)),
+      y: Math.max(20, Math.min(y, maxY)),
+    };
+  }, []);
+
+  // Load saved position on mount or set default to top-right
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !hasLoadedPosition.current) {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const savedPos = JSON.parse(saved);
-          // Ensure position is within viewport bounds
-          const boundedPos = boundPosition(savedPos.x, savedPos.y);
-          setPosition(boundedPos);
+          const bounded = boundPosition(savedPos.x, savedPos.y);
+          setPosition(bounded);
+        } else {
+          // Default to Top-Right
+          setPosition({
+             x: window.innerWidth - WIDGET_WIDTH - 20,
+             y: 20
+          });
         }
       } catch {
-        // Use default position if localStorage fails
+        // Fallback
+        setPosition({ x: 20, y: 20 });
       }
+      hasLoadedPosition.current = true;
     }
-  }, []);
+  }, [boundPosition]);
 
   // Save position to localStorage
   const savePosition = useCallback((x: number, y: number) => {
@@ -61,25 +84,12 @@ export function DraggableCamera({
     }
   }, []);
 
-  // Bound position to keep widget on screen
-  const boundPosition = useCallback((x: number, y: number) => {
-    if (typeof window === 'undefined') {
-      return { x: DEFAULT_POSITION.x, y: DEFAULT_POSITION.y };
-    }
-
-    const maxX = window.innerWidth - WIDGET_WIDTH - 20;
-    const maxY = window.innerHeight - WIDGET_HEIGHT - 20;
-
-    return {
-      x: Math.max(10, Math.min(x, maxX)),
-      y: Math.max(10, Math.min(y, maxY)),
-    };
-  }, []);
-
   // Handle drag end with position bounds and persistence
   const handleDragEnd = useCallback(
     (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
       setIsDragging(false);
+      
+      if (!position) return;
 
       const newX = position.x + info.offset.x;
       const newY = position.y + info.offset.y;
@@ -99,6 +109,8 @@ export function DraggableCamera({
   // Handle window resize to keep widget in bounds
   useEffect(() => {
     const handleResize = () => {
+      if (!position) return;
+      
       const bounded = boundPosition(position.x, position.y);
       if (bounded.x !== position.x || bounded.y !== position.y) {
         setPosition(bounded);
@@ -110,7 +122,7 @@ export function DraggableCamera({
     return () => window.removeEventListener('resize', handleResize);
   }, [position, boundPosition, savePosition]);
 
-  if (!isVisible) return null;
+  if (!isVisible || !position) return null;
 
   return (
     <motion.div
@@ -119,19 +131,19 @@ export function DraggableCamera({
       dragMomentum={false}
       dragElastic={0}
       dragConstraints={{
-        left: 10,
-        right: window.innerWidth - WIDGET_WIDTH - 10,
-        top: 10,
-        bottom: window.innerHeight - WIDGET_HEIGHT - 10,
+        left: 20,
+        right: typeof window !== 'undefined' ? window.innerWidth - WIDGET_WIDTH - 20 : 0,
+        top: 20,
+        bottom: typeof window !== 'undefined' ? window.innerHeight - WIDGET_HEIGHT - 20 : 0,
       }}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      initial={false}
+      initial={false} // Use animate for positioning
       animate={{
         x: position.x,
         y: position.y,
       }}
-      className="fixed z-50"
+      className="fixed z-[100] top-[10px]"
       style={{
         touchAction: 'none', // Prevent scrolling while dragging on mobile
       }}
