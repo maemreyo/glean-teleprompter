@@ -70,7 +70,7 @@ export function Runner() {
              </div>
 
              {/* Content (Refactored to use TeleprompterText) */}
-             <div ref={textContainerRef} className="relative z-10 h-full overflow-y-auto scrollbar-hide">
+             <div ref={textContainerRef} className="relative z-10 h-full overflow-y-auto no-scrollbar mask-gradient-y">
                 <div className="min-h-screen flex flex-col items-center">
                   <div className="h-[45vh]" />
                   <div className="max-w-4xl w-full p-6">
@@ -85,7 +85,7 @@ export function Runner() {
                         style={{ textShadow: '0 4px 20px rgba(0,0,0,0.8)' }}
                       />
                   </div>
-                  <div className="h-[55vh]" />
+                  <div className="h-screen" />
                 </div>
              </div>
 

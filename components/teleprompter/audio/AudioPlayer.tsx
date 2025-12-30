@@ -49,6 +49,11 @@ const NativeAudioStrategy: React.FC<AudioPlayerProps> = ({ url, playing, volume,
 const Player = ReactPlayer as any;
 
 const YouTubeStrategy: React.FC<AudioPlayerProps> = ({ url, playing, volume, loop }) => {
+    // Debug YouTube Payer
+    useEffect(() => {
+        console.log("[AudioPlayer] YouTube Strategy Prop Update:", { url, playing, volume, loop });
+    }, [url, playing, volume, loop]);
+
     // Note: YouTube iframe API has restrictions on autoplay and background play on mobile.
     // We use ReactPlayer to handle most complexity.
     return (
@@ -58,6 +63,10 @@ const YouTubeStrategy: React.FC<AudioPlayerProps> = ({ url, playing, volume, loo
                 playing={playing} 
                 loop={loop} 
                 volume={volume}
+                onReady={() => console.log("[AudioPlayer] Player Ready")}
+                onStart={() => console.log("[AudioPlayer] Player Started")}
+                onPlay={() => console.log("[AudioPlayer] Player Playing")}
+                onError={(e: any) => console.error("[AudioPlayer] Player Error", e)}
                 controls={false}
                 width="0" 
                 height="0"
