@@ -1,50 +1,46 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report - Constitution Update
+Version change: none → 1.0.0
+Modified principles: none (all principles added)
+Added sections: Technology Stack Requirements, Development Workflow
+Removed sections: none
+Templates requiring updates:
+- plan-template.md: Constitution Check section needs gates based on principles
+- spec-template.md: Ensure specifications align with UX, performance, security principles
+- tasks-template.md: Task categorization should reflect principle-driven requirements (UX testing, performance optimization, security reviews)
+- README.md: Already aligns with technology stack requirements
+Follow-up TODOs: none
+-->
+
+# Glean Teleprompter Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. User Experience First
+The teleprompter interface must prioritize user experience with intuitive controls, real-time text display, smooth scrolling, and responsive design. All features must be accessible and usable on both desktop and mobile devices.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Performance & Reliability
+The application must maintain smooth text scrolling at variable speeds, low-latency audio synchronization, and responsive UI interactions. Reliability includes proper error handling and data persistence.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Security & Privacy
+User authentication must be secure using Supabase Auth. All user data must be handled securely, with proper encryption and privacy compliance. No user data should be logged or stored unnecessarily.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Code Quality & Testing
+All code must be written in TypeScript with strict mode enabled. Components must be well-tested with unit and integration tests. Code must follow clean architecture principles with clear separation of concerns.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Technology Standards
+The application must use Next.js as the framework, Supabase for authentication and data, Tailwind CSS for styling, and shadcn/ui for UI components. All dependencies must be kept up-to-date and compatible.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Technology Stack Requirements
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+The project must use Next.js 14+ with App Router, Supabase for backend services, Tailwind CSS for styling, shadcn/ui for components, and TypeScript for type safety. Deployment must be to Vercel for optimal performance.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Development follows Git flow with feature branches, pull request reviews, and automated testing. Code must pass linting, type checking, and tests before merge. Deployment is automated via Vercel.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+The constitution supersedes all other project guidelines. Amendments require documentation and approval. Constitution versioning follows semantic versioning. All pull requests must verify compliance with constitutional principles.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-12-30 | **Last Amended**: 2025-12-30
