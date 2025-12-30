@@ -23,26 +23,26 @@ This task breakdown organizes implementation by user story priority to enable in
 ## Phase 1: Setup & Infrastructure
 
 ### Database & Storage Setup
-- [ ] T001 Create recordings table in Supabase SQL editor with constraints and indexes
-- [ ] T002 Create user_recording_settings table in Supabase SQL editor
-- [ ] T003 Set up user_recordings storage bucket in Supabase dashboard
-- [ ] T004 Configure storage policies for user-scoped file access in Supabase
-- [ ] T005 Create Row Level Security policies for recordings table
+- [x] T001 Create recordings table in Supabase SQL editor with constraints and indexes
+- [x] T002 Create user_recording_settings table in Supabase SQL editor
+- [x] T003 Set up user_recordings storage bucket in Supabase dashboard
+- [x] T004 Configure storage policies for user-scoped file access in Supabase
+- [x] T005 Create Row Level Security policies for recordings table
 
 ### TypeScript Types & Interfaces
-- [ ] T006 Create shared TypeScript interfaces for recording entities in types/recording.ts
-- [ ] T007 Define API response types and error structures in types/api.ts
+- [x] T006 Create shared TypeScript interfaces for recording entities in types/recording.ts
+- [x] T007 Define API response types and error structures in types/api.ts
 
 ## Phase 2: Foundational Components
 
 ### Core Utilities
-- [ ] T008 [P] Create utility functions for video format detection in lib/utils/video.ts
-- [ ] T009 [P] Implement storage quota calculation helpers in lib/utils/quota.ts
-- [ ] T010 [P] Create error handling utilities for media operations in lib/utils/media-errors.ts
+- [x] T008 [P] Create utility functions for video format detection in lib/utils/video.ts
+- [x] T009 [P] Implement storage quota calculation helpers in lib/utils/quota.ts
+- [x] T010 [P] Create error handling utilities for media operations in lib/utils/media-errors.ts
 
 ### Base UI Components
-- [ ] T011 [P] Create base camera widget component structure in components/teleprompter/camera/BaseCamera.tsx
-- [ ] T012 [P] Implement camera permission request dialog in components/teleprompter/camera/PermissionDialog.tsx
+- [x] T011 [P] Create base camera widget component structure in components/teleprompter/camera/BaseCamera.tsx
+- [x] T012 [P] Implement camera permission request dialog in components/teleprompter/camera/PermissionDialog.tsx
 
 ## Phase 3: User Story 1 - Camera Mirror (Priority: P1)
 
@@ -50,10 +50,10 @@ This task breakdown organizes implementation by user story priority to enable in
 **Independent Test**: Can enable camera and verify mirrored video feed without recording functionality
 
 ### Core Functionality
-- [ ] T013 [US1] Implement camera permission handling with user-friendly error messages in hooks/useCamera.ts
-- [ ] T014 [US1] Create video stream initialization with mirroring support in hooks/useCamera.ts
-- [ ] T015 [US1] Build basic camera widget component with video display in components/teleprompter/camera/CameraWidget.tsx
-- [ ] T016 [US1] Add mirror transformation to video element in components/teleprompter/camera/CameraWidget.tsx
+- [x] T013 [US1] Implement camera permission handling with user-friendly error messages in hooks/useCamera.ts
+- [x] T014 [US1] Create video stream initialization with mirroring support in hooks/useCamera.ts
+- [x] T015 [US1] Build basic camera widget component with video display in components/teleprompter/camera/CameraWidget.tsx
+- [x] T016 [US1] Add mirror transformation to video element in components/teleprompter/camera/CameraWidget.tsx
 
 ### Integration & Controls
 - [ ] T017 [US1] Integrate camera widget toggle in teleprompter page in app/protected/teleprompter/page.tsx
@@ -69,13 +69,13 @@ This task breakdown organizes implementation by user story priority to enable in
 **Independent Test**: Can drag camera widget to different positions while maintaining video feed
 
 ### Drag Functionality
-- [ ] T021 [US2] Implement drag controls using framer-motion in components/teleprompter/camera/DraggableCamera.tsx
-- [ ] T022 [US2] Add position persistence across page reloads in components/teleprompter/camera/DraggableCamera.tsx
-- [ ] T023 [US2] Implement boundary constraints to keep widget on screen in components/teleprompter/camera/DraggableCamera.tsx
+- [x] T021 [US2] Implement drag controls using framer-motion in components/teleprompter/camera/DraggableCamera.tsx
+- [x] T022 [US2] Add position persistence across page reloads in components/teleprompter/camera/DraggableCamera.tsx
+- [x] T023 [US2] Implement boundary constraints to keep widget on screen in components/teleprompter/camera/DraggableCamera.tsx
 
 ### UX Enhancements
-- [ ] T024 [US2] Add visual feedback during dragging (shadow changes) in components/teleprompter/camera/DraggableCamera.tsx
-- [ ] T025 [US2] Implement touch gesture support for mobile devices in components/teleprompter/camera/DraggableCamera.tsx
+- [x] T024 [US2] Add visual feedback during dragging (shadow changes) in components/teleprompter/camera/DraggableCamera.tsx
+- [x] T025 [US2] Implement touch gesture support for mobile devices in components/teleprompter/camera/DraggableCamera.tsx
 
 ### Testing
 - [ ] T026 [US2] Add drag interaction tests in components/teleprompter/camera/__tests__/DraggableCamera.test.tsx
@@ -86,19 +86,19 @@ This task breakdown organizes implementation by user story priority to enable in
 **Independent Test**: Can start/stop recording and verify video file contains camera feed and audio
 
 ### Recording Logic
-- [ ] T027 [US3] Implement MediaRecorder integration with cross-browser fallbacks in hooks/useCameraRecorder.ts
-- [ ] T028 [US3] Add recording state management (start/stop/pause) in hooks/useCameraRecorder.ts
-- [ ] T029 [US3] Implement audio echo cancellation and noise suppression in hooks/useCameraRecorder.ts
-- [ ] T030 [US3] Add recording duration limits and memory management in hooks/useCameraRecorder.ts
+- [x] T027 [US3] Implement MediaRecorder integration with cross-browser fallbacks in hooks/useCameraRecorder.ts
+- [x] T028 [US3] Add recording state management (start/stop/pause) in hooks/useCameraRecorder.ts
+- [x] T029 [US3] Implement audio echo cancellation and noise suppression in hooks/useCameraRecorder.ts
+- [x] T030 [US3] Add recording duration limits and memory management in hooks/useCameraRecorder.ts
 
 ### UI Controls
-- [ ] T031 [US3] Add recording start/stop button to camera widget in components/teleprompter/camera/RecordingControls.tsx
-- [ ] T032 [US3] Implement recording status indicator (red border, blinking REC) in components/teleprompter/camera/RecordingIndicator.tsx
-- [ ] T033 [US3] Create recording preview modal with save/discard options in components/teleprompter/camera/RecordingModal.tsx
+- [x] T031 [US3] Add recording start/stop button to camera widget in components/teleprompter/camera/RecordingControls.tsx
+- [x] T032 [US3] Implement recording status indicator (red border, blinking REC) in components/teleprompter/camera/RecordingIndicator.tsx
+- [x] T033 [US3] Create recording preview modal with save/discard options in components/teleprompter/camera/RecordingModal.tsx
 
 ### Error Handling
-- [ ] T034 [US3] Add automatic retry logic for recording failures in hooks/useCameraRecorder.ts
-- [ ] T035 [US3] Implement partial recording save on errors in components/teleprompter/camera/RecordingModal.tsx
+- [x] T034 [US3] Add automatic retry logic for recording failures in hooks/useCameraRecorder.ts
+- [x] T035 [US3] Implement partial recording save on errors in components/teleprompter/camera/RecordingModal.tsx
 
 ### Testing
 - [ ] T036 [US3] Add recording lifecycle tests in hooks/__tests__/useCameraRecorder.test.ts
