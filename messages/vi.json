@@ -1,0 +1,49 @@
+{
+  "Editor": {
+    "title": "Creator Studio",
+    "login": "Đăng nhập",
+    "contentLabel": "NỘI DUNG",
+    "contentPlaceholder": "Nhập nội dung...",
+    "useUrl": "Dùng Link Online",
+    "uploadPro": "Upload (Pro)",
+    "bgUrlPlaceholder": "Link ảnh (VD: unplash...)",
+    "musicUrlPlaceholder": "Link nhạc mp3...",
+    "uploadImage": "Ảnh nền",
+    "uploadMusic": "Nhạc (Pro)",
+    "preview": "Preview",
+    "save": "Lưu Cloud",
+    "share": "Share Link",
+    "logout": "Đăng xuất"
+  },
+  "Runner": {
+    "create": "Tạo bản mới",
+    "speed": "Tốc độ",
+    "fontSize": "Cỡ chữ"
+  },
+  "Fonts": {
+    "Classic": "Cổ điển",
+    "Modern": "Hiện đại",
+    "Typewriter": "Máy chữ",
+    "Novel": "Tiểu thuyết",
+    "Neon": "Bay bổng"
+  },
+  "Toast": {
+    "loginRequired": "Vui lòng đăng nhập để upload!",
+    "proFeature": "Tính năng PRO!",
+    "upgradePrompt": "Nâng cấp gói Pro để upload nhạc riêng.",
+    "uploading": "Đang upload...",
+    "uploadSuccess": "Upload thành công!",
+    "uploadFailed": "Upload thất bại",
+    "saving": "Đang lưu...",
+    "saveSuccess": "Đã lưu vào đám mây!",
+    "saveFailed": "Lỗi khi lưu!",
+    "loggingOut": "Đang đăng xuất...",
+    "loggedOut": "Đã đăng xuất",
+    "copied": "Đã copy Link chia sẻ!",
+    "sharePrompt": "Gửi cho bạn bè ngay nào."
+  },
+  "Common": {
+    "loading": "Đang tải...",
+    "defaultText": "Chào mừng! Hãy nhập nội dung của bạn vào đây..."
+  }
+}

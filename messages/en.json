@@ -1,0 +1,49 @@
+{
+  "Editor": {
+    "title": "Creator Studio",
+    "login": "Login",
+    "contentLabel": "CONTENT",
+    "contentPlaceholder": "Enter your script here...",
+    "useUrl": "Use Online Link",
+    "uploadPro": "Upload (Pro)",
+    "bgUrlPlaceholder": "Image URL (e.g. Unsplash...)",
+    "musicUrlPlaceholder": "MP3 URL...",
+    "uploadImage": "Background",
+    "uploadMusic": "Music (Pro)",
+    "preview": "Preview",
+    "save": "Save Cloud",
+    "share": "Share Link",
+    "logout": "Logout"
+  },
+  "Runner": {
+    "create": "Create New",
+    "speed": "Speed",
+    "fontSize": "Size"
+  },
+  "Fonts": {
+    "Classic": "Classic",
+    "Modern": "Modern",
+    "Typewriter": "Typewriter",
+    "Novel": "Novel",
+    "Neon": "Neon"
+  },
+  "Toast": {
+    "loginRequired": "Please login to upload!",
+    "proFeature": "PRO Feature!",
+    "upgradePrompt": "Upgrade to Pro to upload custom music.",
+    "uploading": "Uploading...",
+    "uploadSuccess": "Upload successful!",
+    "uploadFailed": "Upload failed",
+    "saving": "Saving...",
+    "saveSuccess": "Saved to cloud!",
+    "saveFailed": "Error saving!",
+    "loggingOut": "Logging out...",
+    "loggedOut": "Logged out",
+    "copied": "Link copied!",
+    "sharePrompt": "Send it to your friends."
+  },
+  "Common": {
+    "loading": "Loading...",
+    "defaultText": "Welcome! Enter your text here..."
+  }
+}
