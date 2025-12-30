@@ -1,0 +1,817 @@
+openapi: 3.0.3
+info:
+  title: Teleprompter UI Configuration API
+  description: API for managing teleprompter configuration presets
+  version: 1.0.0
+  contact:
+    name: Glean Teleprompter Team
+
+servers:
+  - url: /api/presets
+    description: Preset management endpoints
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Preset:
+      type: object
+      required:
+        - id
+        - userId
+        - name
+        - config
+        - syncStatus
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique preset identifier
+        userId:
+          type: string
+          format: uuid
+          description: Owner user ID
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Preset name
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Optional description
+        config:
+          $ref: '#/components/schemas/ConfigSnapshot'
+        thumbnailUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: Preset thumbnail URL
+        collectionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent collection ID
+        tags:
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            minLength: 1
+            maxLength: 50
+          description: User-defined tags
+        isShared:
+          type: boolean
+          description: Whether preset is shared
+        syncStatus:
+          type: string
+          enum: [synced, pending, error]
+          description: Cloud sync status
+        lastSyncedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last sync timestamp
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    ConfigSnapshot:
+      type: object
+      required:
+        - version
+        - typography
+        - colors
+        - effects
+        - layout
+        - animations
+      properties:
+        version:
+          type: string
+          description: Schema version
+        typography:
+          $ref: '#/components/schemas/TypographyConfig'
+        colors:
+          $ref: '#/components/schemas/ColorConfig'
+        effects:
+          $ref: '#/components/schemas/EffectConfig'
+        layout:
+          $ref: '#/components/schemas/LayoutConfig'
+        animations:
+          $ref: '#/components/schemas/AnimationConfig'
+
+    TypographyConfig:
+      type: object
+      properties:
+        fontFamily:
+          type: string
+        fontWeight:
+          type: integer
+          minimum: 100
+          maximum: 900
+        fontSize:
+          type: number
+          minimum: 12
+          maximum: 120
+        letterSpacing:
+          type: number
+          minimum: -5
+          maximum: 20
+        lineHeight:
+          type: number
+          minimum: 1.0
+          maximum: 3.0
+        textTransform:
+          type: string
+          enum: [uppercase, lowercase, capitalize, none]
+
+    ColorConfig:
+      type: object
+      properties:
+        primaryColor:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$'
+        gradientEnabled:
+          type: boolean
+        gradientType:
+          type: string
+          enum: [linear, radial]
+        gradientColors:
+          type: array
+          minItems: 2
+          maxItems: 3
+          items:
+            type: string
+            pattern: '^#[0-9A-Fa-f]{6}$'
+        gradientAngle:
+          type: number
+          minimum: 0
+          maximum: 360
+        outlineColor:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+        glowColor:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+
+    EffectConfig:
+      type: object
+      properties:
+        shadowEnabled:
+          type: boolean
+        shadowOffsetX:
+          type: number
+          minimum: 0
+          maximum: 20
+        shadowOffsetY:
+          type: number
+          minimum: 0
+          maximum: 20
+        shadowBlur:
+          type: number
+          minimum: 0
+          maximum: 30
+        shadowColor:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+        shadowOpacity:
+          type: number
+          minimum: 0
+          maximum: 1
+        outlineEnabled:
+          type: boolean
+        outlineWidth:
+          type: number
+          minimum: 1
+          maximum: 10
+        outlineColor:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+        glowEnabled:
+          type: boolean
+        glowBlurRadius:
+          type: number
+          minimum: 5
+          maximum: 50
+        glowIntensity:
+          type: number
+          minimum: 0
+          maximum: 1
+        glowColor:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+
+    LayoutConfig:
+      type: object
+      properties:
+        horizontalMargin:
+          type: number
+          minimum: 0
+          maximum: 200
+        verticalPadding:
+          type: number
+          minimum: 0
+          maximum: 100
+        textAlign:
+          type: string
+          enum: [left, center, right, justify]
+        columnCount:
+          type: integer
+          minimum: 1
+          maximum: 4
+        columnGap:
+          type: number
+          minimum: 20
+          maximum: 100
+        textAreaWidth:
+          type: number
+          minimum: 50
+          maximum: 100
+        textAreaPosition:
+          type: string
+          enum: [left, center, right]
+
+    AnimationConfig:
+      type: object
+      properties:
+        smoothScrollEnabled:
+          type: boolean
+        scrollDamping:
+          type: number
+          minimum: 0.1
+          maximum: 1.0
+        entranceAnimation:
+          type: string
+          enum: [fade-in, slide-up, scale-in, none]
+        entranceDuration:
+          type: integer
+          minimum: 200
+          maximum: 2000
+        wordHighlightEnabled:
+          type: boolean
+        highlightColor:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+        highlightSpeed:
+          type: integer
+          minimum: 100
+          maximum: 500
+        autoScrollEnabled:
+          type: boolean
+        autoScrollSpeed:
+          type: number
+          minimum: 10
+          maximum: 100
+        autoScrollAcceleration:
+          type: number
+          minimum: 0
+          maximum: 10
+
+    PresetCollection:
+      type: object
+      required:
+        - id
+        - userId
+        - name
+        - isSystem
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        description:
+          type: string
+          maxLength: 200
+          nullable: true
+        icon:
+          type: string
+          nullable: true
+        color:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          nullable: true
+        isSystem:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: object
+          additionalProperties: true
+          description: Additional error details
+
+paths:
+  /:
+    get:
+      summary: List all presets
+      description: Retrieve all presets for the authenticated user
+      tags:
+        - Presets
+      parameters:
+        - name: collection_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by collection ID
+        - name: tag
+          in: query
+          schema:
+            type: string
+          description: Filter by tag
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+          description: Maximum number of results
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Number of results to skip
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  presets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Preset'
+                  total:
+                    type: integer
+                    description: Total number of presets
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create a new preset
+      description: Create a new preset for the authenticated user
+      tags:
+        - Presets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - config
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                description:
+                  type: string
+                  maxLength: 500
+                config:
+                  $ref: '#/components/schemas/ConfigSnapshot'
+                collectionId:
+                  type: string
+                  format: uuid
+                tags:
+                  type: array
+                  maxItems: 10
+                  items:
+                    type: string
+                isShared:
+                  type: boolean
+                  default: false
+      responses:
+        '201':
+          description: Preset created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preset'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /{id}:
+    get:
+      summary: Get a preset by ID
+      description: Retrieve a specific preset
+      tags:
+        - Presets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preset'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Preset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update a preset
+      description: Update an existing preset
+      tags:
+        - Presets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                description:
+                  type: string
+                  maxLength: 500
+                config:
+                  $ref: '#/components/schemas/ConfigSnapshot'
+                collectionId:
+                  type: string
+                  format: uuid
+                tags:
+                  type: array
+                  maxItems: 10
+                  items:
+                    type: string
+                isShared:
+                  type: boolean
+      responses:
+        '200':
+          description: Preset updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preset'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Preset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete a preset
+      description: Delete an existing preset
+      tags:
+        - Presets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Preset deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Preset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /sync:
+    post:
+      summary: Sync presets to cloud
+      description: Manually trigger sync of all presets to cloud storage
+      tags:
+        - Sync
+      responses:
+        '200':
+          description: Sync completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  synced:
+                    type: integer
+                    description: Number of presets synced
+                  failed:
+                    type: integer
+                    description: Number of presets that failed to sync
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        presetId:
+                          type: string
+                        error:
+                          type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: Download presets from cloud
+      description: Manually trigger download of all presets from cloud storage
+      tags:
+        - Sync
+      responses:
+        '200':
+          description: Download completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  downloaded:
+                    type: integer
+                    description: Number of presets downloaded
+                  presets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Preset'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /collections:
+    get:
+      summary: List all collections
+      description: Retrieve all preset collections for the authenticated user
+      tags:
+        - Collections
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collections:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PresetCollection'
+                  total:
+                    type: integer
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create a new collection
+      description: Create a new preset collection
+      tags:
+        - Collections
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                description:
+                  type: string
+                  maxLength: 200
+                icon:
+                  type: string
+                color:
+                  type: string
+                  pattern: '^#[0-9A-Fa-f]{6}$'
+      responses:
+        '201':
+          description: Collection created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresetCollection'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /collections/{id}:
+    delete:
+      summary: Delete a collection
+      description: Delete an existing collection (presets are not deleted)
+      tags:
+        - Collections
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Collection deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Collection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /export/{id}:
+    get:
+      summary: Export a preset as JSON
+      description: Export a preset configuration as a downloadable JSON file
+      tags:
+        - Presets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Preset exported successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preset'
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: attachment; filename="preset-name.json"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Preset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /import:
+    post:
+      summary: Import a preset from JSON
+      description: Import a preset configuration from a JSON file
+      tags:
+        - Presets
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: JSON preset file
+      responses:
+        '201':
+          description: Preset imported successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preset'
+        '400':
+          description: Bad request (invalid JSON)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+tags:
+  - name: Presets
+    description: Preset management operations
+  - name: Collections
+    description: Collection management operations
+  - name: Sync
+    description: Cloud synchronization operations
