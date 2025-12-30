@@ -56,12 +56,12 @@ This task breakdown organizes implementation by user story priority to enable in
 - [x] T016 [US1] Add mirror transformation to video element in components/teleprompter/camera/CameraWidget.tsx
 
 ### Integration & Controls
-- [ ] T017 [US1] Integrate camera widget toggle in teleprompter page in app/protected/teleprompter/page.tsx
-- [ ] T018 [US1] Add camera enable/disable button to teleprompter controls in components/teleprompter/Runner.tsx
+- [x] T017 [US1] Integrate camera widget toggle in teleprompter page in components/teleprompter/Runner.tsx
+- [x] T018 [US1] Add camera enable/disable button to teleprompter controls in components/teleprompter/Runner.tsx
 
 ### Testing & Polish
 - [ ] T019 [US1] Add unit tests for camera permission handling in hooks/__tests__/useCamera.test.ts
-- [ ] T020 [US1] Test video mirroring across different browsers in components/teleprompter/camera/CameraWidget.test.tsx
+- [ ] T020 [US1] Test video mirroring across different browsers in components/teleprompter/camera/__tests__/CameraWidget.test.tsx
 
 ## Phase 4: User Story 2 - Draggable Widget (Priority: P2)
 
@@ -110,28 +110,28 @@ This task breakdown organizes implementation by user story priority to enable in
 **Independent Test**: Can upload recordings and view them in personal library
 
 ### Storage Integration
-- [ ] T038 [US4] Implement file upload to Supabase Storage in lib/supabase/storage.ts
-- [ ] T039 [US4] Create recording metadata persistence in lib/supabase/recordings.ts
-- [ ] T040 [US4] Add quota checking before uploads in lib/supabase/recordings.ts
+- [x] T038 [US4] Implement file upload to Supabase Storage in lib/supabase/storage.ts
+- [x] T039 [US4] Create recording metadata persistence in lib/supabase/recordings.ts
+- [x] T040 [US4] Add quota checking before uploads in lib/supabase/recordings.ts
 
 ### API Endpoints
-- [ ] T041 [US4] Create recording list API endpoint in app/api/recordings/route.ts
-- [ ] T042 [US4] Implement recording detail API in app/api/recordings/[id]/route.ts
-- [ ] T043 [US4] Add storage quota API endpoint in app/api/recordings/quota/route.ts
-- [ ] T044 [US4] Create upload endpoint with validation in app/api/recordings/upload/route.ts
+- [x] T041 [US4] Create recording list API endpoint in app/api/recordings/route.ts
+- [x] T042 [US4] Implement recording detail API in app/api/recordings/[id]/route.ts
+- [x] T043 [US4] Add storage quota API endpoint in app/api/recordings/quota/route.ts
+- [x] T044 [US4] Create upload endpoint with validation in app/api/recordings/upload/route.ts
 
 ### Format Conversion
-- [ ] T045 [US4] Implement server-side WebM to MP4 conversion in app/api/recordings/convert/route.ts
-- [ ] T046 [US4] Add conversion job status tracking in lib/supabase/recordings.ts
+- [x] T045 [US4] Implement server-side WebM to MP4 conversion in app/api/recordings/convert/route.ts
+- [x] T046 [US4] Add conversion job status tracking in lib/supabase/recordings.ts
 
 ### Library UI
-- [ ] T047 [US4] Create recordings library component in components/teleprompter/RecordingsLibrary.tsx
-- [ ] T048 [US4] Add recording playback functionality in components/teleprompter/RecordingPlayer.tsx
-- [ ] T049 [US4] Implement download functionality in components/teleprompter/RecordingDownload.tsx
+- [x] T047 [US4] Create recordings library component in components/teleprompter/RecordingsLibrary.tsx
+- [x] T048 [US4] Add recording playback functionality in components/teleprompter/RecordingPlayer.tsx
+- [x] T049 [US4] Implement download functionality in components/teleprompter/RecordingDownload.tsx
 
 ### Quota Management
-- [ ] T050 [US4] Add storage quota warnings in components/teleprompter/StorageQuota.tsx
-- [ ] T051 [US4] Implement reduced quality recording when quota exceeded in hooks/useCameraRecorder.ts
+- [x] T050 [US4] Add storage quota warnings in components/teleprompter/StorageQuota.tsx
+- [x] T051 [US4] Implement reduced quality recording when quota exceeded in hooks/useCameraRecorder.ts
 
 ### Testing
 - [ ] T052 [US4] Add storage integration tests in lib/supabase/__tests__/storage.test.ts

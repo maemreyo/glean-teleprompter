@@ -9,6 +9,7 @@ import type { RecordingQuality } from '@/types/recording';
 import { RECORDING_LIMITS } from '@/types/recording';
 import { MediaError, MediaErrorCode, createMediaError } from '@/lib/utils/media-errors';
 import { getSupportedMimeType } from '@/lib/utils/video';
+import { getStorageQuota } from '@/lib/supabase/recordings';
 
 export interface UseCameraRecorderOptions {
   /** Recording quality preset */
@@ -38,7 +39,7 @@ export interface RecordingState {
 
 export interface UseCameraRecorderReturn extends RecordingState {
   /** Start recording */
-  startRecording: (stream: MediaStream) => boolean;
+  startRecording: (stream: MediaStream) => Promise<boolean>;
   /** Stop recording */
   stopRecording: () => void;
   /** Pause recording */
@@ -51,6 +52,8 @@ export interface UseCameraRecorderReturn extends RecordingState {
   mimeType: string;
   /** Check if recording is currently paused */
   isPaused: boolean;
+  /** Current effective quality (may be adjusted for quota) */
+  effectiveQuality: RecordingQuality;
 }
 
 export function useCameraRecorder(options: UseCameraRecorderOptions = {}): UseCameraRecorderReturn {
@@ -76,9 +79,25 @@ export function useCameraRecorder(options: UseCameraRecorderOptions = {}): UseCa
   const durationIntervalRef = useRef<number | null>(null);
   const retryCountRef = useRef(0);
   const MAX_RETRIES = 2;
+  const [effectiveQuality, setEffectiveQuality] = useState<RecordingQuality>(quality);
 
   // Get supported MIME type
   const mimeType = getSupportedMimeType();
+
+  // Check quota and adjust quality if needed
+  const adjustQualityForQuota = useCallback(async (): Promise<RecordingQuality> => {
+    try {
+      const quota = await getStorageQuota();
+      // If usage is above 80%, switch to reduced quality
+      if (quota.usage_percentage >= 80) {
+        return 'reduced';
+      }
+      return quality;
+    } catch {
+      // If quota check fails, use the configured quality
+      return quality;
+    }
+  }, [quality]);
 
   // Update recording state
   const updateState = useCallback((updates: Partial<RecordingState>) => {
@@ -114,7 +133,7 @@ export function useCameraRecorder(options: UseCameraRecorderOptions = {}): UseCa
   }, []);
 
   // Start recording
-  const startRecording = useCallback((stream: MediaStream): boolean => {
+  const startRecording = useCallback(async (stream: MediaStream): Promise<boolean> => {
     // Clear previous state
     chunksRef.current = [];
     retryCountRef.current = 0;
@@ -136,11 +155,20 @@ export function useCameraRecorder(options: UseCameraRecorderOptions = {}): UseCa
       return false;
     }
 
+    // Adjust quality based on quota
+    const adjustedQuality = await adjustQualityForQuota();
+    setEffectiveQuality(adjustedQuality);
+
+    // Notify user if quality was reduced
+    if (adjustedQuality === 'reduced' && quality === 'standard') {
+      console.warn('Recording quality reduced due to storage limits');
+    }
+
     try {
       // Create MediaRecorder with options
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType,
-        videoBitsPerSecond: quality === 'standard' ? 2500000 : 1200000,
+        videoBitsPerSecond: adjustedQuality === 'standard' ? 2500000 : 1200000,
       });
 
       mediaRecorderRef.current = mediaRecorder;
@@ -287,5 +315,6 @@ export function useCameraRecorder(options: UseCameraRecorderOptions = {}): UseCa
     clearRecording,
     mimeType,
     isPaused: state.status === 'paused',
+    effectiveQuality,
   };
 }

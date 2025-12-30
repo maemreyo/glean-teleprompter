@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Edit3, Pause, Play, Music } from 'lucide-react';
+import { ArrowLeft, Edit3, Pause, Play, Music, Camera, CameraOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,8 @@ import { useTranslations } from 'next-intl';
 // Modular Components
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
 import { UniversalAudioPlayer } from '@/components/teleprompter/audio/AudioPlayer';
+import { DraggableCamera } from '@/components/teleprompter/camera/DraggableCamera';
+import { useCamera } from '@/hooks/useCamera';
 
 export function Runner() {
     const t = useTranslations('Runner');
@@ -20,6 +22,14 @@ export function Runner() {
     
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+    const [cameraVisible, setCameraVisible] = useState(false);
+    
+    const { requestPermissions, stopCamera } = useCamera({
+        quality: 'standard',
+        includeAudio: true,
+        onPermissionGranted: () => setCameraVisible(true),
+        onPermissionDenied: () => setCameraVisible(false),
+    });
     
     // Auto-start music if URL exists? Or wait for user? 
     // Usually teleprompter should auto start everything on play?
@@ -58,6 +68,28 @@ export function Runner() {
 
              {/* Top Control */}
              <div className="absolute top-6 left-6 z-50 flex gap-2">
+                {/* Camera Toggle Button */}
+                <button
+                  onClick={() => {
+                      if (cameraVisible) {
+                          stopCamera();
+                          setCameraVisible(false);
+                      } else {
+                          requestPermissions().then((granted) => {
+                              if (granted) setCameraVisible(true);
+                          });
+                      }
+                  }}
+                  className={cn(
+                      "p-2 rounded-full transition-all",
+                      cameraVisible
+                          ? "bg-red-500 hover:bg-red-600"
+                          : "bg-black/40 hover:bg-black/60 backdrop-blur"
+                  )}
+                  title={cameraVisible ? "Hide Camera" : "Show Camera"}
+                >
+                  {cameraVisible ? <CameraOff size={20} /> : <Camera size={20} />}
+                </button>
                 {!store.isReadOnly ? (
                   <button onClick={() => store.setMode('setup')} className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur rounded-full text-white/80 transition-all">
                     <ArrowLeft size={20} />
@@ -116,6 +148,13 @@ export function Runner() {
                   )}
                </div>
              </div>
+
+             {/* Camera Widget */}
+             <DraggableCamera
+               isVisible={cameraVisible}
+               onToggle={() => setCameraVisible(!cameraVisible)}
+               quality="standard"
+             />
         </motion.div>
     );
 }

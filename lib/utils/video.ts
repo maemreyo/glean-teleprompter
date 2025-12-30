@@ -186,3 +186,15 @@ export function getDefaultAudioConstraints(): MediaTrackConstraints {
     sampleRate: { ideal: 48000 },
   };
 }
+
+/**
+ * Generate a unique job ID for video conversion
+ * @param recordingId - The recording ID
+ * @param targetFormat - Target format for conversion
+ * @returns Unique job ID
+ */
+export function generateJobId(recordingId: string, targetFormat: RecordingFileFormat): string {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 9);
+  return `conv_${recordingId.substring(0, 8)}_${targetFormat}_${timestamp}_${random}`;
+}
