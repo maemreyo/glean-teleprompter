@@ -1,0 +1,73 @@
+'use client'
+
+import { cn } from '@/lib/utils'
+import { FontSelector } from './FontSelector'
+import { FontSizeControl } from './FontSizeControl'
+import { SliderInput } from '../ui/SliderInput'
+import { useConfigStore } from '@/lib/stores/useConfigStore'
+
+export function TypographyTab() {
+  const { typography, setTypography } = useConfigStore()
+  
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold mb-1">Typography Settings</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Configure font family, size, weight, and spacing for your teleprompter text.
+        </p>
+      </div>
+      
+      {/* Font Family Selector */}
+      <FontSelector />
+      
+      {/* Font Size & Weight */}
+      <FontSizeControl />
+      
+      {/* Letter Spacing */}
+      <SliderInput
+        value={typography.letterSpacing}
+        min={-5}
+        max={20}
+        step={0.5}
+        unit="px"
+        label="Letter Spacing"
+        onChange={(value) => setTypography({ letterSpacing: value })}
+      />
+      
+      {/* Line Height */}
+      <SliderInput
+        value={typography.lineHeight}
+        min={1}
+        max={3}
+        step={0.1}
+        label="Line Height"
+        onChange={(value) => setTypography({ lineHeight: value })}
+      />
+      
+      {/* Text Transform */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Text Transform
+        </label>
+        <div className="flex gap-2">
+          {(['none', 'uppercase', 'lowercase', 'capitalize'] as const).map((transform) => (
+            <button
+              key={transform}
+              onClick={() => setTypography({ textTransform: transform })}
+              className={cn(
+                'flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                'border border-gray-300 dark:border-gray-600',
+                typography.textTransform === transform
+                  ? 'bg-blue-500 text-white border-blue-500'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              )}
+            >
+              {transform.charAt(0).toUpperCase() + transform.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}

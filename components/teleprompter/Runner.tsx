@@ -89,14 +89,8 @@ export function Runner() {
                 <div className="min-h-screen flex flex-col items-center">
                   <div className="h-[45vh]" />
                   <div className="max-w-4xl w-full p-6">
-                      <TeleprompterText 
+                      <TeleprompterText
                         text={store.text}
-                        fontName={store.font}
-                        colorIndex={store.colorIndex}
-                        fontSize={store.fontSize}
-                        lineHeight={store.lineHeight}
-                        margin={store.margin}
-                        align={store.align}
                         style={{ textShadow: '0 4px 20px rgba(0,0,0,0.8)' }}
                       />
                   </div>

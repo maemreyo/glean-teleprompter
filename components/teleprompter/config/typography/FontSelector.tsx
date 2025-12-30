@@ -1,0 +1,172 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Check, ChevronDown, Type, Heading, Code, PenTool, TextCursorInput } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useConfigStore } from '@/lib/stores/useConfigStore'
+import {
+  fontLibrary,
+  categoryDisplayNames,
+  type FontCategory,
+} from '@/lib/fonts/google-fonts'
+
+interface FontSelectorProps {
+  className?: string
+}
+
+// Map categories to their icons
+const categoryIconComponents: Record<FontCategory, React.ComponentType<{ className?: string }>> = {
+  serif: Type,
+  sans: Heading,
+  display: TextCursorInput,
+  mono: Code,
+  handwriting: PenTool,
+}
+
+export function FontSelector({ className }: FontSelectorProps) {
+  const { typography, setTypography } = useConfigStore()
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<FontCategory>('sans')
+  const [searchQuery, setSearchQuery] = useState('')
+  
+  // Find current font category
+  useEffect(() => {
+    for (const [category, fonts] of Object.entries(fontLibrary)) {
+      if (fonts.some(f => f.name === typography.fontFamily)) {
+        setSelectedCategory(category as FontCategory)
+        break
+      }
+    }
+  }, [typography.fontFamily])
+  
+  const currentFonts = fontLibrary[selectedCategory] || []
+  const filteredFonts = searchQuery
+    ? currentFonts.filter(f => 
+        f.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : currentFonts
+  
+  const handleSelectFont = (fontName: string) => {
+    setTypography({ fontFamily: fontName })
+    setIsOpen(false)
+    setSearchQuery('')
+  }
+  
+  return (
+    <div className={cn('relative', className)}>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Font Family
+      </label>
+      
+      {/* Category Selector */}
+      <div className="flex gap-2 mb-3 overflow-x-auto pb-2">
+        {Object.keys(fontLibrary).map((category) => {
+          const Icon = categoryIconComponents[category as FontCategory] || Type
+          
+          return (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category as FontCategory)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors',
+                'border border-gray-200 dark:border-gray-700',
+                selectedCategory === category
+                  ? 'bg-blue-500 text-white border-blue-500'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              )}
+            >
+              <Icon className="w-4 h-4" />
+              <span className="hidden sm:inline">{categoryDisplayNames[category as FontCategory]}</span>
+            </button>
+          )
+        })}
+      </div>
+      
+      {/* Font Dropdown */}
+      <div className="relative">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={cn(
+            'w-full flex items-center justify-between px-4 py-3 text-left',
+            'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600',
+            'rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700',
+            'focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'transition-colors'
+          )}
+        >
+          <span
+            className="truncate"
+            style={{ fontFamily: typography.fontFamily }}
+          >
+            {typography.fontFamily}
+          </span>
+          <ChevronDown
+            className={cn(
+              'w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform',
+              isOpen && 'transform rotate-180'
+            )}
+          />
+        </button>
+        
+        {/* Dropdown Menu */}
+        {isOpen && (
+          <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-hidden flex flex-col">
+            {/* Search */}
+            <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+              <input
+                type="text"
+                placeholder="Search fonts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={cn(
+                  'w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg',
+                  'focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100'
+                )}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+            
+            {/* Font List */}
+            <div className="flex-1 overflow-y-auto p-2">
+              {filteredFonts.length === 0 ? (
+                <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+                  No fonts found
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {filteredFonts.map((font) => (
+                    <button
+                      key={font.name}
+                      onClick={() => handleSelectFont(font.name)}
+                      className={cn(
+                        'w-full flex items-center justify-between px-3 py-2 rounded-lg',
+                        'text-left hover:bg-gray-100 dark:hover:bg-gray-700',
+                        'transition-colors group'
+                      )}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div
+                          className="truncate text-sm"
+                          style={{ fontFamily: font.name }}
+                        >
+                          {font.name}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {font.previewText}
+                        </div>
+                      </div>
+                      {typography.fontFamily === font.name && (
+                        <Check className="w-5 h-5 text-blue-500 flex-shrink-0 ml-2" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
