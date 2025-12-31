@@ -190,7 +190,8 @@
       "effects": "Effects",
       "layout": "Layout",
       "animations": "Animations",
-      "presets": "Presets"
+      "presets": "Presets",
+      "media": "Media"
     },
     "selectTab": "Select a tab to configure settings",
     "typography": {

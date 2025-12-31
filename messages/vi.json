@@ -137,7 +137,8 @@
       "effects": "Hiệu ứng",
       "layout": "Bố cục",
       "animations": "Hoạt ảnh",
-      "presets": "Mẫu"
+      "presets": "Mẫu",
+      "media": "Phương tiện"
     },
     "selectTab": "Chọn một tab để cài đặt",
     "typography": {

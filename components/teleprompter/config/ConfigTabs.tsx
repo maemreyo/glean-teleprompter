@@ -8,6 +8,7 @@ import {
   LayoutGrid,
   Wand2,
   FolderOpen,
+  Film,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
@@ -18,8 +19,9 @@ import { EffectsTab } from './effects/EffectsTab'
 import { LayoutTab } from './layout/LayoutTab'
 import { AnimationsTab } from './animations/AnimationsTab'
 import { PresetsTab } from './presets/PresetsTab'
+import { MediaTab } from './media/MediaTab'
 
-type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations' | 'presets'
+type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations' | 'presets' | 'media'
 
 interface TabConfig {
   id: TabId
@@ -64,6 +66,12 @@ const getTabConfig = (t: (key: string) => string): TabConfig[] => [
     labelKey: 'tabs.presets',
     icon: FolderOpen,
     component: PresetsTab,
+  },
+  {
+    id: 'media',
+    labelKey: 'tabs.media',
+    icon: Film,
+    component: MediaTab,
   },
 ]
 
