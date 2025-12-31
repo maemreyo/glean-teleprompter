@@ -153,26 +153,35 @@ export const useConfigStore = create<ConfigState>()(
       // Actions
       setTypography: (config) => set((state) => {
         const newTypography = { ...state.typography, ...config }
+        console.log('[useConfigStore] setTypography called:', { config, newTypography })
         return {
           typography: newTypography,
         }
       }),
       
-      setColors: (config) => set((state) => ({
-        colors: { ...state.colors, ...config }
-      })),
+      setColors: (config) => set((state) => {
+        const newColors = { ...state.colors, ...config }
+        console.log('[useConfigStore] setColors called:', { config, newColors })
+        return { colors: newColors }
+      }),
       
-      setEffects: (config) => set((state) => ({
-        effects: { ...state.effects, ...config }
-      })),
+      setEffects: (config) => set((state) => {
+        const newEffects = { ...state.effects, ...config }
+        console.log('[useConfigStore] setEffects called:', { config, newEffects })
+        return { effects: newEffects }
+      }),
       
-      setLayout: (config) => set((state) => ({
-        layout: { ...state.layout, ...config }
-      })),
+      setLayout: (config) => set((state) => {
+        const newLayout = { ...state.layout, ...config }
+        console.log('[useConfigStore] setLayout called:', { config, newLayout })
+        return { layout: newLayout }
+      }),
       
-      setAnimations: (config) => set((state) => ({
-        animations: { ...state.animations, ...config }
-      })),
+      setAnimations: (config) => set((state) => {
+        const newAnimations = { ...state.animations, ...config }
+        console.log('[useConfigStore] setAnimations called:', { config, newAnimations })
+        return { animations: newAnimations }
+      }),
       
       setActiveTab: (tab) => set({ activeTab: tab }),
       

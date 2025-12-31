@@ -4,12 +4,14 @@ import React, { useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useDemoStore } from '@/stores/useDemoStore';
+import { useConfigStore } from '@/lib/stores/useConfigStore';
 import { Editor } from '@/components/teleprompter/Editor';
 import { Runner } from '@/components/teleprompter/Runner';
 import { AppProvider } from '@/components/AppProvider';
 import { Toaster, toast } from 'sonner';
 import { AnimatePresence } from 'framer-motion';
 import { getTemplateById } from '@/lib/templates/templateConfig';
+import { loadScriptAction } from '@/actions/scripts';
 
 type FontStyle = 'Classic' | 'Modern' | 'Typewriter' | 'Novel' | 'Neon';
 type TextAlign = 'left' | 'center';
@@ -68,9 +70,50 @@ function StudioLogic() {
     // Check for script parameter (for loading saved scripts)
     const scriptId = searchParams.get('script');
     if (scriptId) {
-      // TODO: Load script from API
-      // For now, this would be implemented with the scripts API
-      console.log('Loading script:', scriptId);
+      console.log('[Studio] Loading script:', scriptId);
+      loadScriptAction(scriptId).then(result => {
+        if (result.error) {
+          toast.error('Failed to load script: ' + result.error);
+          return;
+        }
+        if (result.success && result.script) {
+          const script = result.script;
+          console.log('[Studio] Script loaded:', script);
+          
+          // Set basic teleprompter data
+          store.setText(script.content || '');
+          store.setBgUrl(script.bg_url || '');
+          store.setMusicUrl(script.music_url || '');
+          
+          // Load config if present
+          if (script.config) {
+            console.log('[Studio] Loading config from script:', script.config);
+            // Use setAll to restore the full config snapshot
+            useConfigStore.getState().setAll(script.config);
+            toast.success('Loaded script with custom styling');
+          } else {
+            // Fall back to legacy settings
+            if (script.settings) {
+              console.log('[Studio] Loading legacy settings:', script.settings);
+              store.setAll({
+                font: script.settings.font || 'Classic',
+                colorIndex: script.settings.colorIndex || 0,
+                speed: script.settings.speed || 2,
+                fontSize: script.settings.fontSize || 48,
+                align: script.settings.align || 'center',
+                lineHeight: script.settings.lineHeight || 1.5,
+                margin: script.settings.margin || 0,
+                overlayOpacity: script.settings.overlayOpacity || 0.5,
+              });
+            }
+            toast.success('Loaded script');
+          }
+        }
+      }).catch(err => {
+        console.error('[Studio] Error loading script:', err);
+        toast.error('Failed to load script');
+      });
+      return;
     }
 
     // Otherwise start fresh or load from localStorage
