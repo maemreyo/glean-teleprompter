@@ -129,5 +129,98 @@
     "discard": "Hủy bỏ",
     "saving": "Đang lưu...",
     "saveRecording": "Lưu bản ghi"
+  },
+  "Config": {
+    "tabs": {
+      "typography": "Typography",
+      "colors": "Màu sắc",
+      "effects": "Hiệu ứng",
+      "layout": "Bố cục",
+      "animations": "Hoạt ảnh",
+      "presets": "Mẫu"
+    },
+    "selectTab": "Chọn một tab để cài đặt",
+    "typography": {
+      "title": "Cài đặt Typography",
+      "description": "Cấu hình font, kích thước, độ đậm và khoảng cách cho văn bản teleprompter của bạn.",
+      "letterSpacing": "Khoảng cách chữ",
+      "lineHeight": "Chiều cao dòng",
+      "textTransform": "Chuyển đổi văn bản",
+      "none": "Không",
+      "uppercase": "In hoa",
+      "lowercase": "In thường",
+      "capitalize": "Viết hoa đầu câu"
+    },
+    "colors": {
+      "title": "Cài đặt màu sắc",
+      "description": "Cấu hình màu văn bản, gradient và kiểm tra độ tương phản.",
+      "colorPalettes": "Bảng màu",
+      "broadcastStandard": "Tiêu chuẩn phát sóng",
+      "corporate": "Doanh nghiệp",
+      "creative": "Sáng tạo",
+      "highContrast": "Độ tương phản cao",
+      "primaryTextColor": "Màu văn bản chính",
+      "wcagCompliance": "Tuân thủ WCAG",
+      "againstBlackBg": "Đối với nền đen",
+      "enableGradient": "Bật Gradient",
+      "gradientDesc": "Áp dụng gradient cho văn bản",
+      "effectColors": "Màu hiệu ứng",
+      "outlineColor": "Màu viền",
+      "glowColor": "Màu phát sáng"
+    },
+    "effects": {
+      "title": "Hiệu ứng hình ảnh",
+      "description": "Cấu hình bóng, viền, phát sáng và bộ lọc nền để cải thiện khả năng đọc."
+    },
+    "layout": {
+      "title": "Cài đặt bố cục",
+      "description": "Cấu hình lề, khoảng cách, căn chỉnh và vị trí vùng văn bản.",
+      "horizontalMargin": "Lề ngang",
+      "verticalPadding": "Khoảng cách dọc",
+      "textAlign": "Căn chỉnh văn bản",
+      "columns": "Số cột",
+      "columnGap": "Khoảng cách cột",
+      "textAreaWidth": "Chiều rộng vùng văn bản",
+      "textAreaPosition": "Vị trí vùng văn bản"
+    },
+    "animations": {
+      "title": "Cài đặt hoạt ảnh",
+      "description": "Cấu hình hành vi cuộn, hoạt ảnh vào và làm nổi bật.",
+      "smoothScroll": "Cuộn mượt mà",
+      "enableSmoothScrolling": "Bật cuộn mượt mà",
+      "scrollDamping": "Hạn chế cuộn",
+      "entranceAnimation": "Hoạt ảnh vào",
+      "animationType": "Loại hoạt ảnh",
+      "fadeIn": "Hiện dần",
+      "slideUp": "Trượt lên",
+      "scaleIn": "Thu nhỏ vào",
+      "none": "Không",
+      "animationDuration": "Thời lượng hoạt ảnh",
+      "wordHighlighting": "Làm nổi bật từ",
+      "enableWordHighlight": "Bật làm nổi bật từng từ",
+      "highlightSpeed": "Tốc độ nổi bật",
+      "autoScroll": "Tự động cuộn",
+      "enableAutoScrolling": "Bật tự động cuộn",
+      "scrollSpeed": "Tốc độ cuộn",
+      "acceleration": "Gia tốc"
+    },
+    "presets": {
+      "title": "Mẫu",
+      "description": "Lưu, tải và quản lý các mẫu cấu hình của bạn.",
+      "savePreset": "Lưu mẫu",
+      "import": "Nhập",
+      "builtinPresets": "Mẫu có sẵn",
+      "name": "Tên",
+      "description": "Mô tả",
+      "namePlaceholder": "Mẫu tùy chỉnh của tôi",
+      "descriptionPlaceholder": "Mô tả tùy chọn",
+      "cancel": "Hủy",
+      "allSynced": "Đã đồng bộ tất cả mẫu",
+      "syncing": "Đang đồng bộ...",
+      "syncFailed": "Đồng bộ thất bại",
+      "connected": "Đã kết nối với đám mây",
+      "offline": "Chế độ ngoại tuyến",
+      "sync": "Đồng bộ"
+    }
   }
 }

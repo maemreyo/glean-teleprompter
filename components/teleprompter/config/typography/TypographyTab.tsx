@@ -5,16 +5,18 @@ import { FontSelector } from './FontSelector'
 import { FontSizeControl } from './FontSizeControl'
 import { SliderInput } from '../ui/SliderInput'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
+import { useTranslations } from 'next-intl'
 
 export function TypographyTab() {
+  const t = useTranslations('Config.typography')
   const { typography, setTypography } = useConfigStore()
   
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Typography Settings</h3>
+        <h3 className="text-lg font-semibold mb-1">{t('title')}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Configure font family, size, weight, and spacing for your teleprompter text.
+          {t('description')}
         </p>
       </div>
       
@@ -31,7 +33,7 @@ export function TypographyTab() {
         max={20}
         step={0.5}
         unit="px"
-        label="Letter Spacing"
+        label={t('letterSpacing')}
         onChange={(value) => setTypography({ letterSpacing: value })}
       />
       
@@ -41,14 +43,14 @@ export function TypographyTab() {
         min={1}
         max={3}
         step={0.1}
-        label="Line Height"
+        label={t('lineHeight')}
         onChange={(value) => setTypography({ lineHeight: value })}
       />
       
       {/* Text Transform */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Text Transform
+          {t('textTransform')}
         </label>
         <div className="flex gap-2">
           {(['none', 'uppercase', 'lowercase', 'capitalize'] as const).map((transform) => (
@@ -63,7 +65,7 @@ export function TypographyTab() {
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               )}
             >
-              {transform.charAt(0).toUpperCase() + transform.slice(1)}
+              {t(transform)}
             </button>
           ))}
         </div>

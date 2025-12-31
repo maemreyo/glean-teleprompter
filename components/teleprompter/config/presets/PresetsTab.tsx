@@ -7,10 +7,12 @@ import { SyncControls } from './SyncControls'
 import { Button } from '@/components/ui/button'
 import { Upload, Plus } from 'lucide-react'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
+import { useTranslations } from 'next-intl'
 import { builtInPresets, configToPreset, exportPresetAsJSON, importPresetFromJSON } from '@/lib/config/presets'
 import type { Preset } from '@/lib/config/types'
 
 export function PresetsTab() {
+  const t = useTranslations('Config.presets')
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
   const { setTypography, setColors, setEffects, setLayout, setAnimations, typography, colors, effects, layout, animations } = useConfigStore()
@@ -74,9 +76,9 @@ export function PresetsTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Presets</h3>
+        <h3 className="text-lg font-semibold mb-1">{t('title')}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Save, load, and manage your configuration presets.
+          {t('description')}
         </p>
       </div>
 
@@ -84,12 +86,12 @@ export function PresetsTab() {
       <div className="flex flex-wrap gap-2 pt-4">
         <Button onClick={() => setShowSaveDialog(true)} size="sm">
           <Plus className="w-4 h-4 mr-2" />
-          Save Preset
+          {t('savePreset')}
         </Button>
         
         <Button onClick={() => document.getElementById('preset-import')?.click()} size="sm" variant="outline">
           <Upload className="w-4 h-4 mr-2" />
-          Import
+          {t('import')}
         </Button>
         <input
           id="preset-import"
@@ -111,7 +113,7 @@ export function PresetsTab() {
 
       {/* Presets Grid */}
       <div className="space-y-4">
-        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Built-in Presets</h4>
+        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('builtinPresets')}</h4>
         <PresetGrid
           presets={builtInPresets.map((p, i) => ({ 
             ...p, 

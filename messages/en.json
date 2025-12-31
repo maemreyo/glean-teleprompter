@@ -129,5 +129,98 @@
     "discard": "Discard",
     "saving": "Saving...",
     "saveRecording": "Save Recording"
+  },
+  "Config": {
+    "tabs": {
+      "typography": "Typography",
+      "colors": "Colors",
+      "effects": "Effects",
+      "layout": "Layout",
+      "animations": "Animations",
+      "presets": "Presets"
+    },
+    "selectTab": "Select a tab to configure settings",
+    "typography": {
+      "title": "Typography Settings",
+      "description": "Configure font family, size, weight, and spacing for your teleprompter text.",
+      "letterSpacing": "Letter Spacing",
+      "lineHeight": "Line Height",
+      "textTransform": "Text Transform",
+      "none": "None",
+      "uppercase": "Uppercase",
+      "lowercase": "Lowercase",
+      "capitalize": "Capitalize"
+    },
+    "colors": {
+      "title": "Color Settings",
+      "description": "Configure text colors, gradients, and contrast validation.",
+      "colorPalettes": "Color Palettes",
+      "broadcastStandard": "Broadcast Standard",
+      "corporate": "Corporate",
+      "creative": "Creative",
+      "highContrast": "High Contrast",
+      "primaryTextColor": "Primary Text Color",
+      "wcagCompliance": "WCAG Compliance",
+      "againstBlackBg": "Against black background",
+      "enableGradient": "Enable Gradient",
+      "gradientDesc": "Apply gradient fill to text",
+      "effectColors": "Effect Colors",
+      "outlineColor": "Outline Color",
+      "glowColor": "Glow Color"
+    },
+    "effects": {
+      "title": "Visual Effects",
+      "description": "Configure shadows, outlines, glows, and backdrop filters for enhanced readability."
+    },
+    "layout": {
+      "title": "Layout Settings",
+      "description": "Configure margins, padding, alignment, and text area positioning.",
+      "horizontalMargin": "Horizontal Margin",
+      "verticalPadding": "Vertical Padding",
+      "textAlign": "Text Alignment",
+      "columns": "Columns",
+      "columnGap": "Column Gap",
+      "textAreaWidth": "Text Area Width",
+      "textAreaPosition": "Text Area Position"
+    },
+    "animations": {
+      "title": "Animation Settings",
+      "description": "Configure scroll behaviors, entrance animations, and highlighting.",
+      "smoothScroll": "Smooth Scroll",
+      "enableSmoothScrolling": "Enable Smooth Scrolling",
+      "scrollDamping": "Scroll Damping",
+      "entranceAnimation": "Entrance Animation",
+      "animationType": "Animation Type",
+      "fadeIn": "Fade In",
+      "slideUp": "Slide Up",
+      "scaleIn": "Scale In",
+      "none": "None",
+      "animationDuration": "Animation Duration",
+      "wordHighlighting": "Word Highlighting",
+      "enableWordHighlight": "Enable Word-by-Word Highlighting",
+      "highlightSpeed": "Highlight Speed",
+      "autoScroll": "Auto Scroll",
+      "enableAutoScrolling": "Enable Auto Scrolling",
+      "scrollSpeed": "Scroll Speed",
+      "acceleration": "Acceleration"
+    },
+    "presets": {
+      "title": "Presets",
+      "description": "Save, load, and manage your configuration presets.",
+      "savePreset": "Save Preset",
+      "import": "Import",
+      "builtinPresets": "Built-in Presets",
+      "name": "Name",
+      "description": "Description",
+      "namePlaceholder": "My Custom Preset",
+      "descriptionPlaceholder": "Optional description",
+      "cancel": "Cancel",
+      "allSynced": "All presets synced",
+      "syncing": "Syncing...",
+      "syncFailed": "Sync failed",
+      "connected": "Connected to cloud",
+      "offline": "Offline mode",
+      "sync": "Sync"
+    }
   }
 }

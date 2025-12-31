@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Cloud, CloudOff, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export function SyncControls() {
+  const t = useTranslations('Config.presets')
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error'>('synced')
   const [isOnline] = useState(true)
 
@@ -29,12 +31,12 @@ export function SyncControls() {
         )}
         <div>
           <p className="text-sm font-medium">
-            {syncStatus === 'synced' && 'All presets synced'}
-            {syncStatus === 'syncing' && 'Syncing...'}
-            {syncStatus === 'error' && 'Sync failed'}
+            {syncStatus === 'synced' && t('allSynced')}
+            {syncStatus === 'syncing' && t('syncing')}
+            {syncStatus === 'error' && t('syncFailed')}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {isOnline ? 'Connected to cloud' : 'Offline mode'}
+            {isOnline ? t('connected') : t('offline')}
           </p>
         </div>
       </div>
@@ -47,7 +49,7 @@ export function SyncControls() {
           disabled={syncStatus === 'syncing'}
         >
           <RefreshCw className={`w-4 h-4 mr-2 ${syncStatus === 'syncing' ? 'animate-spin' : ''}`} />
-          Sync
+          {t('sync')}
         </Button>
       )}
     </div>

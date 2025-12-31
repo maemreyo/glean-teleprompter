@@ -3,16 +3,18 @@
 import { SliderInput } from '../ui/SliderInput'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export function LayoutTab() {
+  const t = useTranslations('Config.layout')
   const { layout, setLayout } = useConfigStore()
   
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Layout Settings</h3>
+        <h3 className="text-lg font-semibold mb-1">{t('title')}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Configure margins, padding, alignment, and text area positioning.
+          {t('description')}
         </p>
       </div>
       
@@ -23,7 +25,7 @@ export function LayoutTab() {
         max={200}
         step={5}
         unit="px"
-        label="Horizontal Margin"
+        label={t('horizontalMargin')}
         onChange={(value) => setLayout({ horizontalMargin: value })}
       />
       
@@ -34,14 +36,14 @@ export function LayoutTab() {
         max={100}
         step={5}
         unit="px"
-        label="Vertical Padding"
+        label={t('verticalPadding')}
         onChange={(value) => setLayout({ verticalPadding: value })}
       />
       
       {/* Text Alignment */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Text Alignment
+          {t('textAlign')}
         </label>
         <div className="flex gap-2">
           {(['left', 'center', 'right', 'justify'] as const).map((align) => (
@@ -65,7 +67,7 @@ export function LayoutTab() {
       {/* Column Count */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Columns
+          {t('columns')}
         </label>
         <div className="flex gap-2">
           {[1, 2, 3, 4].map((count) => (
@@ -94,7 +96,7 @@ export function LayoutTab() {
           max={100}
           step={5}
           unit="px"
-          label="Column Gap"
+          label={t('columnGap')}
           onChange={(value) => setLayout({ columnGap: value })}
         />
       )}
@@ -106,14 +108,14 @@ export function LayoutTab() {
         max={100}
         step={5}
         unit="%"
-        label="Text Area Width"
+        label={t('textAreaWidth')}
         onChange={(value) => setLayout({ textAreaWidth: value })}
       />
       
       {/* Text Area Position */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Text Area Position
+          {t('textAreaPosition')}
         </label>
         <div className="flex gap-2">
           {(['left', 'center', 'right'] as const).map((position) => (

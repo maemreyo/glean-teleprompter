@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useTranslations } from 'next-intl'
 
 interface SavePresetDialogProps {
   open: boolean
@@ -13,6 +14,7 @@ interface SavePresetDialogProps {
 }
 
 export function SavePresetDialog({ open, onClose, onSave }: SavePresetDialogProps) {
+  const t = useTranslations('Config.presets')
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
 
@@ -28,28 +30,28 @@ export function SavePresetDialog({ open, onClose, onSave }: SavePresetDialogProp
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Save Preset</DialogTitle>
+          <DialogTitle>{t('savePreset')}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="preset-name">Name *</Label>
+            <Label htmlFor="preset-name">{t('name')} *</Label>
             <Input
               id="preset-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="My Custom Preset"
+              placeholder={t('namePlaceholder')}
               maxLength={100}
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="preset-description">Description</Label>
+            <Label htmlFor="preset-description">{t('description')}</Label>
             <Input
               id="preset-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional description"
+              placeholder={t('descriptionPlaceholder')}
               maxLength={500}
             />
           </div>
@@ -57,10 +59,10 @@ export function SavePresetDialog({ open, onClose, onSave }: SavePresetDialogProp
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button onClick={handleSave} disabled={!name.trim()}>
-            Save Preset
+            {t('savePreset')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -6,33 +6,36 @@ import { ContrastBadge } from './ContrastBadge'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
 import { validateContrast } from '@/lib/config/contrast'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 // Color palettes
-const colorPalettes = [
+const getColorPalettes = (t: (key: string) => string) => [
   {
-    name: 'Broadcast Standard',
+    name: t('broadcastStandard'),
     category: 'broadcast',
     colors: ['#ffffff', '#fbbf24', '#4ade80', '#60a5fa', '#f472b6', '#f87171'],
   },
   {
-    name: 'Corporate',
+    name: t('corporate'),
     category: 'corporate',
     colors: ['#1e3a5f', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'],
   },
   {
-    name: 'Creative',
+    name: t('creative'),
     category: 'creative',
     colors: ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6', '#6366f1'],
   },
   {
-    name: 'High Contrast',
+    name: t('highContrast'),
     category: 'high-contrast',
     colors: ['#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00'],
   },
 ]
 
 export function ColorsTab() {
+  const t = useTranslations('Config.colors')
   const { colors, setColors } = useConfigStore()
+  const colorPalettes = getColorPalettes(t)
   
   // Calculate contrast validation (against black background for now)
   const contrastValidation = validateContrast(
@@ -48,16 +51,16 @@ export function ColorsTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Color Settings</h3>
+        <h3 className="text-lg font-semibold mb-1">{t('title')}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Configure text colors, gradients, and contrast validation.
+          {t('description')}
         </p>
       </div>
       
       {/* Color Palettes */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Color Palettes
+          {t('colorPalettes')}
         </label>
         <div className="grid grid-cols-2 gap-2">
           {colorPalettes.map((palette) => (
@@ -85,7 +88,7 @@ export function ColorsTab() {
       
       {/* Primary Color */}
       <ColorPicker
-        label="Primary Text Color"
+        label={t('primaryTextColor')}
         value={colors.primaryColor}
         onChange={(value) => setColors({ primaryColor: value })}
       />
@@ -94,10 +97,10 @@ export function ColorsTab() {
       <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            WCAG Compliance
+            {t('wcagCompliance')}
           </label>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Against black background
+            {t('againstBlackBg')}
           </p>
         </div>
         <ContrastBadge validation={contrastValidation} />
@@ -107,10 +110,10 @@ export function ColorsTab() {
       <div className="flex items-center justify-between">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Enable Gradient
+            {t('enableGradient')}
           </label>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Apply gradient fill to text
+            {t('gradientDesc')}
           </p>
         </div>
         <button
@@ -147,17 +150,17 @@ export function ColorsTab() {
       {/* Effect Colors */}
       <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Effect Colors
+          {t('effectColors')}
         </h4>
         
         <ColorPicker
-          label="Outline Color"
+          label={t('outlineColor')}
           value={colors.outlineColor}
           onChange={(value) => setColors({ outlineColor: value })}
         />
         
         <ColorPicker
-          label="Glow Color"
+          label={t('glowColor')}
           value={colors.glowColor}
           onChange={(value) => setColors({ glowColor: value })}
         />
