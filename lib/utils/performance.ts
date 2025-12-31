@@ -51,7 +51,7 @@ export function usePerformanceMonitor(sampleInterval: number = 1000): Performanc
 
   const frameTimesRef = useRef<number[]>([])
   const lastFrameTimeRef = useRef<number>(performance.now())
-  const rafIdRef = useRef<number>()
+  const rafIdRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     let lastSampleTime = performance.now()

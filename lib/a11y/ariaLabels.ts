@@ -45,7 +45,7 @@ export function colorSwatch(color: string): string {
     '#60a5fa': 'light blue',
     '#f472b6': 'pink',
     '#a78bfa': 'purple',
-    '#fbbf24': 'gold',
+
   }
 
   const colorLower = color.toLowerCase()

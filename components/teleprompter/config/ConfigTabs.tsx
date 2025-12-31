@@ -19,6 +19,7 @@ import { useConfigStore } from '@/lib/stores/useConfigStore'
 import { useTranslations } from 'next-intl'
 import { ARIA_LABELS } from '@/lib/a11y/ariaLabels'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import type { TabId } from '@/lib/config/types'
 import { TypographyTab } from './typography/TypographyTab'
 import { ColorsTab } from './colors/ColorsTab'
 import { EffectsTab } from './effects/EffectsTab'
@@ -27,8 +28,6 @@ import { AnimationsTab } from './animations/AnimationsTab'
 import { PresetsTab } from './presets/PresetsTab'
 import { MediaTab } from './media/MediaTab'
 import { TabBottomSheet } from './TabBottomSheet'
-
-type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations' | 'presets' | 'media'
 
 interface TabConfig {
   id: TabId

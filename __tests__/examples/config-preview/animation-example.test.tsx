@@ -75,7 +75,7 @@ describe('Animation Config Impact Tests', () => {
   })
 
   describe('Entrance Animation', () => {
-    const animations = ['none', 'fade', 'slide', 'zoom']
+    const animations: Array<'fade-in' | 'slide-up' | 'scale-in' | 'none'> = ['none', 'fade-in', 'slide-up', 'scale-in']
     
     animations.forEach(animation => {
       it(`should set entrance animation: ${animation}`, async () => {
@@ -162,16 +162,16 @@ describe('Animation Config Impact Tests', () => {
     })
   })
 
-  describe('Animation Acceleration', () => {
-    const accelerations = [1, 2, 3, 4]
-    
-    accelerations.forEach(acceleration => {
-      it(`should set animation acceleration: ${acceleration}x`, async () => {
+  describe('Animation Duration', () => {
+    const durations = [200, 500, 1000, 2000]
+
+    durations.forEach(duration => {
+      it(`should set entrance duration: ${duration}ms`, async () => {
         render(<TestAnimationContainer testId="container" />)
         setConfigState(createTestConfigUpdate.animations({
-          animationAcceleration: acceleration
+          entranceDuration: duration
         }))
-        
+
         await waitFor(() => {
           const element = screen.getByTestId('preview-text')
           // Config is stored - actual animation speed would be tested in integration
@@ -186,7 +186,7 @@ describe('Animation Config Impact Tests', () => {
       render(<TestAnimationContainer testId="container" />)
       setConfigState(createTestConfigUpdate.animations({
         smoothScrollEnabled: true,
-        entranceAnimation: 'fade'
+        entranceAnimation: 'fade-in'
       }))
       
       await waitFor(() => {
@@ -199,11 +199,10 @@ describe('Animation Config Impact Tests', () => {
       render(<TestAnimationContainer testId="container" />)
       setConfigState(createTestConfigUpdate.animations({
         smoothScrollEnabled: true,
-        entranceAnimation: 'slide',
+        entranceAnimation: 'slide-up',
         wordHighlightEnabled: true,
         autoScrollEnabled: true,
-        autoScrollSpeed: 5,
-        animationAcceleration: 1.5
+        autoScrollSpeed: 5
       }))
       
       await waitFor(() => {
@@ -216,11 +215,11 @@ describe('Animation Config Impact Tests', () => {
   describe('Animation Performance', () => {
     it('should apply animation config within 50ms', async () => {
       render(<TestAnimationContainer testId="container" />)
-      
+
       const startTime = performance.now()
       setConfigState(createTestConfigUpdate.animations({
-        entranceAnimation: 'fade',
-        animationAcceleration: 2
+        entranceAnimation: 'fade-in',
+        entranceDuration: 200
       }))
       
       await waitFor(() => {
@@ -266,8 +265,8 @@ describe('Animation Config Impact Tests', () => {
       
       // Apply custom config
       setConfigState(createTestConfigUpdate.animations({
-        entranceAnimation: 'fade',
-        animationAcceleration: 2
+        entranceAnimation: 'fade-in',
+        entranceDuration: 200
       }))
       
       await waitFor(() => {

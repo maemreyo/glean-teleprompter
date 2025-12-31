@@ -179,3 +179,6 @@ export interface ContrastValidation {
   passesAAA: boolean
   level: 'FAIL' | 'AA' | 'AAA'
 }
+
+// UI Tab types
+export type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations' | 'presets' | 'media'

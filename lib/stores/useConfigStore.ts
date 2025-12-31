@@ -7,6 +7,7 @@ import type {
   LayoutConfig,
   AnimationConfig,
   ConfigSnapshot,
+  TabId,
 } from '@/lib/config/types'
 
 // Default configurations
@@ -81,7 +82,7 @@ interface ConfigState {
   animations: AnimationConfig
   
   // UI state
-  activeTab: string
+  activeTab: TabId
   isPanelOpen: boolean
   
   // Undo/Redo
@@ -95,7 +96,7 @@ interface ConfigState {
   setLayout: (config: Partial<LayoutConfig>) => void
   setAnimations: (config: Partial<AnimationConfig>) => void
   
-  setActiveTab: (tab: string) => void
+  setActiveTab: (tab: TabId) => void
   togglePanel: () => void
   
   // Set all config at once (for loading from saved scripts)

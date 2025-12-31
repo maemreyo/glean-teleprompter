@@ -239,7 +239,7 @@ describe('Effects Config Impact Tests', () => {
     it('should not apply backdrop when disabled', async () => {
       render(<TestEffectsPreview text="Sample Text" testId="preview-text" />)
       setConfigState(createTestConfigUpdate.effects({
-        backdropEnabled: false
+        backdropFilterEnabled: false
       }))
       
       await waitFor(() => {
@@ -251,7 +251,7 @@ describe('Effects Config Impact Tests', () => {
     it('should apply backdrop blur when enabled', async () => {
       render(<TestEffectsPreview text="Sample Text" testId="preview-text" />)
       setConfigState(createTestConfigUpdate.effects({
-        backdropEnabled: true,
+        backdropFilterEnabled: true,
         backdropBlur: 10
       }))
       
@@ -394,7 +394,7 @@ describe('Effects Config Impact Tests', () => {
         { shadowEnabled: true },
         { outlineEnabled: true },
         { glowEnabled: true },
-        { backdropEnabled: true }
+        { backdropFilterEnabled: true }
       ]
       const responseTimes: number[] = []
       

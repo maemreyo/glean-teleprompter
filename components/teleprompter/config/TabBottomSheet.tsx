@@ -3,8 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations' | 'presets' | 'media'
+import type { TabId } from '@/lib/config/types'
 
 interface TabConfig {
   id: TabId

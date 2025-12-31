@@ -211,7 +211,7 @@ function StudioLogic() {
           message: errorContext.message,
           details: errorContext.details,
           originalError: result.error,
-          stack: result.error instanceof Error && typeof result.error.stack === 'string' ? result.error.stack : undefined,
+          stack: result.error && (result.error as any) instanceof Error && typeof (result.error as any).stack === 'string' ? (result.error as any).stack : undefined,
         });
         
         // Set error context in UI store for ErrorDialog
@@ -301,7 +301,7 @@ function StudioLogic() {
         message: errorContext.message,
         details: errorContext.details,
         originalError: err,
-        stack: err instanceof Error && typeof err.stack === 'string' ? err.stack : undefined,
+        stack: err && (err as any) instanceof Error && typeof (err as any).stack === 'string' ? (err as any).stack : undefined,
       });
       
       // Set error context in UI store for ErrorDialog

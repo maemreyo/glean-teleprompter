@@ -174,7 +174,7 @@ describe('Layout Config Impact Tests', () => {
   describe('Column Layout', () => {
     it('should apply single column layout', async () => {
       render(<TestLayoutContainer testId="container" />)
-      setConfigState(createTestConfigUpdate.layout({ columnLayout: 1 }))
+      setConfigState(createTestConfigUpdate.layout({ columnCount: 1 }))
       
       await waitFor(() => {
         const container = screen.getByTestId('container')
@@ -184,7 +184,7 @@ describe('Layout Config Impact Tests', () => {
 
     it('should apply two column layout', async () => {
       render(<TestLayoutContainer testId="container" />)
-      setConfigState(createTestConfigUpdate.layout({ columnLayout: 2 }))
+      setConfigState(createTestConfigUpdate.layout({ columnCount: 2 }))
       
       await waitFor(() => {
         const container = screen.getByTestId('container')
@@ -194,7 +194,7 @@ describe('Layout Config Impact Tests', () => {
 
     it('should apply three column layout', async () => {
       render(<TestLayoutContainer testId="container" />)
-      setConfigState(createTestConfigUpdate.layout({ columnLayout: 3 }))
+      setConfigState(createTestConfigUpdate.layout({ columnCount: 3 }))
       
       await waitFor(() => {
         const container = screen.getByTestId('container')
@@ -222,7 +222,7 @@ describe('Layout Config Impact Tests', () => {
   describe('Text Area Position', () => {
     it('should apply positive horizontal offset', async () => {
       render(<TestLayoutContainer testId="container" />)
-      setConfigState(createTestConfigUpdate.layout({ textAreaPosition: 20 }))
+      setConfigState(createTestConfigUpdate.layout({ textAreaPosition: 'right' }))
       
       await waitFor(() => {
         const container = screen.getByTestId('container')
@@ -234,7 +234,7 @@ describe('Layout Config Impact Tests', () => {
 
     it('should apply negative horizontal offset', async () => {
       render(<TestLayoutContainer testId="container" />)
-      setConfigState(createTestConfigUpdate.layout({ textAreaPosition: -20 }))
+      setConfigState(createTestConfigUpdate.layout({ textAreaPosition: 'left' }))
       
       await waitFor(() => {
         const container = screen.getByTestId('container')
@@ -245,7 +245,7 @@ describe('Layout Config Impact Tests', () => {
 
     it('should apply no offset at position 0', async () => {
       render(<TestLayoutContainer testId="container" />)
-      setConfigState(createTestConfigUpdate.layout({ textAreaPosition: 0 }))
+      setConfigState(createTestConfigUpdate.layout({ textAreaPosition: 'center' }))
       
       await waitFor(() => {
         const container = screen.getByTestId('container')
@@ -262,9 +262,9 @@ describe('Layout Config Impact Tests', () => {
         horizontalMargin: 10,
         verticalPadding: 15,
         textAlign: 'center',
-        columnLayout: 1,
+        columnCount: 1,
         textAreaWidth: 80,
-        textAreaPosition: 0
+        textAreaPosition: 'center'
       }))
       
       await waitFor(() => {
@@ -281,7 +281,7 @@ describe('Layout Config Impact Tests', () => {
     it('should apply multi-column layout with alignment', async () => {
       render(<TestLayoutContainer testId="container" />)
       setConfigState(createTestConfigUpdate.layout({
-        columnLayout: 2,
+        columnCount: 2,
         textAlign: 'justify'
       }))
       
