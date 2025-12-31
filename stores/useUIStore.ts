@@ -1,244 +1,289 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-// Auto-save status tracking
+// ==================== Interfaces from data-model.md ====================
+
+/**
+ * Auto-save status tracking
+ */
 export interface AutoSaveStatus {
   status: 'idle' | 'saving' | 'saved' | 'error'
-  lastSavedAt: number | null
-  errorMessage: string | null
+  lastSavedAt?: number
+  errorMessage?: string
+  retryCount?: number
 }
 
-// Textarea user preferences
+/**
+ * Textarea user preferences
+ */
 export interface TextareaPreferences {
-  height: number // Current height in pixels
-  isFullscreen: boolean // Whether in fullscreen mode
-  expandedState: 'compact' | 'medium' | 'large' | 'fullscreen' // Height preset
+  size: 'default' | 'medium' | 'large' | 'fullscreen' | 'custom'
+  customHeight?: number
+  isFullscreen: boolean
 }
 
-// Footer state management
+/**
+ * Footer state management
+ */
 export interface FooterState {
-  isCollapsed: boolean // Whether footer is minimized
-  isVisible: boolean // Whether footer is visible at all
+  isCollapsed: boolean
+  collapsedSince?: number
 }
 
-// Preview panel state for mobile/tablet
+/**
+ * Preview panel state for mobile/tablet
+ */
 export interface PreviewPanelState {
-  isOpen: boolean // Whether preview panel is open
-  position: 'bottom' | 'right' // Bottom for mobile, right for tablet
-  height: number // Height in pixels (for bottom sheet)
-  width: number // Width in pixels (for right panel)
+  isOpen: boolean
+  lastToggledAt?: number
 }
 
-// Keyboard shortcuts statistics for discoverability
+/**
+ * Keyboard shortcuts statistics for discoverability
+ */
 export interface KeyboardShortcutsStats {
-  totalShortcutsUsed: number
-  shortcutUsageCounts: Record<string, number> // e.g., { 'ctrl+z': 5, 'ctrl+s': 10 }
-  lastUsedShortcut: string | null
-  showShortcutsModal: boolean
-  showInlineHint: boolean
+  sessionsCount: number
+  modalOpenedCount: number
+  tipsShown: string[]
+  lastSessionAt?: number
 }
 
-// Error context for contextual error messages
+/**
+ * Error context for contextual error messages
+ */
 export interface ErrorContext {
   type: 'network' | 'not_found' | 'permission' | 'quota' | 'unknown'
   message: string
-  action: 'retry' | 'browse_templates' | 'sign_up' | 'none'
-  details: string
+  details?: string
   timestamp: number
+  action?: 'retry' | 'browse_templates' | 'sign_up' | 'copy_error' | 'none'
 }
 
-// Main UI Store interface
+// ==================== Default Values ====================
+
+const DEFAULT_TEXTAREA_PREFS: TextareaPreferences = {
+  size: 'default',
+  isFullscreen: false,
+}
+
+const DEFAULT_FOOTER_STATE: FooterState = {
+  isCollapsed: false,
+}
+
+const DEFAULT_PREVIEW_STATE: PreviewPanelState = {
+  isOpen: false,
+}
+
+const DEFAULT_SHORTCUTS_STATS: KeyboardShortcutsStats = {
+  sessionsCount: 0,
+  modalOpenedCount: 0,
+  tipsShown: [],
+}
+
+const DEFAULT_AUTOSAVE_STATUS: AutoSaveStatus = {
+  status: 'idle',
+}
+
+// ==================== localStorage Helpers ====================
+
+function loadFromStorage<T>(key: string, defaultValue: T): T {
+  try {
+    if (typeof window === 'undefined') return defaultValue
+    const stored = localStorage.getItem(key)
+    return stored ? JSON.parse(stored) : defaultValue
+  } catch (error) {
+    console.warn(`Failed to load ${key} from localStorage:`, error)
+    return defaultValue
+  }
+}
+
+function saveToStorage<T>(key: string, value: T): void {
+  try {
+    if (typeof window === 'undefined') return
+    localStorage.setItem(key, JSON.stringify(value))
+  } catch (error) {
+    console.warn(`Failed to save ${key} to localStorage:`, error)
+  }
+}
+
+// ==================== Main UI Store Interface ====================
+
 interface UIStore {
-  // Auto-save status
-  autoSaveStatus: AutoSaveStatus
-  
-  // Textarea preferences
+  // State
   textareaPrefs: TextareaPreferences
-  
-  // Footer state
   footerState: FooterState
-  
-  // Preview panel state
   previewState: PreviewPanelState
-  
-  // Keyboard shortcuts stats
-  keyboardShortcutsStats: KeyboardShortcutsStats
-  
-  // Error context
+  shortcutsStats: KeyboardShortcutsStats
+  autoSaveStatus: AutoSaveStatus
   errorContext: ErrorContext | null
-  
-  // Actions - Auto-save
-  setAutoSaveStatus: (status: AutoSaveStatus) => void
-  updateAutoSaveStatus: (status: AutoSaveStatus['status'], error?: string) => void
-  
-  // Actions - Textarea
+
+  // Textarea actions
   setTextareaPrefs: (prefs: Partial<TextareaPreferences>) => void
-  setTextareaHeight: (height: number) => void
-  setTextareaExpandedState: (state: TextareaPreferences['expandedState']) => void
-  toggleFullscreen: () => void
-  
-  // Actions - Footer
+  toggleTextareaSize: () => void
+
+  // Footer actions
   setFooterState: (state: Partial<FooterState>) => void
   toggleFooter: () => void
-  
-  // Actions - Preview panel
+
+  // Preview panel actions
   setPreviewState: (state: Partial<PreviewPanelState>) => void
   togglePreview: () => void
-  openPreview: () => void
-  closePreview: () => void
-  
-  // Actions - Keyboard shortcuts
-  setKeyboardShortcutsStats: (stats: Partial<KeyboardShortcutsStats>) => void
-  trackShortcutUsage: (shortcut: string) => void
-  setShowShortcutsModal: (show: boolean) => void
-  setShowInlineHint: (show: boolean) => void
-  
-  // Actions - Error context
+
+  // Keyboard shortcuts actions
+  incrementSessionsCount: () => void
+  recordModalOpened: () => void
+  markTipShown: (tip: string) => void
+
+  // Auto-save actions
+  setAutoSaveStatus: (status: Partial<AutoSaveStatus>) => void
+
+  // Error context actions
   setErrorContext: (error: ErrorContext | null) => void
   clearError: () => void
 }
 
-// Initial state values
-const initialAutoSaveStatus: AutoSaveStatus = {
-  status: 'idle',
-  lastSavedAt: null,
-  errorMessage: null,
-}
+// ==================== Create the UI Store ====================
 
-const initialTextareaPrefs: TextareaPreferences = {
-  height: 128,
-  isFullscreen: false,
-  expandedState: 'compact',
-}
-
-const initialFooterState: FooterState = {
-  isCollapsed: false,
-  isVisible: true,
-}
-
-const initialPreviewState: PreviewPanelState = {
-  isOpen: false,
-  position: 'bottom',
-  height: 0,
-  width: 0,
-}
-
-const initialKeyboardShortcutsStats: KeyboardShortcutsStats = {
-  totalShortcutsUsed: 0,
-  shortcutUsageCounts: {},
-  lastUsedShortcut: null,
-  showShortcutsModal: false,
-  showInlineHint: false,
-}
-
-// Create the UI store with persist middleware
 export const useUIStore = create<UIStore>()(
   persist(
     (set, get) => ({
-      // Initial state
-      autoSaveStatus: initialAutoSaveStatus,
-      textareaPrefs: initialTextareaPrefs,
-      footerState: initialFooterState,
-      previewState: initialPreviewState,
-      keyboardShortcutsStats: initialKeyboardShortcutsStats,
+      // ==================== Initial State ====================
+      textareaPrefs: DEFAULT_TEXTAREA_PREFS,
+      footerState: DEFAULT_FOOTER_STATE,
+      previewState: DEFAULT_PREVIEW_STATE,
+      shortcutsStats: DEFAULT_SHORTCUTS_STATS,
+      autoSaveStatus: DEFAULT_AUTOSAVE_STATUS,
       errorContext: null,
-      
-      // Auto-save actions
-      setAutoSaveStatus: (status) => set({ autoSaveStatus: status }),
-      
-      updateAutoSaveStatus: (status, error) => set((state) => ({
-        autoSaveStatus: {
-          status,
-          lastSavedAt: status === 'saved' ? Date.now() : state.autoSaveStatus.lastSavedAt,
-          errorMessage: error ?? null,
-        },
-      })),
-      
-      // Textarea actions
-      setTextareaPrefs: (prefs) => set((state) => ({
-        textareaPrefs: { ...state.textareaPrefs, ...prefs },
-      })),
-      
-      setTextareaHeight: (height) => set((state) => ({
-        textareaPrefs: { ...state.textareaPrefs, height },
-      })),
-      
-      setTextareaExpandedState: (expandedState) => set((state) => ({
-        textareaPrefs: {
-          ...state.textareaPrefs,
-          expandedState,
-          height: expandedState === 'compact' ? 128 : expandedState === 'medium' ? 300 : expandedState === 'large' ? 500 : window.innerHeight,
-          isFullscreen: expandedState === 'fullscreen',
-        },
-      })),
-      
-      toggleFullscreen: () => set((state) => ({
-        textareaPrefs: {
-          ...state.textareaPrefs,
-          isFullscreen: !state.textareaPrefs.isFullscreen,
-          height: !state.textareaPrefs.isFullscreen ? window.innerHeight : 128,
-          expandedState: !state.textareaPrefs.isFullscreen ? 'fullscreen' : 'compact',
-        },
-      })),
-      
-      // Footer actions
-      setFooterState: (footerState) => set((state) => ({
-        footerState: { ...state.footerState, ...footerState },
-      })),
-      
-      toggleFooter: () => set((state) => ({
-        footerState: { ...state.footerState, isCollapsed: !state.footerState.isCollapsed },
-      })),
-      
-      // Preview panel actions
-      setPreviewState: (previewState) => set((state) => ({
-        previewState: { ...state.previewState, ...previewState },
-      })),
-      
-      togglePreview: () => set((state) => ({
-        previewState: { ...state.previewState, isOpen: !state.previewState.isOpen },
-      })),
-      
-      openPreview: () => set((state) => ({
-        previewState: { ...state.previewState, isOpen: true },
-      })),
-      
-      closePreview: () => set((state) => ({
-        previewState: { ...state.previewState, isOpen: false },
-      })),
-      
-      // Keyboard shortcuts actions
-      setKeyboardShortcutsStats: (stats) => set((state) => ({
-        keyboardShortcutsStats: { ...state.keyboardShortcutsStats, ...stats },
-      })),
-      
-      trackShortcutUsage: (shortcut) => set((state) => {
-        const currentCount = state.keyboardShortcutsStats.shortcutUsageCounts[shortcut] || 0
-        return {
-          keyboardShortcutsStats: {
-            ...state.keyboardShortcutsStats,
-            totalShortcutsUsed: state.keyboardShortcutsStats.totalShortcutsUsed + 1,
-            shortcutUsageCounts: {
-              ...state.keyboardShortcutsStats.shortcutUsageCounts,
-              [shortcut]: currentCount + 1,
-            },
-            lastUsedShortcut: shortcut,
-          },
-        }
-      }),
-      
-      setShowShortcutsModal: (show) => set((state) => ({
-        keyboardShortcutsStats: { ...state.keyboardShortcutsStats, showShortcutsModal: show },
-      })),
-      
-      setShowInlineHint: (show) => set((state) => ({
-        keyboardShortcutsStats: { ...state.keyboardShortcutsStats, showInlineHint: show },
-      })),
-      
-      // Error context actions
-      setErrorContext: (errorContext) => set({ errorContext }),
-      
-      clearError: () => set({ errorContext: null }),
+
+      // ==================== Textarea Actions ====================
+      setTextareaPrefs: (prefs) => {
+        set((state) => {
+          const updated = { ...state.textareaPrefs, ...prefs }
+          saveToStorage('teleprompter_textarea_prefs', updated)
+          return { textareaPrefs: updated }
+        })
+      },
+
+      toggleTextareaSize: () => {
+        set((state) => {
+          const sizeOrder: Array<'default' | 'medium' | 'large' | 'fullscreen'> = [
+            'default',
+            'medium',
+            'large',
+            'fullscreen',
+          ]
+          // Skip toggle if in custom mode, reset to default
+          const currentSize = state.textareaPrefs.size
+          const startIndex = currentSize === 'custom' ? 0 : sizeOrder.indexOf(currentSize)
+          const nextSize = sizeOrder[(startIndex + 1) % sizeOrder.length]
+          const updated = {
+            ...state.textareaPrefs,
+            size: nextSize,
+            isFullscreen: nextSize === 'fullscreen',
+            customHeight: undefined,
+          }
+          saveToStorage('teleprompter_textarea_prefs', updated)
+          return { textareaPrefs: updated }
+        })
+      },
+
+      // ==================== Footer Actions ====================
+      setFooterState: (footerState) => {
+        set((state) => {
+          const updated = { ...state.footerState, ...footerState }
+          saveToStorage('teleprompter_footer_state', updated)
+          return { footerState: updated }
+        })
+      },
+
+      toggleFooter: () => {
+        set((state) => {
+          const isCollapsed = !state.footerState.isCollapsed
+          const updated = {
+            ...state.footerState,
+            isCollapsed,
+            collapsedSince: isCollapsed ? Date.now() : undefined,
+          }
+          saveToStorage('teleprompter_footer_state', updated)
+          return { footerState: updated }
+        })
+      },
+
+      // ==================== Preview Panel Actions ====================
+      setPreviewState: (previewState) => {
+        set((state) => {
+          const updated = { ...state.previewState, ...previewState }
+          saveToStorage('teleprompter_preview_state', updated)
+          return { previewState: updated }
+        })
+      },
+
+      togglePreview: () => {
+        set((state) => {
+          const isOpen = !state.previewState.isOpen
+          const updated = {
+            ...state.previewState,
+            isOpen,
+            lastToggledAt: Date.now(),
+          }
+          saveToStorage('teleprompter_preview_state', updated)
+          return { previewState: updated }
+        })
+      },
+
+      // ==================== Keyboard Shortcuts Actions ====================
+      incrementSessionsCount: () => {
+        set((state) => {
+          const updated = {
+            ...state.shortcutsStats,
+            sessionsCount: state.shortcutsStats.sessionsCount + 1,
+            lastSessionAt: Date.now(),
+          }
+          saveToStorage('teleprompter_shortcuts_stats', updated)
+          return { shortcutsStats: updated }
+        })
+      },
+
+      recordModalOpened: () => {
+        set((state) => {
+          const updated = {
+            ...state.shortcutsStats,
+            modalOpenedCount: state.shortcutsStats.modalOpenedCount + 1,
+          }
+          saveToStorage('teleprompter_shortcuts_stats', updated)
+          return { shortcutsStats: updated }
+        })
+      },
+
+      markTipShown: (tip) => {
+        set((state) => {
+          if (state.shortcutsStats.tipsShown.includes(tip)) {
+            return state
+          }
+          const updated = {
+            ...state.shortcutsStats,
+            tipsShown: [...state.shortcutsStats.tipsShown, tip],
+          }
+          saveToStorage('teleprompter_shortcuts_stats', updated)
+          return { shortcutsStats: updated }
+        })
+      },
+
+      // ==================== Auto-Save Actions ====================
+      setAutoSaveStatus: (status) => {
+        set((state) => ({
+          autoSaveStatus: { ...state.autoSaveStatus, ...status },
+        }))
+      },
+
+      // ==================== Error Context Actions ====================
+      setErrorContext: (errorContext) => {
+        set({ errorContext })
+      },
+
+      clearError: () => {
+        set({ errorContext: null })
+      },
     }),
     {
       name: 'teleprompter-ui-store',
@@ -246,7 +291,8 @@ export const useUIStore = create<UIStore>()(
       partialize: (state) => ({
         textareaPrefs: state.textareaPrefs,
         footerState: state.footerState,
-        keyboardShortcutsStats: state.keyboardShortcutsStats,
+        previewState: state.previewState,
+        shortcutsStats: state.shortcutsStats,
       }),
     }
   )

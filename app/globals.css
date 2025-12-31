@@ -80,4 +80,26 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Focus visible styles for keyboard navigation accessibility */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    transition: outline-color 0.15s ease-in-out, outline-offset 0.15s ease-in-out;
+  }
+
+  /* Reset focus for mouse-only interactions */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Ensure focus styles on interactive elements */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
 }

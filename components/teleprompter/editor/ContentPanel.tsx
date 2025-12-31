@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Play, Save, Share2, LogOut, Crown } from 'lucide-react';
+import { Play, Save, Share2, LogOut, Crown, Eye, EyeOff } from 'lucide-react';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -12,6 +12,8 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useConfigStore } from '@/lib/stores/useConfigStore';
 import { useDemoStore } from '@/stores/useDemoStore';
+import { useUIStore } from '@/stores/useUIStore';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 /**
  * ContentPanel - The content editing section of the Editor
@@ -20,6 +22,7 @@ import { useDemoStore } from '@/stores/useDemoStore';
  * - Header with title, auth, and theme switcher
  * - Text area for script content
  * - Quick action buttons (Preview, Save, Share)
+ * - Mobile/Tablet preview toggle button
  */
 export function ContentPanel() {
   const t = useTranslations('Editor');
@@ -29,6 +32,8 @@ export function ContentPanel() {
   const { isDemoMode } = useDemoStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
   const { typography, colors, effects, layout, animations } = useConfigStore();
+  const { previewState, togglePreview } = useUIStore();
+  const isMobileOrTablet = useMediaQuery('(max-width: 1023px)');
   
   // Handlers
   const handleSave = async () => {
@@ -107,6 +112,16 @@ export function ContentPanel() {
         </h1>
         
         <div className="flex items-center gap-2">
+          {/* Mobile/Tablet Preview Toggle Button */}
+          {isMobileOrTablet && (
+            <button
+              onClick={togglePreview}
+              className="p-1.5 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={previewState.isOpen ? 'Hide preview' : 'Show preview'}
+            >
+              {previewState.isOpen ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          )}
           <ThemeSwitcher />
           {!user ? (
             <button onClick={loginWithGoogle} className="text-xs bg-primary text-primary-foreground px-3 py-1.5 rounded-full font-bold hover:bg-primary/90 transition-colors">
