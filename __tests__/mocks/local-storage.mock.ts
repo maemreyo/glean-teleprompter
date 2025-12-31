@@ -59,7 +59,12 @@ const createLocalStorageMock = (): MockLocalStorage => {
 };
 
 // Global mock instance
-export const mockLocalStorage = createLocalStorageMock();
+export const mockLocalStorage = createLocalStorageMock() as jest.Mocked<MockLocalStorage>;
+
+// Make it global for the actual localStorage
+if (typeof globalThis.localStorage === 'undefined') {
+  globalThis.localStorage = mockLocalStorage as unknown as Storage;
+}
 
 /**
  * Assert that a value was stored in localStorage

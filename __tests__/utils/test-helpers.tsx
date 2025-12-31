@@ -36,8 +36,12 @@ export function setupTestEnvironment() {
  * Call this in afterEach hooks
  */
 export function teardownTestEnvironment() {
-  // Clean up timers
-  jest.runOnlyPendingTimers();
+  // Clean up timers (only if fake timers are enabled)
+  try {
+    jest.runOnlyPendingTimers();
+  } catch (e) {
+    // Ignore error if fake timers are not enabled
+  }
   jest.useRealTimers();
   
   // Clear all mocks

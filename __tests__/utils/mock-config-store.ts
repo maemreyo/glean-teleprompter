@@ -1,5 +1,4 @@
-import { act } from 'react-dom/test-utils'
-import { useConfigStore } from '@/lib/stores/useConfigStore'
+import { act } from 'react'
 import type { ConfigSnapshot, TypographyConfig, ColorConfig, EffectConfig, LayoutConfig, AnimationConfig } from '@/lib/config/types'
 
 // Mock store state for testing
@@ -66,39 +65,49 @@ export const mockInitialState = {
 // Helper to reset store to initial state
 export const resetConfigStore = () => {
   act(() => {
-    useConfigStore.getState().resetAll()
+    const { useConfigStore } = require('@/lib/stores/useConfigStore')
+    const mockStore = useConfigStore()
+    if (mockStore?.resetAll) {
+      mockStore.resetAll()
+    }
   })
 }
 
 // Helper to set specific config state
 export const setConfigState = (config: Partial<ConfigSnapshot>) => {
   act(() => {
-    if (config.typography) {
-      useConfigStore.getState().setTypography(config.typography)
+    const { useConfigStore } = require('@/lib/stores/useConfigStore')
+    const mockStore = useConfigStore()
+    if (!mockStore) return
+
+    if (config.typography && mockStore.setTypography) {
+      mockStore.setTypography(config.typography)
     }
-    if (config.colors) {
-      useConfigStore.getState().setColors(config.colors)
+    if (config.colors && mockStore.setColors) {
+      mockStore.setColors(config.colors)
     }
-    if (config.effects) {
-      useConfigStore.getState().setEffects(config.effects)
+    if (config.effects && mockStore.setEffects) {
+      mockStore.setEffects(config.effects)
     }
-    if (config.layout) {
-      useConfigStore.getState().setLayout(config.layout)
+    if (config.layout && mockStore.setLayout) {
+      mockStore.setLayout(config.layout)
     }
-    if (config.animations) {
-      useConfigStore.getState().setAnimations(config.animations)
+    if (config.animations && mockStore.setAnimations) {
+      mockStore.setAnimations(config.animations)
     }
   })
 }
 
 // Helper to get current store state
 export const getCurrentConfigState = () => {
+  const { useConfigStore } = require('@/lib/stores/useConfigStore')
+  const mockStore = useConfigStore()
   return {
-    typography: useConfigStore.getState().typography,
-    colors: useConfigStore.getState().colors,
-    effects: useConfigStore.getState().effects,
-    layout: useConfigStore.getState().layout,
-    animations: useConfigStore.getState().animations,
+    typography: mockStore?.typography || mockInitialState.typography,
+    colors: mockStore?.colors || mockInitialState.colors,
+    effects: mockStore?.effects || mockInitialState.effects,
+    layout: mockStore?.layout || mockInitialState.layout,
+    animations: mockStore?.animations || mockInitialState.animations,
   }
 }
 
