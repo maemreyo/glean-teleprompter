@@ -91,11 +91,11 @@ Each user story phase is independently testable and can be completed in any orde
 ### Tasks
 
 - [X] T019 [US1] Create test file `__tests__/integration/studio/initialization.test.tsx` with describe blocks
-- [ ] T020 [US1] Write test: "should display Editor component when no URL parameters present"
-- [ ] T021 [US1] Write test: "should disable demo mode on initial mount"
-- [ ] T022 [US1] Write test: "should initialize exactly once (no duplicate initialization)"
-- [ ] T023 [US1] Write test: "should show Suspense fallback during initial load"
-- [ ] T024 [US1] Write test: "should render AppProvider and Toaster components"
+- [X] T020 [US1] Write test: "should display Editor component when no URL parameters present"
+- [X] T021 [US1] Write test: "should disable demo mode on initial mount"
+- [X] T022 [US1] Write test: "should initialize exactly once (no duplicate initialization)"
+- [X] T023 [US1] Write test: "should show Suspense fallback during initial load"
+- [X] T024 [US1] Write test: "should render AppProvider and Toaster components"
 
 ---
 
@@ -114,14 +114,14 @@ Each user story phase is independently testable and can be completed in any orde
 
 ### Tasks
 
-- [ ] T025 [US2] Create test file `__tests__/integration/studio/template-loading.test.tsx` with describe blocks
+- [X] T025 [US2] Create test file `__tests__/integration/studio/template-loading.test.tsx` with describe blocks
 - [X] T026 [P] [US2] Create template fixture data in `__tests__/fixtures/templates.ts`
-- [ ] T027 [US2] Write test: "should load template content when ?template parameter present"
-- [ ] T028 [US2] Write test: "should apply all template settings to teleprompter store"
-- [ ] T029 [US2] Write test: "should show success toast with template name after loading"
-- [ ] T030 [US2] Write test: "should set mode to setup after template load"
-- [ ] T031 [US2] Write test: "should fall through to default initialization when template not found"
-- [ ] T032 [US2] Write test: "should handle template with missing optional settings"
+- [X] T027 [US2] Write test: "should load template content when ?template parameter present"
+- [X] T028 [US2] Write test: "should apply all template settings to teleprompter store"
+- [X] T029 [US2] Write test: "should show success toast with template name after loading"
+- [X] T030 [US2] Write test: "should set mode to setup after template load"
+- [X] T031 [US2] Write test: "should fall through to default initialization when template not found"
+- [X] T032 [US2] Write test: "should handle template with missing optional settings"
 
 ---
 

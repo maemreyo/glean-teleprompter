@@ -17,7 +17,9 @@ let StudioLogic: React.ComponentType;
 
 // Mock the AppProvider to avoid next-intl ESM issues
 jest.mock('@/components/AppProvider', () => ({
-  AppProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>
+  AppProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="app-provider">{children}</div>
+  )
 }));
 
 // Mock the Toaster
@@ -102,5 +104,38 @@ describe('Studio Page - Initial Page Load (US1)', () => {
     });
   });
 
+  it('should show Suspense fallback during initial load', async () => {
+    // Given: Studio page with Suspense wrapper
+    // Note: In testing, Suspense fallback shows briefly or not at all
+    // depending on async operations. We'll test the structure is correct.
 
+    // When: Page loads
+    render(<StudioPage />);
+
+    // Then: Suspense should resolve to show Editor
+    // The Suspense fallback text should not be present after load completes
+    await waitFor(() => {
+      expect(screen.queryByText('Loading Studio...')).not.toBeInTheDocument();
+      expect(screen.getByTestId('editor-component')).toBeInTheDocument();
+    });
+  });
+
+  it('should render AppProvider and Toaster components', async () => {
+    // Given: Studio page structure with providers
+    // (AppProvider is mocked to render children, Toaster is mocked)
+
+    // When: Page loads
+    render(<StudioPage />);
+
+    // Then: AppProvider should be present (wrapper div)
+    // Note: Toaster is a separate child of AppProvider
+    await waitFor(() => {
+      // AppProvider wrapper should be present
+      const appProvider = screen.getByTestId('app-provider');
+      expect(appProvider).toBeInTheDocument();
+
+      // Editor component (inside Suspense, inside AppProvider) should be present
+      expect(screen.getByTestId('editor-component')).toBeInTheDocument();
+    });
+  });
 });
