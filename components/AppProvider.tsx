@@ -15,10 +15,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages} timeZone="Asia/Ho_Chi_Minh">
-       {/* Inject Locale Switcher capability via Context if needed, or just let users switch via store later ?? 
-           Actually, for now, let's expose a way to switch locale.
-           Or better: Keep it simple.
-       */}
        <div className="relative">
           {children}
           {/* Simple Locale Switcher Overlay for testing/usage */}

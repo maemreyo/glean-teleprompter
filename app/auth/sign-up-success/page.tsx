@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -5,10 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
+import { AppProvider } from "@/components/AppProvider";
 
-export default async function Page() {
-  const t = await getTranslations("SignUpSuccess");
+function SignUpSuccessContent() {
+  const t = useTranslations("SignUpSuccess");
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -30,5 +33,13 @@ export default async function Page() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <AppProvider>
+      <SignUpSuccessContent />
+    </AppProvider>
   );
 }
