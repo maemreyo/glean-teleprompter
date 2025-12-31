@@ -162,6 +162,7 @@ export interface MockLoadScriptAction {
   // Helper methods for test control
   __setMockResult: (result: ScriptActionResult) => void;
   __setMockError: (error: string) => void;
+  __setMockReject: (error?: Error | string) => void;
   __setDelay: (ms: number) => void;
   __reset: () => void;
 }

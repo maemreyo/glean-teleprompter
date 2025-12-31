@@ -239,4 +239,25 @@ describe('Studio Page - Script Loading (US3)', () => {
       expect(mockToast.error).toHaveBeenCalled();
     });
   });
+
+  it('should handle promise rejection from loadScriptAction', async () => {
+    // Given: URL with script that causes promise rejection
+    mockLoadScriptAction.__setMockReject(new Error('Network connection failed'));
+    setSearchParams({ script: 'error-script-id' });
+
+    // When: Page loads
+    render(<StudioPage />);
+
+    // Then: Error should be caught and error toast shown
+    await waitFor(() => {
+      expect(mockLoadScriptAction).toHaveBeenCalledWith('error-script-id');
+      // Should log error to console
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        '[Studio] Error loading script:',
+        expect.any(Error)
+      );
+      // Should show error toast
+      expect(mockToast.error).toHaveBeenCalledWith('Failed to load script');
+    });
+  });
 });
