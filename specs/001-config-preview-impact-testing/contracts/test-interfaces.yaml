@@ -1,0 +1,301 @@
+openapi: 3.0.1
+info:
+  title: Config Preview Impact Testing Interfaces
+  version: 1.0.0
+  description: API interfaces for config-preview impact testing methodology
+
+paths:
+  /test/config-impact/validate:
+    post:
+      summary: Validate a config change impact on preview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scenarioId:
+                  type: string
+                  description: Test scenario identifier
+                configChange:
+                  $ref: '#/components/schemas/ConfigUpdate'
+                expectedImpact:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ExpectedVisualImpact'
+                timeout:
+                  type: number
+                  default: 5000
+                  description: Validation timeout in milliseconds
+              required:
+                - scenarioId
+                - configChange
+                - expectedImpact
+      responses:
+        '200':
+          description: Validation successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  responseTime:
+                    type: number
+                    description: Actual response time in milliseconds
+                  validations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationResult'
+        '400':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                  failedValidations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationResult'
+
+  /test/config-impact/batch:
+    post:
+      summary: Run multiple config impact tests
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                testSuite:
+                  type: string
+                  description: Test suite identifier
+                scenarios:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      scenarioId:
+                        type: string
+                      configChange:
+                        $ref: '#/components/schemas/ConfigUpdate'
+                      expectedImpact:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ExpectedVisualImpact'
+                parallel:
+                  type: boolean
+                  default: true
+                  description: Run tests in parallel
+              required:
+                - scenarios
+      responses:
+        '200':
+          description: Batch test completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalTests:
+                    type: number
+                  passedTests:
+                    type: number
+                  failedTests:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scenarioId:
+                          type: string
+                        success:
+                          type: boolean
+                        responseTime:
+                          type: number
+                        errors:
+                          type: array
+                          items:
+                            type: string
+
+  /test/config-impact/performance:
+    post:
+      summary: Measure performance of config changes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                configChange:
+                  $ref: '#/components/schemas/ConfigUpdate'
+                iterations:
+                  type: number
+                  default: 10
+                  description: Number of iterations to measure
+                warmup:
+                  type: number
+                  default: 3
+                  description: Warmup iterations
+              required:
+                - configChange
+      responses:
+        '200':
+          description: Performance metrics collected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  averageResponseTime:
+                    type: number
+                    description: Average response time in milliseconds
+                  minResponseTime:
+                    type: number
+                  maxResponseTime:
+                    type: number
+                  percentile95:
+                    type: number
+                  percentile99:
+                    type: number
+                  memoryUsage:
+                    type: object
+                    properties:
+                      average:
+                        type: number
+                        description: Average memory usage in MB
+                      peak:
+                        type: number
+                        description: Peak memory usage in MB
+
+components:
+  schemas:
+    ConfigUpdate:
+      type: object
+      properties:
+        typography:
+          $ref: '#/components/schemas/TypographyConfig'
+        colors:
+          $ref: '#/components/schemas/ColorConfig'
+        effects:
+          $ref: '#/components/schemas/EffectConfig'
+        layout:
+          $ref: '#/components/schemas/LayoutConfig'
+        animations:
+          $ref: '#/components/schemas/AnimationConfig'
+
+    TypographyConfig:
+      type: object
+      properties:
+        fontFamily:
+          type: string
+        fontSize:
+          type: number
+        fontWeight:
+          type: number
+        letterSpacing:
+          type: number
+        lineHeight:
+          type: number
+        textTransform:
+          type: string
+
+    ColorConfig:
+      type: object
+      properties:
+        primaryColor:
+          type: string
+        gradientEnabled:
+          type: boolean
+        gradientColors:
+          type: array
+          items:
+            type: string
+
+    EffectConfig:
+      type: object
+      properties:
+        shadowEnabled:
+          type: boolean
+        outlineEnabled:
+          type: boolean
+        glowEnabled:
+          type: boolean
+
+    LayoutConfig:
+      type: object
+      properties:
+        horizontalMargin:
+          type: number
+        verticalPadding:
+          type: number
+        textAlign:
+          type: string
+        textAreaWidth:
+          type: number
+
+    AnimationConfig:
+      type: object
+      properties:
+        smoothScrollEnabled:
+          type: boolean
+        entranceAnimation:
+          type: string
+        autoScrollEnabled:
+          type: boolean
+
+    ExpectedVisualImpact:
+      type: object
+      properties:
+        component:
+          type: string
+        property:
+          type: string
+        value:
+          oneOf:
+            - type: string
+            - type: number
+        validator:
+          type: string
+          enum: [exact, contains, range]
+        tolerance:
+          type: number
+      required:
+        - component
+        - property
+        - value
+        - validator
+
+    ValidationResult:
+      type: object
+      properties:
+        component:
+          type: string
+        property:
+          type: string
+        expected:
+          oneOf:
+            - type: string
+            - type: number
+        actual:
+          oneOf:
+            - type: string
+            - type: number
+        success:
+          type: boolean
+        error:
+          type: string
