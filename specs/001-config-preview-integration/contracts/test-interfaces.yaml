@@ -1,0 +1,104 @@
+openapi: 3.0.1
+info:
+  title: Config Panel to Preview Integration Test Interfaces
+  version: 1.0.0
+  description: Test interfaces for verifying config-to-preview synchronization
+
+paths:
+  /test/config-preview-integration:
+    post:
+      summary: Execute integration test scenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scenario:
+                  type: string
+                  description: Test scenario identifier (e.g., 'typography-font-family')
+                configChange:
+                  type: object
+                  description: Configuration update to apply
+                expectedResults:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      property:
+                        type: string
+                        description: CSS property to verify
+                      value:
+                        type: string
+                        description: Expected value
+              required:
+                - scenario
+                - configChange
+                - expectedResults
+      responses:
+        '200':
+          description: Test passed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passed:
+                    type: boolean
+                    example: true
+                  executionTime:
+                    type: number
+                    description: Test execution time in milliseconds
+        '500':
+          description: Test failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passed:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    description: Failure reason
+                  actualValue:
+                    type: string
+                    description: Actual value found (if applicable)
+
+components:
+  schemas:
+    ConfigTestScenario:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+          enum: [typography, colors, effects, layout, animations]
+        configChange:
+          type: object
+        expectedStyles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpectedStyle'
+      required:
+        - name
+        - category
+        - configChange
+        - expectedStyles
+
+    ExpectedStyle:
+      type: object
+      properties:
+        property:
+          type: string
+        value:
+          type: string
+        element:
+          type: string
+          default: ".teleprompter-text"
+      required:
+        - property
+        - value

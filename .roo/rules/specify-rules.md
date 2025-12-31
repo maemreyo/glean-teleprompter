@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2025-12-31
 
 ## Active Technologies
+- TypeScript 5.3+ with strict mode + React 18.2+, Next.js 14+, Jest, React Testing Library, Zustand 4.4+ (001-config-preview-integration)
+- N/A (testing feature) (001-config-preview-integration)
 
 - TypeScript 5.3+ with strict mode + React 18.2+, Next.js 14+, Zustand 4.4+, Supabase 2.39+, Google Fonts API, react-colorful (001-ui-config-system)
 
@@ -23,6 +25,7 @@ npm test && npm run lint
 TypeScript 5.3+ with strict mode: Follow standard conventions
 
 ## Recent Changes
+- 001-config-preview-integration: Added TypeScript 5.3+ with strict mode + React 18.2+, Next.js 14+, Jest, React Testing Library, Zustand 4.4+
 
 - 001-ui-config-system: Added TypeScript 5.3+ with strict mode + React 18.2+, Next.js 14+, Zustand 4.4+, Supabase 2.39+, Google Fonts API, react-colorful
 
