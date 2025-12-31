@@ -123,6 +123,7 @@ export function useCameraRecorder(options: UseCameraRecorderOptions = {}): UseCa
         return { ...prev, duration: newDuration };
       });
     }, 1000);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maxDuration]);
 
   const stopDurationTracking = useCallback(() => {
@@ -238,6 +239,7 @@ export function useCameraRecorder(options: UseCameraRecorderOptions = {}): UseCa
       onError?.(error);
       return false;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mimeType, quality, updateState, onError, onRecordingComplete, startDurationTracking, stopDurationTracking]);
 
   // Stop recording

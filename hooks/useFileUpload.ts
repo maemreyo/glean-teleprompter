@@ -34,9 +34,10 @@ export const useFileUpload = () => {
             
             toast.success("Upload thành công!", { id: toastId });
             return publicUrl;
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            toast.error("Upload bộ thất: " + error.message, { id: toastId });
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            toast.error("Upload bộ thất: " + errorMessage, { id: toastId });
             return null;
         } finally {
             setUploading(false);

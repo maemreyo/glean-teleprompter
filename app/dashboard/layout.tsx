@@ -27,14 +27,20 @@ export default async function DashboardLayout({
               Glean
             </Link>
             <div className="hidden md:flex items-center gap-6">
-              <Link 
-                href="/dashboard" 
+              <Link
+                href="/dashboard"
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 Overview
               </Link>
-              <Link 
-                href="/studio" 
+              <Link
+                href="/dashboard/recordings"
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Recordings
+              </Link>
+              <Link
+                href="/studio"
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 Studio

@@ -49,6 +49,7 @@ export function RecordingsLibrary({ className }: RecordingsLibraryProps) {
 
   useEffect(() => {
     loadRecordings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   const handleDelete = async (id: string) => {

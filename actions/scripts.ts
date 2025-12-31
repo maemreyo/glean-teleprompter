@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-export async function saveScriptAction(scriptData: any) {
+export async function saveScriptAction(scriptData: Record<string, unknown>) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     

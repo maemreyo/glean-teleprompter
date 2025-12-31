@@ -17,6 +17,12 @@ export default async function DashboardPage() {
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user?.id)
 
+  // Fetch user's scripts count
+  const { count: scriptsCount } = await supabase
+    .from('scripts')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user?.id)
+
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
@@ -25,12 +31,12 @@ export default async function DashboardPage() {
           Welcome back{user?.email ? `, ${user.email}` : ''}!
         </h1>
         <p className="text-gray-400 mt-2">
-          Manage your recordings, presets, and settings
+          Manage your recordings, scripts, presets, and settings
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Link
           href="/studio"
           className="bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-pink-500 transition-colors group"
@@ -49,6 +55,20 @@ export default async function DashboardPage() {
             </div>
           </div>
         </Link>
+
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Total Scripts</p>
+              <p className="text-white text-2xl font-bold mt-1">{scriptsCount || 0}</p>
+            </div>
+            <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+          </div>
+        </div>
 
         <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
           <div className="flex items-center justify-between">
@@ -82,7 +102,7 @@ export default async function DashboardPage() {
       {/* Quick Actions */}
       <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
         <h2 className="text-white text-lg font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             href="/studio"
             className="flex items-center gap-3 p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
@@ -112,6 +132,21 @@ export default async function DashboardPage() {
               <p className="text-gray-400 text-sm">Manage your recorded videos</p>
             </div>
           </Link>
+
+          <Link
+            href="/dashboard/scripts"
+            className="flex items-center gap-3 p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            <div className="h-10 w-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-white font-medium">Manage Scripts</p>
+              <p className="text-gray-400 text-sm">View and edit your saved scripts</p>
+            </div>
+          </Link>
         </div>
       </div>
 
@@ -132,11 +167,11 @@ export default async function DashboardPage() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-pink-500 font-bold">3.</span>
-            <span>Use camera recording to capture yourself while reading</span>
+            <span>Save your scripts to the cloud and share them with others</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-pink-500 font-bold">4.</span>
-            <span>Save and download your recordings for sharing</span>
+            <span>Use camera recording to capture yourself while reading</span>
           </li>
         </ol>
       </div>

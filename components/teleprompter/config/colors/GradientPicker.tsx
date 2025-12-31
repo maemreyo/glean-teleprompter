@@ -19,7 +19,6 @@ export function GradientPicker({
   type,
   colors,
   angle,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used in ColorsTab
   onEnabledChange,
   onTypeChange,
   onColorsChange,

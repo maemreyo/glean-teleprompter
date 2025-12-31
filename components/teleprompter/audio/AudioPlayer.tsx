@@ -46,6 +46,7 @@ const NativeAudioStrategy: React.FC<AudioPlayerProps> = ({ url, playing, volume,
     return <audio ref={audioRef} src={url} loop={loop} />;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Player = ReactPlayer as any;
 
 const YouTubeStrategy: React.FC<AudioPlayerProps> = ({ url, playing, volume, loop }) => {
@@ -57,15 +58,16 @@ const YouTubeStrategy: React.FC<AudioPlayerProps> = ({ url, playing, volume, loo
     // Note: YouTube iframe API has restrictions on autoplay and background play on mobile.
     // We use ReactPlayer to handle most complexity.
     return (
-        <div className="hidden"> 
-            <Player 
-                url={url} 
-                playing={playing} 
-                loop={loop} 
+        <div className="hidden">
+            <Player
+                url={url}
+                playing={playing}
+                loop={loop}
                 volume={volume}
                 onReady={() => console.log("[AudioPlayer] Player Ready")}
                 onStart={() => console.log("[AudioPlayer] Player Started")}
                 onPlay={() => console.log("[AudioPlayer] Player Playing")}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onError={(e: any) => console.error("[AudioPlayer] Player Error", e)}
                 controls={false}
                 width="0" 

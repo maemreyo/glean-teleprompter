@@ -5,10 +5,12 @@ import { Play, Save, Share2, LogOut, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useDemoStore } from '@/stores/useDemoStore';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { saveScriptAction } from '@/actions/scripts';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 
 // Modular Components
 import { FontSelector } from '@/components/teleprompter/controls/FontSelector';
@@ -18,12 +20,25 @@ import { TeleprompterText } from '@/components/teleprompter/display/Teleprompter
 
 export function Editor() {
   const t = useTranslations('Editor');
+  const router = useRouter();
   const store = useTeleprompterStore();
   const { user, isPro } = useAuthStore();
+  const { isDemoMode } = useDemoStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
   
   // Handlers
   const handleSave = async () => {
+    // Check demo mode first
+    if (isDemoMode) {
+      toast.error('Demo Mode: Sign up to save your scripts and recordings', {
+        action: {
+          label: 'Sign Up',
+          onClick: () => router.push('/auth/sign-up')
+        }
+      });
+      return;
+    }
+    
     if (!user) {
         await loginWithGoogle();
         return;
