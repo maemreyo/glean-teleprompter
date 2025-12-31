@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Play, Save, Share2, LogOut, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
@@ -15,7 +15,6 @@ import { FontSelector } from '@/components/teleprompter/controls/FontSelector';
 import { ColorPicker } from '@/components/teleprompter/controls/ColorPicker';
 import { MediaInput } from '@/components/teleprompter/controls/MediaInput';
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
-import { FONT_STYLES, TEXT_COLORS } from '@/lib/constants';
 
 export function Editor() {
   const t = useTranslations('Editor');
@@ -130,7 +129,11 @@ export function Editor() {
 
                 {/* Font & Color */}
                 <div className="space-y-4">
-                  <FontSelector selectedFont={store.font} onSelect={(f) => store.setFont(f as any)} />
+                  {/* eslint-disable @typescript-eslint/no-explicit-any */}
+                  <FontSelector
+                    selectedFont={store.font as any}
+                    onSelect={(f) => store.setFont(f as any)}
+                  />
                   <ColorPicker selectedIndex={store.colorIndex} onSelect={store.setColorIndex} />
                 </div>
 
@@ -160,7 +163,7 @@ export function Editor() {
                <div className="absolute inset-0 bg-black/30" />
                <div className="absolute inset-0 flex items-center justify-center p-12 overflow-hidden">
                    {/* Reusing TeleprompterText for Exact WYSIWYG */}
-                   <TeleprompterText 
+                   <TeleprompterText
                         text={store.text}
                         fontName={store.font}
                         colorIndex={store.colorIndex}

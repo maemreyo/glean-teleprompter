@@ -6,7 +6,7 @@ import { Cloud, CloudOff, RefreshCw } from 'lucide-react'
 
 export function SyncControls() {
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error'>('synced')
-  const [isOnline, setIsOnline] = useState(true)
+  const [isOnline] = useState(true)
 
   const handleSync = async () => {
     setSyncStatus('syncing')
