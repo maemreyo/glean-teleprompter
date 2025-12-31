@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   Type,
   Palette,
@@ -13,6 +13,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
 import { useTranslations } from 'next-intl'
+import { ARIA_LABELS } from '@/lib/a11y/ariaLabels'
 import { TypographyTab } from './typography/TypographyTab'
 import { ColorsTab } from './colors/ColorsTab'
 import { EffectsTab } from './effects/EffectsTab'
@@ -79,26 +80,59 @@ export function ConfigTabs() {
   const t = useTranslations('Config')
   const { activeTab, setActiveTab } = useConfigStore()
   const [hoveredTab, setHoveredTab] = useState<TabId | null>(null)
-  
   const tabs = getTabConfig(t)
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component
-  
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+
+  // Handle arrow key navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const currentIndex = tabs.findIndex(tab => tab.id === activeTab)
+    let newIndex = currentIndex
+
+    switch (e.key) {
+      case 'ArrowLeft':
+        e.preventDefault()
+        newIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1
+        break
+      case 'ArrowRight':
+        e.preventDefault()
+        newIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0
+        break
+      case 'Home':
+        e.preventDefault()
+        newIndex = 0
+        break
+      case 'End':
+        e.preventDefault()
+        newIndex = tabs.length - 1
+        break
+      default:
+        return
+    }
+
+    setActiveTab(tabs[newIndex].id)
+    // Focus the new tab
+    tabRefs.current[newIndex]?.focus()
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Tab Navigation */}
-      <div className="flex border-b border-border overflow-x-auto">
-        {tabs.map((tab) => {
+      <div role="tablist" aria-label="Configuration tabs" className="flex border-b border-border overflow-x-auto">
+        {tabs.map((tab, index) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
           const isHovered = hoveredTab === tab.id
           const label = t(tab.labelKey)
-          
+
           return (
             <button
               key={tab.id}
+              ref={(el) => { tabRefs.current[index] = el }}
               onClick={() => setActiveTab(tab.id)}
               onMouseEnter={() => setHoveredTab(tab.id)}
               onMouseLeave={() => setHoveredTab(null)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
               className={cn(
                 'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap',
                 'border-b-2 -mb-px',
@@ -106,8 +140,9 @@ export function ConfigTabs() {
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               )}
-              aria-label={`Switch to ${label} tab`}
+              aria-label={ARIA_LABELS.configTab(label, index, tabs.length)}
               aria-selected={isActive}
+              tabIndex={isActive ? 0 : -1}
               role="tab"
             >
               <Icon

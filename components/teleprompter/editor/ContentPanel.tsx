@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Play, Save, Share2, LogOut, Crown, Eye, EyeOff } from 'lucide-react';
+import { Play, Save, Share2, LogOut, Crown, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -14,6 +14,9 @@ import { useConfigStore } from '@/lib/stores/useConfigStore';
 import { useDemoStore } from '@/stores/useDemoStore';
 import { useUIStore } from '@/stores/useUIStore';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useAutoSave } from '@/hooks/useAutoSave';
+import { AutoSaveStatus } from '@/components/teleprompter/config/ui/AutoSaveStatus';
+import { useRef } from 'react';
 
 /**
  * ContentPanel - The content editing section of the Editor
@@ -32,9 +35,38 @@ export function ContentPanel() {
   const { isDemoMode } = useDemoStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
   const { typography, colors, effects, layout, animations } = useConfigStore();
-  const { previewState, togglePreview } = useUIStore();
+  const { previewState, togglePreview, footerState, toggleFooter } = useUIStore();
   const isMobileOrTablet = useMediaQuery('(max-width: 1023px)');
   
+  // Ref for textarea element
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-save hook for local draft persistence
+  const { status: autoSaveStatus, lastSavedAt, error: autoSaveError, saveNow } = useAutoSave(
+    {
+      text: store.text,
+      bgUrl: store.bgUrl,
+      musicUrl: store.musicUrl,
+    },
+    {
+      storageKey: 'teleprompter_draft',
+      interval: 5000,
+      enabled: true,
+    }
+  );
+  
+  // Auto-scroll to bottom when Enter is pressed (T029)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && textareaRef.current) {
+      // Small timeout to ensure content renders first
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+        }
+      }, 10);
+    }
+  };
+
   // Handlers
   const handleSave = async () => {
     // Check demo mode first
@@ -92,6 +124,8 @@ export function ContentPanel() {
 
     if (result.success) {
       toast.success(t('saveSuccess'), { id: toastId });
+      // Update auto-save timestamp to show "Just now"
+      await saveNow();
     } else {
       toast.error(t('saveFailed') + " " + result.error, { id: toastId });
     }
@@ -112,6 +146,14 @@ export function ContentPanel() {
         </h1>
         
         <div className="flex items-center gap-2">
+          {/* Auto-save status indicator */}
+          <AutoSaveStatus
+            status={autoSaveStatus}
+            lastSavedAt={lastSavedAt ?? undefined}
+            errorMessage={autoSaveError ?? undefined}
+            onRetry={saveNow}
+          />
+          
           {/* Mobile/Tablet Preview Toggle Button */}
           {isMobileOrTablet && (
             <button
@@ -141,35 +183,70 @@ export function ContentPanel() {
         </div>
       </div>
 
-      {/* Content Controls */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar pb-24">
+      {/* Content Controls - T028: Added pb-32 (128px) padding-bottom to prevent footer obstruction */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar pb-32">
         {/* Text Area */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <label className="text-xs font-bold text-muted-foreground uppercase">{t('contentLabel')}</label>
           </div>
           <textarea
+            ref={textareaRef}
             value={store.text}
             onChange={(e) => store.setText(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="w-full h-32 bg-secondary rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary outline-none resize-none border border-border placeholder-muted-foreground"
             placeholder={t('contentPlaceholder')}
           />
         </div>
       </div>
 
-      {/* Footer Actions */}
+      {/* Footer Actions - T032: Semi-transparent backdrop (bg-card/90 backdrop-blur) */}
       <div className="absolute bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur border-t border-border space-y-2">
-        <button onClick={() => store.setMode('running')} className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-          <Play size={16} fill="currentColor" /> {t('preview')}
-        </button>
-        <div className="grid grid-cols-2 gap-2">
-          <button onClick={handleSave} className="py-2 bg-green-900/40 text-green-400 border border-green-900 hover:bg-green-900/60 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors">
-            <Save size={14} /> {t('save')}
-          </button>
-          <button onClick={handleShare} className="py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors">
-            <Share2 size={14} /> {t('share')}
+        
+        {/* T030/T033: Collapse/Expand button */}
+        <div className="flex justify-center">
+          <button
+            onClick={toggleFooter}
+            className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={footerState.isCollapsed ? 'Expand footer' : 'Collapse footer'}
+          >
+            {footerState.isCollapsed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
         </div>
+        
+        {/* T031: Minimized footer state - show only Preview button when collapsed */}
+        {footerState.isCollapsed ? (
+          <button
+            onClick={() => store.setMode('running')}
+            className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+          >
+            <Play size={16} fill="currentColor" /> {t('preview')}
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={() => store.setMode('running')}
+              className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+            >
+              <Play size={16} fill="currentColor" /> {t('preview')}
+            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={handleSave}
+                className="py-2 bg-green-900/40 text-green-400 border border-green-900 hover:bg-green-900/60 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+              >
+                <Save size={14} /> {t('save')}
+              </button>
+              <button
+                onClick={handleShare}
+                className="py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+              >
+                <Share2 size={14} /> {t('share')}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

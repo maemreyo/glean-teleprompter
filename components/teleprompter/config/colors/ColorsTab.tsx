@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { ColorPicker } from '../ui/ColorPicker'
 import { GradientPicker } from './GradientPicker'
 import { ContrastBadge } from './ContrastBadge'
@@ -7,6 +8,7 @@ import { useConfigStore } from '@/lib/stores/useConfigStore'
 import { validateContrast } from '@/lib/config/contrast'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
+import { ARIA_LABELS } from '@/lib/a11y/ariaLabels'
 
 // Color palettes
 const getColorPalettes = (t: (key: string) => string) => [
@@ -36,16 +38,31 @@ export function ColorsTab() {
   const t = useTranslations('Config.colors')
   const { colors, setColors } = useConfigStore()
   const colorPalettes = getColorPalettes(t)
-  
+  const [focusedPaletteIndex, setFocusedPaletteIndex] = useState<number | null>(null)
+
   // Calculate contrast validation (against black background for now)
   const contrastValidation = validateContrast(
     colors.primaryColor,
     '#000000'
   )
-  
+
   // Apply palette
   const applyPalette = (palette: typeof colorPalettes[0]) => {
     setColors({ primaryColor: palette.colors[0] })
+  }
+
+  // Handle keyboard navigation for color swatches
+  const handleSwatchKeyDown = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    color: string,
+    paletteIndex: number,
+    swatchIndex: number
+  ) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      const palette = colorPalettes[paletteIndex]
+      setColors({ primaryColor: color })
+    }
   }
   
   return (
@@ -62,22 +79,36 @@ export function ColorsTab() {
         <label className="block text-sm font-medium text-foreground">
           {t('colorPalettes')}
         </label>
-        <div className="grid grid-cols-2 gap-2">
-          {colorPalettes.map((palette) => (
+        <div
+          role="grid"
+          aria-label="Color palette"
+          className="grid grid-cols-2 gap-2"
+        >
+          {colorPalettes.map((palette, paletteIndex) => (
             <button
               key={palette.name}
               onClick={() => applyPalette(palette)}
-              className="p-3 rounded-lg border border-border hover:border-primary transition-colors text-left"
+              className="p-3 rounded-lg border border-border hover:border-primary transition-colors text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              aria-label={`${palette.name} palette`}
+              role="row"
             >
               <div className="text-sm font-medium text-foreground mb-2">
                 {palette.name}
               </div>
-              <div className="flex gap-1">
-                {palette.colors.map((color) => (
+              <div role="grid" className="flex gap-1">
+                {palette.colors.map((color, swatchIndex) => (
                   <div
                     key={color}
                     className="w-6 h-6 rounded-full border border-border"
                     style={{ backgroundColor: color }}
+                    role="gridcell"
+                    aria-label={ARIA_LABELS.colorSwatch(color)}
+                    tabIndex={0}
+                    onKeyDown={(e) => handleSwatchKeyDown(e, color, paletteIndex, swatchIndex)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setColors({ primaryColor: color })
+                    }}
                   />
                 ))}
               </div>

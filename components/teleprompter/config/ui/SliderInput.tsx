@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+import { ARIA_LABELS } from '@/lib/a11y/ariaLabels'
 
 interface SliderInputProps {
   value: number
@@ -19,7 +20,7 @@ export function SliderInput({
   min,
   max,
   step,
-  unit,
+  unit = '',
   label,
   onChange,
   className,
@@ -42,6 +43,11 @@ export function SliderInput({
       setInputValue(newValue.toString())
     }
   }
+
+  // Format value for ARIA
+  const ariaLabel = label
+    ? ARIA_LABELS.slider(label, value, unit)
+    : `${value}${unit}`
   
   return (
     <div className={cn('space-y-2', className)}>
@@ -59,6 +65,11 @@ export function SliderInput({
           value={value}
           onChange={(e) => handleSliderChange(parseFloat(e.target.value))}
           className="flex-1 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary hover:accent-primary/80 transition-colors"
+          aria-label={ariaLabel}
+          aria-valuenow={value}
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuetext={ariaLabel}
         />
         <div className="relative w-20 sm:w-24 flex items-center">
           <input

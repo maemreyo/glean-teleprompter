@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ContentPanel } from './editor/ContentPanel';
 import { ConfigPanel } from './config/ConfigPanel';
 import { PreviewPanel } from './editor/PreviewPanel';
@@ -20,11 +21,14 @@ import { PreviewPanel } from './editor/PreviewPanel';
  * - Inline sliders (moved to TypographyTab/LayoutTab)
  */
 export function Editor() {
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       exit={{ opacity: 0, y: -50 }}
+      transition={prefersReducedMotion ? { duration: 0 } : undefined}
       className="h-screen flex flex-col lg:flex-row overflow-hidden"
     >
       {/* Content Panel - Text editing and quick actions */}

@@ -7,6 +7,8 @@ import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { ARIA_LABELS } from '@/lib/a11y/ariaLabels';
 
 // Modular Components
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
@@ -19,6 +21,7 @@ export function Runner() {
     const store = useTeleprompterStore();
     const router = useRouter();
     const textContainerRef = useRef<HTMLDivElement>(null);
+    const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMusicPlaying, setIsMusicPlaying] = useState(false);
@@ -45,8 +48,11 @@ export function Runner() {
     }, [isPlaying, store.speed, store.mode]);
 
     return (
-        <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={prefersReducedMotion ? { duration: 0 } : undefined}
             className="relative h-screen w-full overflow-hidden font-sans text-white"
         >
              {/* Universal Audio Player (Hidden or Managed) */}
@@ -76,11 +82,19 @@ export function Runner() {
                   {cameraVisible ? <CameraOff size={20} /> : <Camera size={20} />}
                 </button>
                 {!store.isReadOnly ? (
-                  <button onClick={() => store.setMode('setup')} className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur rounded-full text-white/80 transition-all">
+                  <button
+                    onClick={() => store.setMode('setup')}
+                    className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur rounded-full text-white transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+                    aria-label="Back to setup"
+                  >
                     <ArrowLeft size={20} />
                   </button>
                 ) : (
-                  <button onClick={() => { store.setIsReadOnly(false); store.setMode('setup'); router.push(window.location.pathname); }} className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur rounded-full text-white text-sm font-medium flex items-center gap-2 border border-white/10">
+                  <button
+                    onClick={() => { store.setIsReadOnly(false); store.setMode('setup'); router.push(window.location.pathname); }}
+                    className="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur rounded-full text-white text-sm font-medium flex items-center gap-2 border border-white/20 transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+                    aria-label={`Create new teleprompter, ${t('create')}`}
+                  >
                     <Edit3 size={14} /> {t('create')}
                   </button>
                 )}
@@ -108,20 +122,52 @@ export function Runner() {
                   </button>
 
                   <div className="flex-1 space-y-2">
-                     <div className="flex items-center justify-between text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                     <div className="flex items-center justify-between text-[10px] text-white/70 font-medium uppercase tracking-wider">
                        <span>{t('speed')}</span>
                        <span>{t('fontSize')}</span>
                      </div>
                      <div className="grid grid-cols-2 gap-4">
-                        <input type="range" min="1" max="10" value={store.speed} onChange={(e) => store.setSpeed(Number(e.target.value))} className="h-1 bg-gray-600 rounded-full appearance-none accent-white cursor-pointer" />
-                        <input type="range" min="20" max="80" value={store.fontSize} onChange={(e) => store.setFontSize(Number(e.target.value))} className="h-1 bg-gray-600 rounded-full appearance-none accent-white cursor-pointer" />
+                        <input
+                          type="range"
+                          min="1"
+                          max="10"
+                          value={store.speed}
+                          onChange={(e) => store.setSpeed(Number(e.target.value))}
+                          className="h-1 bg-gray-600 rounded-full appearance-none accent-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50"
+                          aria-label={ARIA_LABELS.slider(t('speed'), store.speed, '')}
+                          aria-valuenow={store.speed}
+                          aria-valuemin={1}
+                          aria-valuemax={10}
+                          aria-valuetext={`${store.speed}`}
+                        />
+                        <input
+                          type="range"
+                          min="20"
+                          max="80"
+                          value={store.fontSize}
+                          onChange={(e) => store.setFontSize(Number(e.target.value))}
+                          className="h-1 bg-gray-600 rounded-full appearance-none accent-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50"
+                          aria-label={ARIA_LABELS.slider(t('fontSize'), store.fontSize, 'pixels')}
+                          aria-valuenow={store.fontSize}
+                          aria-valuemin={20}
+                          aria-valuemax={80}
+                          aria-valuetext={`${store.fontSize} pixels`}
+                        />
                      </div>
                   </div>
 
                   <div className="w-px h-8 bg-white/10 mx-1" />
                   
                   {store.musicUrl && (
-                    <button onClick={() => setIsMusicPlaying(!isMusicPlaying)} className={cn("p-3 rounded-xl transition-all", isMusicPlaying ? "text-pink-400 bg-pink-500/10" : "text-gray-400 hover:text-white")}>
+                    <button
+                      onClick={() => setIsMusicPlaying(!isMusicPlaying)}
+                      className={cn(
+                        "p-3 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-white/50",
+                        isMusicPlaying ? "text-pink-400 bg-pink-500/20" : "text-white/70 hover:text-white"
+                      )}
+                      aria-label={isMusicPlaying ? "Pause music" : "Play music"}
+                      aria-pressed={isMusicPlaying}
+                    >
                       <Music size={20} />
                     </button>
                   )}
