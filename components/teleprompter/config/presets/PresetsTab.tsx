@@ -77,7 +77,7 @@ export function PresetsTab() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-1">{t('title')}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-muted-foreground">
           {t('description')}
         </p>
       </div>
@@ -103,8 +103,8 @@ export function PresetsTab() {
       </div>
 
       {importError && (
-        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-sm text-red-600 dark:text-red-400">{importError}</p>
+        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+          <p className="text-sm text-destructive">{importError}</p>
         </div>
       )}
 
@@ -113,7 +113,7 @@ export function PresetsTab() {
 
       {/* Presets Grid */}
       <div className="space-y-4">
-        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('builtinPresets')}</h4>
+        <h4 className="text-sm font-medium text-foreground">{t('builtinPresets')}</h4>
         <PresetGrid
           presets={builtInPresets.map((p, i) => ({ 
             ...p, 

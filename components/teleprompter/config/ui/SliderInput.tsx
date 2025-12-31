@@ -46,7 +46,7 @@ export function SliderInput({
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="text-sm font-medium text-foreground">
           {label}
         </label>
       )}
@@ -58,7 +58,7 @@ export function SliderInput({
           step={step}
           value={value}
           onChange={(e) => handleSliderChange(parseFloat(e.target.value))}
-          className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-600 transition-colors"
+          className="flex-1 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary hover:accent-primary/80 transition-colors"
         />
         <div className="relative w-20 sm:w-24 flex items-center">
           <input
@@ -70,13 +70,13 @@ export function SliderInput({
             onChange={handleInputChange}
             className={cn(
               "w-full px-2 py-1 text-sm border rounded-lg",
-              "focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-              "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
-              "border-gray-300 dark:border-gray-600"
+              "focus:ring-2 focus:ring-primary focus:border-transparent",
+              "bg-background text-foreground",
+              "border-border"
             )}
           />
           {unit && (
-            <span className="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-gray-500 dark:text-gray-400 pointer-events-none">
+            <span className="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
               {unit}
             </span>
           )}

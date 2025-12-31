@@ -21,15 +21,15 @@ export function TemplateCard({ template, index }: TemplateCardProps) {
       className="group"
     >
       <Link href={`/studio?template=${template.id}`}>
-        <div className="h-full bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-pink-500/50 transition-all hover:shadow-lg hover:shadow-pink-500/10">
+        <div className="h-full bg-card border border-border rounded-xl p-6 hover:border-pink-500/50 transition-all hover:shadow-lg hover:shadow-pink-500/10">
           {/* Icon and Header */}
           <div className="flex items-start justify-between mb-4">
             <div className="text-4xl">{template.icon}</div>
-            <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-pink-400 transition-colors" />
+            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-pink-400 transition-colors" />
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-bold text-white mb-2 group-hover:text-pink-400 transition-colors">
+          <h3 className="text-lg font-bold text-card-foreground mb-2 group-hover:text-pink-400 transition-colors">
             {template.name}
           </h3>
 

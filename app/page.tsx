@@ -27,7 +27,7 @@ export default function LandingPage() {
   // Show loading while checking auth
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         Loading...
       </div>
     );
@@ -39,7 +39,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
+    <div className="min-h-screen bg-gradient-to-b from-background via-secondary/50 to-background">
       <PublicNavbar />
       <main>
         <Hero />
@@ -47,14 +47,14 @@ export default function LandingPage() {
         <CTASection />
 
         {/* Footer */}
-        <footer className="border-t border-gray-800 py-8 px-4">
-          <div className="container mx-auto text-center text-sm text-gray-500">
+        <footer className="border-t border-border py-8 px-4">
+          <div className="container mx-auto text-center text-sm text-muted-foreground">
             <p>© 2025 Glean Teleprompter. All rights reserved.</p>
             <div className="flex justify-center gap-6 mt-4">
-              <a href="/demo" className="hover:text-pink-400 transition-colors">Demo</a>
-              <a href="/quickstart" className="hover:text-pink-400 transition-colors">Templates</a>
-              <a href="/auth/login" className="hover:text-pink-400 transition-colors">Log In</a>
-              <a href="/auth/sign-up" className="hover:text-pink-400 transition-colors">Sign Up</a>
+              <a href="/demo" className="hover:text-primary transition-colors">Demo</a>
+              <a href="/quickstart" className="hover:text-primary transition-colors">Templates</a>
+              <a href="/auth/login" className="hover:text-primary transition-colors">Log In</a>
+              <a href="/auth/sign-up" className="hover:text-primary transition-colors">Sign Up</a>
             </div>
           </div>
         </footer>

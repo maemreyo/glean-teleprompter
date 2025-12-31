@@ -54,7 +54,7 @@ export function FontSelector({ className }: FontSelectorProps) {
   
   return (
     <div className={cn('relative', className)}>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label className="block text-sm font-medium text-foreground mb-2">
         Font Family
       </label>
       
@@ -112,16 +112,16 @@ export function FontSelector({ className }: FontSelectorProps) {
         {isOpen && (
           <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-hidden flex flex-col">
             {/* Search */}
-            <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-3 border-b border-border">
               <input
                 type="text"
                 placeholder="Search fonts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={cn(
-                  'w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg',
-                  'focus:outline-none focus:ring-2 focus:ring-blue-500',
-                  'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100'
+                  'w-full px-3 py-2 text-sm border border-border rounded-lg',
+                  'focus:outline-none focus:ring-2 focus:ring-primary',
+                  'bg-background text-foreground'
                 )}
                 onClick={(e) => e.stopPropagation()}
               />
@@ -130,7 +130,7 @@ export function FontSelector({ className }: FontSelectorProps) {
             {/* Font List */}
             <div className="flex-1 overflow-y-auto p-2">
               {filteredFonts.length === 0 ? (
-                <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+                <div className="text-center text-muted-foreground py-8">
                   No fonts found
                 </div>
               ) : (
@@ -152,7 +152,7 @@ export function FontSelector({ className }: FontSelectorProps) {
                         >
                           {font.name}
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        <div className="text-xs text-muted-foreground truncate">
                           {font.previewText}
                         </div>
                       </div>

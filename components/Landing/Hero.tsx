@@ -26,16 +26,16 @@ export function Hero() {
 
           {/* Main heading */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent">
               Glean Teleprompter
             </span>
           </h1>
 
           {/* Tagline */}
-          <p className="text-xl md:text-2xl text-gray-400 mb-4">
+          <p className="text-xl md:text-2xl text-muted-foreground mb-4">
             Professional teleprompter for content creators
           </p>
-          <p className="text-gray-500 mb-8 max-w-2xl mx-auto">
+          <p className="text-muted-foreground/80 mb-8 max-w-2xl mx-auto">
             Write, rehearse, and record your scripts with ease. Perfect for YouTubers,
             podcasters, presenters, and anyone who speaks to an audience.
           </p>
@@ -51,15 +51,15 @@ export function Hero() {
             </Link>
             <Link
               href="/demo"
-              className="px-8 py-4 bg-gray-800 text-white font-bold rounded-full hover:bg-gray-700 transition-colors"
+              className="px-8 py-4 bg-secondary text-secondary-foreground font-bold rounded-full hover:bg-secondary/80 transition-colors"
             >
               Try Demo
             </Link>
           </div>
 
           {/* Secondary link */}
-          <p className="mt-6 text-sm text-gray-500">
-            No account required to try • <Link href="/auth/sign-up" className="text-pink-400 hover:text-pink-300">Sign up for free</Link>
+          <p className="mt-6 text-sm text-muted-foreground">
+            No account required to try • <Link href="/auth/sign-up" className="text-primary hover:text-primary/80">Sign up for free</Link>
           </p>
         </motion.div>
       </div>

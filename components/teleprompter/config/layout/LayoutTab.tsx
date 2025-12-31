@@ -13,7 +13,7 @@ export function LayoutTab() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-1">{t('title')}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-muted-foreground">
           {t('description')}
         </p>
       </div>
@@ -42,7 +42,7 @@ export function LayoutTab() {
       
       {/* Text Alignment */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-foreground">
           {t('textAlign')}
         </label>
         <div className="flex gap-2">
@@ -52,10 +52,10 @@ export function LayoutTab() {
               onClick={() => setLayout({ textAlign: align })}
               className={cn(
                 'flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-                'border border-gray-300 dark:border-gray-600',
+                'border border-border',
                 layout.textAlign === align
-                  ? 'bg-blue-500 text-white border-blue-500'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-foreground hover:bg-secondary'
               )}
             >
               {align.charAt(0).toUpperCase() + align.slice(1)}
@@ -66,7 +66,7 @@ export function LayoutTab() {
       
       {/* Column Count */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-foreground">
           {t('columns')}
         </label>
         <div className="flex gap-2">
@@ -76,10 +76,10 @@ export function LayoutTab() {
               onClick={() => setLayout({ columnCount: count })}
               className={cn(
                 'flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-                'border border-gray-300 dark:border-gray-600',
+                'border border-border',
                 layout.columnCount === count
-                  ? 'bg-blue-500 text-white border-blue-500'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-foreground hover:bg-secondary'
               )}
             >
               {count}
@@ -114,7 +114,7 @@ export function LayoutTab() {
       
       {/* Text Area Position */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-foreground">
           {t('textAreaPosition')}
         </label>
         <div className="flex gap-2">
@@ -124,10 +124,10 @@ export function LayoutTab() {
               onClick={() => setLayout({ textAreaPosition: position })}
               className={cn(
                 'flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-                'border border-gray-300 dark:border-gray-600',
+                'border border-border',
                 layout.textAreaPosition === position
-                  ? 'bg-blue-500 text-white border-blue-500'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-foreground hover:bg-secondary'
               )}
             >
               {position.charAt(0).toUpperCase() + position.slice(1)}

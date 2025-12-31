@@ -17,10 +17,10 @@ export const FontSelector: React.FC<FontSelectorProps> = ({ selectedFont, onSele
             key={style.name} 
             onClick={() => onSelect(style.name)}
             className={cn(
-                "px-3 py-1.5 rounded-md text-xs border transition-all whitespace-nowrap", 
-                selectedFont === style.name 
-                    ? "bg-white text-black font-bold" 
-                    : "border-gray-800 text-gray-500 hover:border-gray-600"
+                "px-3 py-1.5 rounded-md text-xs border transition-all whitespace-nowrap",
+                selectedFont === style.name
+                    ? "bg-primary text-primary-foreground font-bold"
+                    : "border-border text-muted-foreground hover:border-muted-foreground/50"
             )}
         >
           {style.name}

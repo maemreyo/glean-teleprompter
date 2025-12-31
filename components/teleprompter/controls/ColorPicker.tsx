@@ -17,8 +17,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ selectedIndex, onSelec
             key={color.name} 
             onClick={() => onSelect(idx)}
             className={cn(
-                "w-5 h-5 rounded-full transition-transform border border-transparent hover:scale-110", 
-                selectedIndex === idx ? "ring-2 ring-white scale-110" : "opacity-60"
+                "w-5 h-5 rounded-full transition-transform border border-transparent hover:scale-110",
+                selectedIndex === idx ? "ring-2 ring-foreground scale-110" : "opacity-60"
             )}
             style={{ backgroundColor: color.value }}
             title={color.name}

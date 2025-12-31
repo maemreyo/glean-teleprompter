@@ -78,7 +78,7 @@ export function ConfigTabs() {
   return (
     <div className="flex flex-col h-full">
       {/* Tab Navigation */}
-      <div className="flex border-b border-gray-200 dark:border-gray-800 overflow-x-auto">
+      <div className="flex border-b border-border overflow-x-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
@@ -95,8 +95,8 @@ export function ConfigTabs() {
                 'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap',
                 'border-b-2 -mb-px',
                 isActive
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               )}
               aria-label={`Switch to ${label} tab`}
               aria-selected={isActive}
@@ -117,7 +117,7 @@ export function ConfigTabs() {
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto p-4">
         {ActiveComponent ? <ActiveComponent /> : (
-          <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-center h-full text-muted-foreground">
             {t('selectTab')}
           </div>
         )}

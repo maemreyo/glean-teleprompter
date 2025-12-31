@@ -12,6 +12,7 @@ import { useTranslations } from 'next-intl';
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
 import { UniversalAudioPlayer } from '@/components/teleprompter/audio/AudioPlayer';
 import { DraggableCamera } from '@/components/teleprompter/camera/DraggableCamera';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 export function Runner() {
     const t = useTranslations('Runner');
@@ -59,7 +60,8 @@ export function Runner() {
              <div className="absolute inset-0 bg-black transition-opacity" style={{ opacity: store.overlayOpacity }} />
 
              {/* Top Control */}
-             <div className="absolute top-6 left-6 z-50 flex gap-2">
+             <div className="absolute top-6 left-6 z-50 flex gap-2 items-center">
+                <ThemeSwitcher />
                 {/* Camera Toggle Button */}
                 <button
                   onClick={() => setCameraVisible(!cameraVisible)}

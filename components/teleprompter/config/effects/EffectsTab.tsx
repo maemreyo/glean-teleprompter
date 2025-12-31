@@ -13,7 +13,7 @@ export function EffectsTab() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-1">{t('title')}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-muted-foreground">
           {t('description')}
         </p>
       </div>

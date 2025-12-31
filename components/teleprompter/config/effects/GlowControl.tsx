@@ -13,10 +13,10 @@ export function GlowControl() {
       {/* Enable Glow */}
       <div className="flex items-center justify-between">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-foreground">
             Text Glow
           </label>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-muted-foreground">
             Add luminous effect around text
           </p>
         </div>

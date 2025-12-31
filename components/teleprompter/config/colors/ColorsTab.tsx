@@ -52,14 +52,14 @@ export function ColorsTab() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-1">{t('title')}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-muted-foreground">
           {t('description')}
         </p>
       </div>
       
       {/* Color Palettes */}
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-foreground">
           {t('colorPalettes')}
         </label>
         <div className="grid grid-cols-2 gap-2">
@@ -67,16 +67,16 @@ export function ColorsTab() {
             <button
               key={palette.name}
               onClick={() => applyPalette(palette)}
-              className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-colors text-left"
+              className="p-3 rounded-lg border border-border hover:border-primary transition-colors text-left"
             >
-              <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+              <div className="text-sm font-medium text-foreground mb-2">
                 {palette.name}
               </div>
               <div className="flex gap-1">
                 {palette.colors.map((color) => (
                   <div
                     key={color}
-                    className="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600"
+                    className="w-6 h-6 rounded-full border border-border"
                     style={{ backgroundColor: color }}
                   />
                 ))}
@@ -94,12 +94,12 @@ export function ColorsTab() {
       />
       
       {/* Contrast Validation */}
-      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+      <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             {t('wcagCompliance')}
           </label>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-muted-foreground">
             {t('againstBlackBg')}
           </p>
         </div>
@@ -109,10 +109,10 @@ export function ColorsTab() {
       {/* Gradient Toggle */}
       <div className="flex items-center justify-between">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-foreground">
             {t('enableGradient')}
           </label>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-muted-foreground">
             {t('gradientDesc')}
           </p>
         </div>
@@ -120,8 +120,8 @@ export function ColorsTab() {
           onClick={() => setColors({ gradientEnabled: !colors.gradientEnabled })}
           className={cn(
             'relative w-12 h-6 rounded-full transition-colors',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500',
-            colors.gradientEnabled ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+            'focus:outline-none focus:ring-2 focus:ring-primary',
+            colors.gradientEnabled ? 'bg-primary' : 'bg-muted'
           )}
         >
           <span
@@ -148,8 +148,8 @@ export function ColorsTab() {
       )}
       
       {/* Effect Colors */}
-      <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      <div className="space-y-4 pt-4 border-t border-border">
+        <h4 className="text-sm font-medium text-foreground">
           {t('effectColors')}
         </h4>
         

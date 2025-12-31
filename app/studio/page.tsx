@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import React, { useEffect, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useDemoStore } from '@/stores/useDemoStore';
 import { Editor } from '@/components/teleprompter/Editor';
@@ -23,13 +23,24 @@ type TextAlign = 'left' | 'center';
  */
 function StudioLogic() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const store = useTeleprompterStore();
   const { setDemoMode } = useDemoStore();
+  
+  // Track if we've already initialized to prevent infinite loops
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    // Ensure demo mode is off
+    // Only run initialization once on mount
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    // Ensure demo mode is off (only once)
     setDemoMode(false);
+  }, [setDemoMode]);
+
+  useEffect(() => {
+    // Skip if not initialized yet
+    if (!initializedRef.current) return;
 
     // Check for template parameter first
     const templateId = searchParams.get('template');
@@ -75,7 +86,9 @@ function StudioLogic() {
         console.error('Error loading local draft', e);
       }
     }
-  }, [searchParams, store, setDemoMode]);
+    // Only depend on searchParams, which is stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Auto-save to localStorage
   useEffect(() => {

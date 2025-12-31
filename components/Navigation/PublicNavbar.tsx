@@ -12,17 +12,17 @@ export function PublicNavbar() {
   const { logout } = useSupabaseAuth();
 
   return (
-    <nav className="border-b border-gray-800 bg-gray-950/80 backdrop-blur sticky top-0 z-50">
+    <nav className="border-b border-border bg-background/80 backdrop-blur sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
           Glean Teleprompter
         </Link>
 
         <div className="hidden md:flex items-center gap-6">
-          <Link href="/demo" className="text-gray-300 hover:text-white transition-colors">
+          <Link href="/demo" className="text-muted-foreground hover:text-foreground transition-colors">
             Try Demo
           </Link>
-          <Link href="/quickstart" className="text-gray-300 hover:text-white transition-colors">
+          <Link href="/quickstart" className="text-muted-foreground hover:text-foreground transition-colors">
             Templates
           </Link>
         </div>
@@ -32,7 +32,7 @@ export function PublicNavbar() {
             <ThemeSwitcher />
             <Link
               href="/auth/login"
-              className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
+              className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Log In
             </Link>
@@ -48,13 +48,13 @@ export function PublicNavbar() {
             <ThemeSwitcher />
             <Link
               href="/dashboard"
-              className="px-4 py-2 text-sm bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
             >
               Dashboard
             </Link>
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-800 rounded-lg">
+            <div className="flex items-center gap-2 px-3 py-2 bg-secondary rounded-lg">
               <div className="flex flex-col items-end">
-                <span className="text-xs text-gray-300 max-w-[100px] truncate">{user.email}</span>
+                <span className="text-xs text-secondary-foreground max-w-[100px] truncate">{user.email}</span>
                 {isPro && (
                   <span className="text-[10px] text-yellow-400 font-bold flex items-center gap-0.5">
                     <Crown size={8} /> PRO
@@ -63,7 +63,7 @@ export function PublicNavbar() {
               </div>
               <button
                 onClick={logout}
-                className="p-1 hover:bg-gray-700 rounded text-gray-400 hover:text-white transition-colors"
+                className="p-1 hover:bg-secondary-foreground/10 rounded text-muted-foreground hover:text-secondary-foreground transition-colors"
                 aria-label="Logout"
               >
                 <LogOut size={14} />
@@ -74,11 +74,11 @@ export function PublicNavbar() {
       </div>
 
       {/* Mobile menu items */}
-      <div className="md:hidden border-t border-gray-800 py-3 flex justify-around items-center">
-        <Link href="/demo" className="text-sm text-gray-400 hover:text-white">
+      <div className="md:hidden border-t border-border py-3 flex justify-around items-center">
+        <Link href="/demo" className="text-sm text-muted-foreground hover:text-foreground">
           Demo
         </Link>
-        <Link href="/quickstart" className="text-sm text-gray-400 hover:text-white">
+        <Link href="/quickstart" className="text-sm text-muted-foreground hover:text-foreground">
           Templates
         </Link>
         <ThemeSwitcher />

@@ -9,7 +9,7 @@ export function FontSizeControl() {
   
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label className="block text-sm font-medium text-foreground">
         Font Size
       </label>
       
@@ -27,7 +27,7 @@ export function FontSizeControl() {
         
         {/* Font Weight */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-foreground">
             Weight
           </label>
           <select

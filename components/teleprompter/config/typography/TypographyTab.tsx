@@ -15,7 +15,7 @@ export function TypographyTab() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-1">{t('title')}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-muted-foreground">
           {t('description')}
         </p>
       </div>
@@ -49,7 +49,7 @@ export function TypographyTab() {
       
       {/* Text Transform */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-foreground">
           {t('textTransform')}
         </label>
         <div className="flex gap-2">
@@ -59,10 +59,10 @@ export function TypographyTab() {
               onClick={() => setTypography({ textTransform: transform })}
               className={cn(
                 'flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-                'border border-gray-300 dark:border-gray-600',
+                'border border-border',
                 typography.textTransform === transform
-                  ? 'bg-blue-500 text-white border-blue-500'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-foreground hover:bg-secondary'
               )}
             >
               {t(transform)}

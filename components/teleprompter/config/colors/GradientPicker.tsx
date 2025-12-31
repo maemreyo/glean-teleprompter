@@ -54,10 +54,10 @@ export function GradientPicker({
           onClick={() => onTypeChange(type === 'linear' ? 'radial' : 'linear')}
           className={cn(
             'px-3 py-1.5 text-sm rounded-lg transition-colors',
-            'border border-gray-300 dark:border-gray-600',
+            'border border-border',
             type === 'linear'
-              ? 'bg-blue-500 text-white border-blue-500'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'bg-background text-foreground hover:bg-secondary'
           )}
         >
           Linear
@@ -66,10 +66,10 @@ export function GradientPicker({
           onClick={() => onTypeChange(type === 'radial' ? 'linear' : 'radial')}
           className={cn(
             'px-3 py-1.5 text-sm rounded-lg transition-colors',
-            'border border-gray-300 dark:border-gray-600',
+            'border border-border',
             type === 'radial'
-              ? 'bg-blue-500 text-white border-blue-500'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'bg-background text-foreground hover:bg-secondary'
           )}
         >
           Radial
@@ -79,7 +79,7 @@ export function GradientPicker({
       {/* Angle control for linear gradients */}
       {type === 'linear' && (
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-foreground">
             Angle: {angle}°
           </label>
           <input
@@ -88,7 +88,7 @@ export function GradientPicker({
             max={360}
             value={angle}
             onChange={(e) => onAngleChange(parseInt(e.target.value))}
-            className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
           />
         </div>
       )}
@@ -96,7 +96,7 @@ export function GradientPicker({
       {/* Color stops */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-foreground">
             Color Stops
           </label>
           <button
@@ -104,7 +104,7 @@ export function GradientPicker({
             disabled={colors.length >= 3}
             className={cn(
               'px-3 py-1 text-sm rounded-lg transition-colors',
-              'bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed'
+              'bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
             + Add Color
@@ -115,20 +115,20 @@ export function GradientPicker({
           {colors.map((color, index) => (
             <div key={index} className="flex items-center gap-2">
               <div
-                className="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600"
+                className="w-10 h-10 rounded-lg border-2 border-border"
                 style={{ backgroundColor: color }}
               />
               <input
                 type="text"
                 value={color}
                 onChange={(e) => handleColorChange(index, e.target.value)}
-                className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg"
+                className="flex-1 px-3 py-2 text-sm border border-border rounded-lg bg-background text-foreground"
                 placeholder="#ffffff"
               />
               {colors.length > 2 && (
                 <button
                   onClick={() => handleRemoveColor(index)}
-                  className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                  className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                   aria-label="Remove color"
                 >
                   ×
@@ -141,7 +141,7 @@ export function GradientPicker({
 
       {/* Gradient preview */}
       <div
-        className="w-full h-12 rounded-lg border border-gray-300 dark:border-gray-600"
+        className="w-full h-12 rounded-lg border border-border"
         style={{
           background: type === 'linear'
             ? `linear-gradient(${angle}deg, ${colors.join(', ')})`

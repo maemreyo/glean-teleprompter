@@ -22,7 +22,7 @@ export function AnimationsTab() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-1">{t('title')}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-muted-foreground">
           {t('description')}
         </p>
       </div>
@@ -30,7 +30,7 @@ export function AnimationsTab() {
       <div className="space-y-6 pt-4">
         {/* Smooth Scroll */}
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('smoothScroll')}</h4>
+          <h4 className="text-sm font-medium text-foreground">{t('smoothScroll')}</h4>
           
           <div className="flex items-center justify-between">
             <Label htmlFor="smooth-scroll" className="text-sm">{t('enableSmoothScrolling')}</Label>
@@ -55,7 +55,7 @@ export function AnimationsTab() {
 
         {/* Entrance Animation */}
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('entranceAnimation')}</h4>
+          <h4 className="text-sm font-medium text-foreground">{t('entranceAnimation')}</h4>
           
           <div className="space-y-2">
             <Label className="text-sm">{t('animationType')}</Label>
@@ -66,8 +66,8 @@ export function AnimationsTab() {
                   onClick={() => setAnimations({ entranceAnimation: type })}
                   className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
                     animations.entranceAnimation === type
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                      : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border hover:bg-secondary'
                   }`}
                 >
                   {animationTypeMap[type]}
@@ -89,7 +89,7 @@ export function AnimationsTab() {
 
         {/* Word Highlighting */}
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('wordHighlighting')}</h4>
+          <h4 className="text-sm font-medium text-foreground">{t('wordHighlighting')}</h4>
           
           <div className="flex items-center justify-between">
             <Label htmlFor="word-highlight" className="text-sm">{t('enableWordHighlight')}</Label>
@@ -117,7 +117,7 @@ export function AnimationsTab() {
 
         {/* Auto Scroll */}
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('autoScroll')}</h4>
+          <h4 className="text-sm font-medium text-foreground">{t('autoScroll')}</h4>
           
           <div className="flex items-center justify-between">
             <Label htmlFor="auto-scroll" className="text-sm">{t('enableAutoScrolling')}</Label>

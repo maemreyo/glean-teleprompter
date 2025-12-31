@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Play, Save, Share2, LogOut, Crown } from 'lucide-react';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { motion } from 'framer-motion';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -81,28 +82,31 @@ export function Editor() {
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -50 }}
         className="h-screen flex flex-col md:flex-row"
     >
-        <div className="w-full md:w-1/3 bg-gray-950 border-r border-gray-800 flex flex-col h-full z-20 shadow-2xl relative">
+        <div className="w-full md:w-1/3 bg-card border-r border-border flex flex-col h-full z-20 shadow-2xl relative">
             {/* Header */}
-            <div className="p-6 border-b border-gray-800 flex justify-between items-center">
+            <div className="p-6 border-b border-border flex justify-between items-center gap-2">
                 <h1 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
                   {t('title')}
                 </h1>
                 
-                {!user ? (
-                   <button onClick={loginWithGoogle} className="text-xs bg-white text-black px-3 py-1.5 rounded-full font-bold hover:bg-gray-200 transition-colors">
-                     {t('login')}
-                   </button>
-                ) : (
-                   <div className="flex items-center gap-2">
-                     <div className="flex flex-col items-end">
-                        <span className="text-[10px] text-gray-400 max-w-[80px] truncate">{user.email}</span>
-                        {isPro && <span className="text-[9px] text-yellow-400 font-bold flex items-center gap-0.5"><Crown size={8}/> PRO</span>}
-                     </div>
-                     <button onClick={logout} className="p-1 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
-                        <LogOut size={14} />
+                <div className="flex items-center gap-2">
+                  <ThemeSwitcher />
+                  {!user ? (
+                     <button onClick={loginWithGoogle} className="text-xs bg-primary text-primary-foreground px-3 py-1.5 rounded-full font-bold hover:bg-primary/90 transition-colors">
+                       {t('login')}
                      </button>
-                   </div>
-                )}
+                  ) : (
+                     <div className="flex items-center gap-2">
+                       <div className="flex flex-col items-end">
+                          <span className="text-[10px] text-muted-foreground max-w-[80px] truncate">{user?.email || ''}</span>
+                          {isPro && <span className="text-[9px] text-yellow-400 font-bold flex items-center gap-0.5"><Crown size={8}/> PRO</span>}
+                       </div>
+                       <button onClick={logout} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground">
+                          <LogOut size={14} />
+                       </button>
+                     </div>
+                  )}
+                </div>
             </div>
 
             {/* Content Controls */}
@@ -110,12 +114,12 @@ export function Editor() {
                 {/* Text Area */}
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-gray-500 uppercase">{t('contentLabel')}</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase">{t('contentLabel')}</label>
                   </div>
                   <textarea
                     value={store.text} 
                     onChange={(e) => store.setText(e.target.value)}
-                    className="w-full h-32 bg-gray-900 rounded-lg p-3 text-sm focus:ring-1 focus:ring-pink-500 outline-none resize-none border border-gray-800 placeholder-gray-600"
+                    className="w-full h-32 bg-secondary rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary outline-none resize-none border border-border placeholder-muted-foreground"
                     placeholder={t('contentPlaceholder')}
                   />
                 </div>
@@ -124,19 +128,19 @@ export function Editor() {
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Line Height ({store.lineHeight})</label>
-                            <input 
+                            <label className="text-[10px] text-muted-foreground uppercase font-bold mb-1 block">Line Height ({store.lineHeight})</label>
+                            <input
                                 type="range" min="1" max="3" step="0.1"
                                 value={store.lineHeight} onChange={(e) => store.setLineHeight(Number(e.target.value))}
-                                className="w-full h-1 bg-gray-800 rounded-full appearance-none accent-pink-500" 
+                                className="w-full h-1 bg-muted rounded-full appearance-none accent-primary"
                             />
                         </div>
                          <div>
-                            <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Margin ({store.margin}%)</label>
-                            <input 
+                            <label className="text-[10px] text-muted-foreground uppercase font-bold mb-1 block">Margin ({store.margin}%)</label>
+                            <input
                                 type="range" min="0" max="30" step="1"
                                 value={store.margin} onChange={(e) => store.setMargin(Number(e.target.value))}
-                                className="w-full h-1 bg-gray-800 rounded-full appearance-none accent-pink-500" 
+                                className="w-full h-1 bg-muted rounded-full appearance-none accent-primary"
                             />
                         </div>
                     </div>
@@ -157,15 +161,15 @@ export function Editor() {
             </div>
 
             {/* Footer Actions */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gray-950/90 backdrop-blur border-t border-gray-800 space-y-2">
-                 <button onClick={() => store.setMode('running')} className="w-full py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
+            <div className="absolute bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur border-t border-border space-y-2">
+                 <button onClick={() => store.setMode('running')} className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                     <Play size={16} fill="currentColor" /> {t('preview')}
                  </button>
                  <div className="grid grid-cols-2 gap-2">
                     <button onClick={handleSave} className="py-2 bg-green-900/40 text-green-400 border border-green-900 hover:bg-green-900/60 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors">
                         <Save size={14} /> {t('save')}
                     </button>
-                    <button onClick={handleShare} className="py-2 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                    <button onClick={handleShare} className="py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors">
                         <Share2 size={14} /> {t('share')}
                     </button>
                  </div>

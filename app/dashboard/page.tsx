@@ -27,10 +27,10 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       {/* Welcome Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white">
+        <h1 className="text-3xl font-bold text-foreground">
           Welcome back{user?.email ? `, ${user.email}` : ''}!
         </h1>
-        <p className="text-gray-400 mt-2">
+        <p className="text-muted-foreground mt-2">
           Manage your recordings, scripts, presets, and settings
         </p>
       </div>
@@ -39,12 +39,12 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Link
           href="/studio"
-          className="bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-pink-500 transition-colors group"
+          className="bg-card border border-border rounded-lg p-6 hover:border-pink-500 transition-colors group"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Quick Action</p>
-              <p className="text-white text-lg font-semibold mt-1 group-hover:text-pink-500">
+              <p className="text-muted-foreground text-sm">Quick Action</p>
+              <p className="text-card-foreground text-lg font-semibold mt-1 group-hover:text-pink-500">
                 Open Studio
               </p>
             </div>
@@ -56,11 +56,11 @@ export default async function DashboardPage() {
           </div>
         </Link>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Scripts</p>
-              <p className="text-white text-2xl font-bold mt-1">{scriptsCount || 0}</p>
+              <p className="text-muted-foreground text-sm">Total Scripts</p>
+              <p className="text-card-foreground text-2xl font-bold mt-1">{scriptsCount || 0}</p>
             </div>
             <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
               <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,11 +70,11 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Recordings</p>
-              <p className="text-white text-2xl font-bold mt-1">{recordingsCount || 0}</p>
+              <p className="text-muted-foreground text-sm">Total Recordings</p>
+              <p className="text-card-foreground text-2xl font-bold mt-1">{recordingsCount || 0}</p>
             </div>
             <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
               <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,11 +84,11 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Saved Presets</p>
-              <p className="text-white text-2xl font-bold mt-1">{presetsCount || 0}</p>
+              <p className="text-muted-foreground text-sm">Saved Presets</p>
+              <p className="text-card-foreground text-2xl font-bold mt-1">{presetsCount || 0}</p>
             </div>
             <div className="h-12 w-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
               <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,12 +100,12 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
-        <h2 className="text-white text-lg font-semibold mb-4">Quick Actions</h2>
+      <div className="bg-card border border-border rounded-lg p-6">
+        <h2 className="text-card-foreground text-lg font-semibold mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             href="/studio"
-            className="flex items-center gap-3 p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-3 p-4 bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
           >
             <div className="h-10 w-10 bg-pink-500/20 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,14 +113,14 @@ export default async function DashboardPage() {
               </svg>
             </div>
             <div>
-              <p className="text-white font-medium">Create New Script</p>
-              <p className="text-gray-400 text-sm">Start recording with the teleprompter</p>
+              <p className="text-card-foreground font-medium">Create New Script</p>
+              <p className="text-muted-foreground text-sm">Start recording with the teleprompter</p>
             </div>
           </Link>
 
           <Link
             href="/dashboard/recordings"
-            className="flex items-center gap-3 p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-3 p-4 bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
           >
             <div className="h-10 w-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,14 +128,14 @@ export default async function DashboardPage() {
               </svg>
             </div>
             <div>
-              <p className="text-white font-medium">View Recordings</p>
-              <p className="text-gray-400 text-sm">Manage your recorded videos</p>
+              <p className="text-card-foreground font-medium">View Recordings</p>
+              <p className="text-muted-foreground text-sm">Manage your recorded videos</p>
             </div>
           </Link>
 
           <Link
             href="/dashboard/scripts"
-            className="flex items-center gap-3 p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-3 p-4 bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
           >
             <div className="h-10 w-10 bg-green-500/20 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,8 +143,8 @@ export default async function DashboardPage() {
               </svg>
             </div>
             <div>
-              <p className="text-white font-medium">Manage Scripts</p>
-              <p className="text-gray-400 text-sm">View and edit your saved scripts</p>
+              <p className="text-card-foreground font-medium">Manage Scripts</p>
+              <p className="text-muted-foreground text-sm">View and edit your saved scripts</p>
             </div>
           </Link>
         </div>
@@ -152,26 +152,26 @@ export default async function DashboardPage() {
 
       {/* Getting Started */}
       <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 rounded-lg p-6">
-        <h2 className="text-white text-lg font-semibold mb-2">Getting Started</h2>
-        <p className="text-gray-400 text-sm mb-4">
+        <h2 className="text-card-foreground text-lg font-semibold mb-2">Getting Started</h2>
+        <p className="text-muted-foreground text-sm mb-4">
           New to Glean Teleprompter? Here&apos;s how to get started:
         </p>
         <ol className="space-y-2 text-gray-300 text-sm">
           <li className="flex items-start gap-2">
             <span className="text-pink-500 font-bold">1.</span>
-            <span>Click &quot;Open Studio&quot; to create your first teleprompter script</span>
+            <span className="text-foreground">Click &quot;Open Studio&quot; to create your first teleprompter script</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-pink-500 font-bold">2.</span>
-            <span>Customize font, colors, and scroll speed to your preference</span>
+            <span className="text-foreground">Customize font, colors, and scroll speed to your preference</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-pink-500 font-bold">3.</span>
-            <span>Save your scripts to the cloud and share them with others</span>
+            <span className="text-foreground">Save your scripts to the cloud and share them with others</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-pink-500 font-bold">4.</span>
-            <span>Use camera recording to capture yourself while reading</span>
+            <span className="text-foreground">Use camera recording to capture yourself while reading</span>
           </li>
         </ol>
       </div>
