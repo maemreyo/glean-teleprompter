@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Play, Save, Share2, LogOut, Crown } from 'lucide-react';
+import { Play, Save, Share2, LogOut, Crown, Settings } from 'lucide-react';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { motion } from 'framer-motion';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
@@ -12,12 +12,14 @@ import { saveScriptAction } from '@/actions/scripts';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { useConfigStore } from '@/lib/stores/useConfigStore';
 
 // Modular Components
 import { FontSelector } from '@/components/teleprompter/controls/FontSelector';
 import { ColorPicker } from '@/components/teleprompter/controls/ColorPicker';
 import { MediaInput } from '@/components/teleprompter/controls/MediaInput';
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
+import { ConfigPanel } from '@/components/teleprompter/config/ConfigPanel';
 
 export function Editor() {
   const t = useTranslations('Editor');
@@ -26,6 +28,7 @@ export function Editor() {
   const { user, isPro } = useAuthStore();
   const { isDemoMode } = useDemoStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
+  const { togglePanel, typography, colors, effects, layout, animations } = useConfigStore();
   
   // Handlers
   const handleSave = async () => {
@@ -50,6 +53,23 @@ export function Editor() {
         content: store.text,
         bg_url: store.bgUrl,
         music_url: store.musicUrl,
+        
+        // NEW: Include full config snapshot from useConfigStore
+        config: {
+            version: '1.0.0',
+            typography,
+            colors,
+            effects,
+            layout,
+            animations,
+            metadata: {
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                appVersion: '1.0.0',
+            },
+        },
+        
+        // DEPRECATED: Keep for backward compatibility with existing scripts
         settings: {
             font: store.font,
             color: store.colorIndex,
@@ -60,6 +80,7 @@ export function Editor() {
             overlayOpacity: store.overlayOpacity,
             align: store.align
         },
+        
         title: store.text.substring(0, 30) || "Untitled",
         description: "Created via Web Editor"
     });
@@ -162,6 +183,13 @@ export function Editor() {
 
             {/* Footer Actions */}
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur border-t border-border space-y-2">
+                 {/* Configuration Button */}
+                 <button
+                   onClick={togglePanel}
+                   className="w-full py-3 bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold rounded-lg hover:from-pink-600 hover:to-violet-600 transition-all flex items-center justify-center gap-2 shadow-lg"
+                 >
+                   <Settings size={16} /> Configuration
+                 </button>
                  <button onClick={() => store.setMode('running')} className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                     <Play size={16} fill="currentColor" /> {t('preview')}
                  </button>
@@ -181,19 +209,16 @@ export function Editor() {
                <div className="absolute inset-0 bg-cover bg-center opacity-70" style={{ backgroundImage: `url('${store.bgUrl}')` }} />
                <div className="absolute inset-0 bg-black/30" />
                <div className="absolute inset-0 flex items-center justify-center p-12 overflow-hidden">
-                   {/* Reusing TeleprompterText for Exact WYSIWYG */}
+                   {/* TeleprompterText now uses ONLY useConfigStore for styling - no legacy props */}
                    <TeleprompterText
                         text={store.text}
-                        fontName={store.font}
-                        colorIndex={store.colorIndex}
-                        fontSize={store.fontSize} // Use actual font size or scaled? Let's use actual for true WYSIWYG
-                        lineHeight={store.lineHeight}
-                        margin={store.margin}
-                        align={store.align}
-                        className="max-h-full overflow-hidden text-ellipsis line-clamp-[10]" // Limit lines in preview?
+                        className="max-h-full overflow-hidden"
                    />
                </div>
         </div>
+       
+       {/* Config Panel - Handles its own visibility */}
+       <ConfigPanel />
     </motion.div>
-  );
+ );
 }

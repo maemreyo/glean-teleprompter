@@ -98,6 +98,9 @@ interface ConfigState {
   setActiveTab: (tab: string) => void
   togglePanel: () => void
   
+  // Set all config at once (for loading from saved scripts)
+  setAll: (config: ConfigSnapshot) => void
+  
   undo: () => void
   redo: () => void
   canUndo: () => boolean
@@ -176,6 +179,14 @@ export const useConfigStore = create<ConfigState>()(
       togglePanel: () => set((state) => ({
         isPanelOpen: !state.isPanelOpen
       })),
+      
+      setAll: (config) => set({
+        typography: config.typography,
+        colors: config.colors,
+        effects: config.effects,
+        layout: config.layout,
+        animations: config.animations,
+      }),
       
       undo: () => set((state) => {
         const previous = state.pastStates[state.pastStates.length - 1]
