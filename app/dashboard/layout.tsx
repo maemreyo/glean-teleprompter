@@ -1,20 +1,39 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+"use client"
+
+import { useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { NavAuth } from '@/components/auth/NavAuth'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import Link from 'next/link'
+import { useAuthStore } from '@/stores/useAuthStore'
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const router = useRouter()
+  const pathname = usePathname()
+  const { user, isLoading } = useAuthStore()
 
-  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push(`/auth/login?redirectTo=${encodeURIComponent(pathname)}`)
+    }
+  }, [user, isLoading, router, pathname])
+
+  // // Show loading state while checking authentication
+  // if (isLoading) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+  //       <div className="text-white">Loading...</div>
+  //     </div>
+  //   )
+  // }
+
+  // Don't render protected content if not authenticated
   if (!user) {
-    redirect('/auth/login?redirectTo=/dashboard')
+    return null
   }
 
   return (

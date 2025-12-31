@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { LogOut, Crown } from 'lucide-react';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 export function PublicNavbar() {
   const { user, isPro } = useAuthStore();
@@ -27,7 +28,8 @@ export function PublicNavbar() {
         </div>
 
         {!user ? (
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <ThemeSwitcher />
             <Link
               href="/auth/login"
               className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
@@ -43,6 +45,7 @@ export function PublicNavbar() {
           </div>
         ) : (
           <div className="flex items-center gap-3">
+            <ThemeSwitcher />
             <Link
               href="/dashboard"
               className="px-4 py-2 text-sm bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
@@ -71,13 +74,14 @@ export function PublicNavbar() {
       </div>
 
       {/* Mobile menu items */}
-      <div className="md:hidden border-t border-gray-800 py-3 flex justify-around">
+      <div className="md:hidden border-t border-gray-800 py-3 flex justify-around items-center">
         <Link href="/demo" className="text-sm text-gray-400 hover:text-white">
           Demo
         </Link>
         <Link href="/quickstart" className="text-sm text-gray-400 hover:text-white">
           Templates
         </Link>
+        <ThemeSwitcher />
       </div>
     </nav>
   );

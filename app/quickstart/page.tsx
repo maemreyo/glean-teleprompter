@@ -6,6 +6,7 @@ import { ArrowLeft, Sparkles } from 'lucide-react';
 import { CategoryFilter } from '@/components/QuickStart/CategoryFilter';
 import { TemplateGrid } from '@/components/QuickStart/TemplateGrid';
 import { templates, getTemplatesByCategory, ScriptTemplate } from '@/lib/templates/templateConfig';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 /**
  * Quick Start page with template selection
@@ -34,6 +35,7 @@ export default function QuickStartPage() {
               <ArrowLeft className="w-5 h-5" />
               <span>Back</span>
             </Link>
+            <ThemeSwitcher />
             <h1 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
               Glean Teleprompter
             </h1>

@@ -5,6 +5,7 @@ import { X, Sparkles } from 'lucide-react';
 import { useDemoStore } from '@/stores/useDemoStore';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 export function DemoBanner() {
   const { showWarning, setShowWarning } = useDemoStore();
@@ -30,6 +31,7 @@ export function DemoBanner() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeSwitcher />
             <Link
               href="/auth/sign-up"
               className="px-4 py-1.5 bg-pink-500 text-white text-sm font-bold rounded-full hover:bg-pink-600 transition-colors"
