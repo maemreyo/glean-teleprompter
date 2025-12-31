@@ -11,9 +11,12 @@ const customJestConfig = {
   moduleNameMapper: {
     // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
     '^@/(.*)$': '<rootDir>/$1',
+    '^next-intl$': '<rootDir>/__tests__/mocks/next-intl.mock.ts',
+    '^next-intl/(.*)$': '<rootDir>/__tests__/mocks/next-intl.mock.ts',
   },
   testEnvironment: 'jest-environment-jsdom',
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
+  testMatch: ['**/__tests__/**/*.test.(ts|tsx|js|jsx)'],
   collectCoverageFrom: [
     '**/*.{js,jsx,ts,tsx}',
     '!**/*.d.ts',

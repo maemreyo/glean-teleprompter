@@ -62,3 +62,28 @@ export const setMockConfigStore = (store: MockConfigStore) => {
 export const resetGlobalConfigStore = () => {
   mockStoreInstance = createMockConfigStore();
 };
+
+// Basic test to ensure the module exports work
+describe('Config Store Mock', () => {
+  it('should export createMockConfigStore function', () => {
+    expect(createMockConfigStore).toBeDefined();
+    expect(typeof createMockConfigStore).toBe('function');
+  });
+
+  it('should create a mock config store with default values', () => {
+    const store = createMockConfigStore();
+    expect(store).toHaveProperty('typography');
+    expect(store).toHaveProperty('colors');
+    expect(store).toHaveProperty('effects');
+    expect(store).toHaveProperty('setAll');
+    expect(store).toHaveProperty('getState');
+  });
+
+  it('should allow overrides', () => {
+    const store = createMockConfigStore({
+      typography: { fontFamily: 'Custom', fontSize: 24, lineHeight: 1.2, align: 'left' as const }
+    });
+    expect(store.typography?.fontFamily).toBe('Custom');
+    expect(store.typography?.fontSize).toBe(24);
+  });
+});

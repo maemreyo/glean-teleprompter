@@ -48,3 +48,22 @@ export const setMockDemoStore = (store: MockDemoStore) => {
 export const resetGlobalDemoStore = () => {
   mockStoreInstance = createMockDemoStore();
 };
+
+// Basic test to ensure the module exports work
+describe('Demo Store Mock', () => {
+  it('should export createMockDemoStore function', () => {
+    expect(createMockDemoStore).toBeDefined();
+    expect(typeof createMockDemoStore).toBe('function');
+  });
+
+  it('should create a mock demo store with default values', () => {
+    const store = createMockDemoStore();
+    expect(store).toHaveProperty('isDemoMode', false);
+    expect(store).toHaveProperty('setDemoMode');
+  });
+
+  it('should allow overrides', () => {
+    const store = createMockDemoStore({ isDemoMode: true });
+    expect(store.isDemoMode).toBe(true);
+  });
+});
