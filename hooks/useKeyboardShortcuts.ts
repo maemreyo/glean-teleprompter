@@ -128,7 +128,10 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
           description: 'Open keyboard shortcuts',
           action: () => {
             trackUsage(`${mod}+shift+?`)
-            recordModalOpened()
+            // Record that modal was opened
+            if (recordModalOpened) {
+              recordModalOpened()
+            }
             window.dispatchEvent(new CustomEvent('teleprompter:open-shortcuts-modal'))
           },
         },
@@ -178,7 +181,7 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
         },
       ]
     },
-    [trackUsage]
+    [trackUsage, recordModalOpened]
   )
 
   // Handle keydown events

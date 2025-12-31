@@ -1,5 +1,6 @@
 import { act } from 'react'
 import type { ConfigSnapshot, TypographyConfig, ColorConfig, EffectConfig, LayoutConfig, AnimationConfig } from '@/lib/config/types'
+import { useConfigStore } from '@/lib/stores/useConfigStore'
 
 // Mock store state for testing
 export const mockInitialState = {
@@ -65,8 +66,7 @@ export const mockInitialState = {
 // Helper to reset store to initial state
 export const resetConfigStore = () => {
   act(() => {
-    const { useConfigStore } = require('@/lib/stores/useConfigStore')
-    const mockStore = useConfigStore()
+    const mockStore = useConfigStore.getState()
     if (mockStore?.resetAll) {
       mockStore.resetAll()
     }
@@ -76,8 +76,7 @@ export const resetConfigStore = () => {
 // Helper to set specific config state
 export const setConfigState = (config: Partial<ConfigSnapshot>) => {
   act(() => {
-    const { useConfigStore } = require('@/lib/stores/useConfigStore')
-    const mockStore = useConfigStore()
+    const mockStore = useConfigStore.getState()
     if (!mockStore) return
 
     if (config.typography && mockStore.setTypography) {
@@ -99,15 +98,29 @@ export const setConfigState = (config: Partial<ConfigSnapshot>) => {
 }
 
 // Helper to get current store state
+// Note: This must be called within a React component or test
+// Returns the config state without version/metadata
 export const getCurrentConfigState = () => {
-  const { useConfigStore } = require('@/lib/stores/useConfigStore')
-  const mockStore = useConfigStore()
+  const state = useConfigStore.getState()
   return {
-    typography: mockStore?.typography || mockInitialState.typography,
-    colors: mockStore?.colors || mockInitialState.colors,
-    effects: mockStore?.effects || mockInitialState.effects,
-    layout: mockStore?.layout || mockInitialState.layout,
-    animations: mockStore?.animations || mockInitialState.animations,
+    typography: state?.typography || mockInitialState.typography,
+    colors: state?.colors || mockInitialState.colors,
+    effects: state?.effects || mockInitialState.effects,
+    layout: state?.layout || mockInitialState.layout,
+    animations: state?.animations || mockInitialState.animations,
+  }
+}
+
+// Helper to get current store state (for use outside React)
+// Returns the config state without version/metadata
+export const getConfigSnapshot = () => {
+  const state = useConfigStore.getState()
+  return {
+    typography: state?.typography || mockInitialState.typography,
+    colors: state?.colors || mockInitialState.colors,
+    effects: state?.effects || mockInitialState.effects,
+    layout: state?.layout || mockInitialState.layout,
+    animations: state?.animations || mockInitialState.animations,
   }
 }
 

@@ -193,6 +193,7 @@
       "presets": "Presets",
       "media": "Media"
     },
+    "allTabs": "All Tabs",
     "selectTab": "Select a tab to configure settings",
     "typography": {
       "title": "Typography Settings",
@@ -275,6 +276,114 @@
       "connected": "Connected to cloud",
       "offline": "Offline mode",
       "sync": "Sync"
+    },
+    "media": {
+      "title": "Media Settings",
+      "description": "Configure background images, music, and other media assets."
     }
+  },
+  "AutoSaveStatus": {
+    "saving": "Saving...",
+    "saved": "Saved",
+    "error": "Save failed",
+    "retry": "Retry save",
+    "justNow": "Just now",
+    "minutesAgo": "{count}m ago",
+    "hoursAgo": "{count}h ago"
+  },
+  "ErrorDialog": {
+    "title": "Error",
+    "close": "Close",
+    "copyError": "Copy error",
+    "copied": "Copied!",
+    "network": {
+      "title": "Network Error",
+      "message": "Network error. Check your connection and try again",
+      "details": "Unable to reach the server. Please check your internet connection.",
+      "action": "Retry"
+    },
+    "notFound": {
+      "title": "Script Not Found",
+      "message": "Script not found. It may have been deleted or the link is incorrect",
+      "details": "The requested script does not exist or has been removed.",
+      "action": "Browse Templates"
+    },
+    "permission": {
+      "title": "Permission Denied",
+      "message": "You don't have permission to view this script",
+      "details": "This script is private or you need to sign in to access it.",
+      "action": "Create Your Own"
+    },
+    "quota": {
+      "title": "Storage Full",
+      "message": "Storage full. Some browsers limit local storage.",
+      "details": "Your browser storage quota has been exceeded. Consider saving to your account or clearing old data.",
+      "action": "Sign Up"
+    },
+    "unknown": {
+      "title": "Unexpected Error",
+      "message": "An unexpected error occurred",
+      "details": "Something went wrong. Please try again.",
+      "action": "Retry"
+    }
+  },
+  "TextareaExpandButton": {
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "exitFullscreen": "Exit fullscreen (Esc)",
+    "enterFullscreen": "Enter fullscreen"
+  },
+  "LoadingStates": {
+    "loadingStudio": "Loading Studio...",
+    "loadingScript": "Loading script...",
+    "loadingTemplate": "Loading template...",
+    "pleaseWait": "Please wait...",
+    "templateLoaded": "Template loaded!",
+    "loadingFailed": "Loading failed"
+  },
+  "PreviewPanel": {
+    "title": "Preview",
+    "togglePreview": "Toggle Preview",
+    "closePreview": "Close Preview",
+    "swipeToClose": "Swipe down to close"
+  },
+  "Footer": {
+    "expand": "Expand footer",
+    "collapse": "Collapse footer"
+  },
+  "TabBottomSheet": {
+    "title": "All Tabs",
+    "selectTab": "Select a tab",
+    "close": "Close"
+  },
+  "KeyboardShortcuts": {
+    "title": "Keyboard Shortcuts",
+    "description": "Work more efficiently with keyboard shortcuts",
+    "searchPlaceholder": "Search shortcuts...",
+    "noResults": "No shortcuts found",
+    "categories": {
+      "editing": "Editing",
+      "navigation": "Navigation",
+      "config": "Configuration",
+      "media": "Media",
+      "general": "General"
+    },
+    "shortcuts": {
+      "undo": "Undo",
+      "redo": "Redo",
+      "save": "Save",
+      "togglePreview": "Toggle Preview",
+      "expandTextarea": "Expand Textarea",
+      "fullscreen": "Toggle Fullscreen",
+      "closeModal": "Close Modal",
+      "nextTab": "Next Tab",
+      "previousTab": "Previous Tab",
+      "openShortcuts": "Open Keyboard Shortcuts"
+    },
+    "proTip": "Pro tip",
+    "proTipMessage": "Press {shortcut} to quickly {action}"
+  },
+  "Performance": {
+    "largeScriptWarning": "This script is very long ({count}+ characters). For best performance, consider splitting it into multiple scripts."
   }
 }

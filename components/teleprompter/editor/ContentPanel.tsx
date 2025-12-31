@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Play, Save, Share2, LogOut, Crown, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
@@ -16,7 +16,8 @@ import { useUIStore } from '@/stores/useUIStore';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { AutoSaveStatus } from '@/components/teleprompter/config/ui/AutoSaveStatus';
-import { useRef } from 'react';
+import { TextareaExpandButton } from '@/components/teleprompter/editor/TextareaExpandButton';
+import type { TextareaSize } from '@/components/teleprompter/editor/TextareaExpandButton';
 
 /**
  * ContentPanel - The content editing section of the Editor
@@ -35,11 +36,38 @@ export function ContentPanel() {
   const { isDemoMode } = useDemoStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
   const { typography, colors, effects, layout, animations } = useConfigStore();
-  const { previewState, togglePreview, footerState, toggleFooter } = useUIStore();
+  const { previewState, togglePreview, footerState, toggleFooter, textareaPrefs, setTextareaPrefs, toggleTextareaSize } = useUIStore();
   const isMobileOrTablet = useMediaQuery('(max-width: 1023px)');
   
   // Ref for textarea element
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  // Track previous size for Esc key to exit fullscreen (T054)
+  const [previousSize, setPreviousSize] = useState<TextareaSize>('default');
+  
+  // Track the last non-fullscreen size
+  useEffect(() => {
+    if (textareaPrefs.size !== 'fullscreen') {
+      // Update previousSize whenever we're not in fullscreen
+      // This ensures we remember the size before entering fullscreen
+      setPreviousSize(textareaPrefs.size as TextareaSize);
+    }
+    // When in fullscreen, we don't update - previousSize retains the last non-fullscreen size
+  }, [textareaPrefs.size]);
+  
+  // Get height class based on current size
+  const getHeightClass = (): string => {
+    switch (textareaPrefs.size) {
+      case 'medium':
+        return 'h-80';
+      case 'large':
+        return 'h-[500px]';
+      case 'fullscreen':
+        return 'h-screen';
+      default:
+        return 'h-32';
+    }
+  };
 
   // Auto-save hook for local draft persistence
   const { status: autoSaveStatus, lastSavedAt, error: autoSaveError, saveNow } = useAutoSave(
@@ -56,6 +84,7 @@ export function ContentPanel() {
   );
   
   // Auto-scroll to bottom when Enter is pressed (T029)
+  // Exit fullscreen with Esc key (T054)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && textareaRef.current) {
       // Small timeout to ensure content renders first
@@ -64,6 +93,14 @@ export function ContentPanel() {
           textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
         }
       }, 10);
+    }
+    
+    // Handle Escape key to exit fullscreen
+    if (e.key === 'Escape' && textareaPrefs.size === 'fullscreen') {
+      e.preventDefault();
+      // Return to previous size (or default if not set)
+      const sizeToRestore = previousSize !== 'fullscreen' ? previousSize : 'default';
+      setTextareaPrefs({ size: sizeToRestore, isFullscreen: false });
     }
   };
 
@@ -137,10 +174,14 @@ export function ContentPanel() {
     toast.success(t('share') + " Copied!");
   };
 
+  // T056: Ensure config panel remains visible when textarea is fullscreen
+  // The ContentPanel already has z-20, and PreviewPanel (config panel) should have higher z-index
+  // This is handled by the parent component's layout
+  
   return (
-    <div className="w-full lg:w-[30%] bg-card border-r border-border flex flex-col h-full z-20 shadow-2xl relative">
-      {/* Header */}
-      <div className="p-6 border-b border-border flex justify-between items-center gap-2">
+    <div className={`w-full lg:w-[30%] bg-card border-r border-border flex flex-col shadow-2xl relative transition-all duration-200 ${textareaPrefs.size === 'fullscreen' ? 'fixed inset-0 z-50 w-full h-screen' : 'z-20 h-full'}`}>
+      {/* Header - T056: Always visible, even in fullscreen */}
+      <div className={`p-6 border-b border-border flex justify-between items-center gap-2 ${textareaPrefs.size === 'fullscreen' ? 'z-50 bg-card' : ''}`}>
         <h1 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
           {t('title')}
         </h1>
@@ -184,25 +225,34 @@ export function ContentPanel() {
       </div>
 
       {/* Content Controls - T028: Added pb-32 (128px) padding-bottom to prevent footer obstruction */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar pb-32">
+      <div className={`flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar ${textareaPrefs.size === 'fullscreen' ? 'overflow-hidden' : 'pb-32'}`}>
         {/* Text Area */}
-        <div className="space-y-2">
+        <div className={`space-y-2 ${textareaPrefs.size === 'fullscreen' ? 'h-full flex flex-col' : ''}`}>
           <div className="flex justify-between items-center">
             <label className="text-xs font-bold text-muted-foreground uppercase">{t('contentLabel')}</label>
           </div>
-          <textarea
-            ref={textareaRef}
-            value={store.text}
-            onChange={(e) => store.setText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="w-full h-32 bg-secondary rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary outline-none resize-none border border-border placeholder-muted-foreground"
-            placeholder={t('contentPlaceholder')}
-          />
+          <div className="relative">
+            <textarea
+              ref={textareaRef}
+              value={store.text}
+              onChange={(e) => store.setText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className={`${getHeightClass()} transition-all duration-200 w-full bg-secondary rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary outline-none resize-none border border-border placeholder-muted-foreground`}
+              placeholder={t('contentPlaceholder')}
+            />
+            <TextareaExpandButton
+              currentSize={textareaPrefs.size as TextareaSize}
+              onToggle={toggleTextareaSize}
+              disabled={false}
+            />
+          </div>
         </div>
       </div>
 
       {/* Footer Actions - T032: Semi-transparent backdrop (bg-card/90 backdrop-blur) */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur border-t border-border space-y-2">
+      {/* T056: Hide footer when fullscreen to maximize editing space */}
+      {textareaPrefs.size !== 'fullscreen' && (
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur border-t border-border space-y-2">
         
         {/* T030/T033: Collapse/Expand button */}
         <div className="flex justify-center">
@@ -247,7 +297,8 @@ export function ContentPanel() {
             </div>
           </>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

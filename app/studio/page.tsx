@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useDemoStore } from '@/stores/useDemoStore';
 import { useConfigStore } from '@/lib/stores/useConfigStore';
+import { useUIStore } from '@/stores/useUIStore';
 import { Editor } from '@/components/teleprompter/Editor';
 import { Runner } from '@/components/teleprompter/Runner';
 import { AppProvider } from '@/components/AppProvider';
@@ -14,6 +15,8 @@ import { getTemplateById } from '@/lib/templates/templateConfig';
 import { loadScriptAction } from '@/actions/scripts';
 import { StudioLoadingScreen } from '@/components/teleprompter/editor/StudioLoadingScreen';
 import { Button } from '@/components/ui/button';
+import { ErrorDialog } from '@/components/teleprompter/ErrorDialog';
+import { getErrorContext } from '@/lib/utils/errorMessages';
 
 type FontStyle = 'Classic' | 'Modern' | 'Typewriter' | 'Novel' | 'Neon';
 type TextAlign = 'left' | 'center';
@@ -37,6 +40,7 @@ function StudioLogic() {
   const searchParams = useSearchParams();
   const store = useTeleprompterStore();
   const { setDemoMode } = useDemoStore();
+  const { errorContext, setErrorContext } = useUIStore();
   
   // Track if we've already initialized to prevent infinite loops
   const initializedRef = useRef(false);
@@ -53,6 +57,9 @@ function StudioLogic() {
   // Refs for retry functionality
   const scriptIdRef = useRef<string | null>(null);
   const templateIdRef = useRef<string | null>(null);
+  
+  // Ref to track the original error for logging
+  const originalErrorRef = useRef<Error | unknown>(null);
 
   useEffect(() => {
     // Only run initialization once on mount
@@ -191,14 +198,37 @@ function StudioLogic() {
       
       if (result.error) {
         clearInterval(progressInterval);
+        
+        // Get contextual error information
+        const errorContext = getErrorContext(result.error);
+        originalErrorRef.current = result.error;
+        
+        // Log structured error to console
+        console.error('[Studio] Script loading error:', {
+          scriptId,
+          timestamp: new Date(errorContext.timestamp).toISOString(),
+          errorType: errorContext.type,
+          message: errorContext.message,
+          details: errorContext.details,
+          originalError: result.error,
+          stack: result.error instanceof Error && typeof result.error.stack === 'string' ? result.error.stack : undefined,
+        });
+        
+        // Set error context in UI store for ErrorDialog
+        setErrorContext(errorContext);
+        
         setLoadingState({
           isLoading: false,
           progress: 0,
           message: '',
-          error: result.error,
+          error: errorContext.message,
           loadType: null
         });
-        toast.error('Failed to load script: ' + result.error);
+        
+        // Show toast with contextual message
+        toast.error(errorContext.message, {
+          description: errorContext.details,
+        });
         return;
       }
       
@@ -258,17 +288,39 @@ function StudioLogic() {
     } catch (err) {
       clearTimeout(timeoutId);
       clearInterval(progressInterval);
-      console.error('[Studio] Error loading script:', err);
+      
+      // Get contextual error information
+      const errorContext = getErrorContext(err);
+      originalErrorRef.current = err;
+      
+      // Log structured error to console
+      console.error('[Studio] Unexpected script loading error:', {
+        scriptId,
+        timestamp: new Date(errorContext.timestamp).toISOString(),
+        errorType: errorContext.type,
+        message: errorContext.message,
+        details: errorContext.details,
+        originalError: err,
+        stack: err instanceof Error && typeof err.stack === 'string' ? err.stack : undefined,
+      });
+      
+      // Set error context in UI store for ErrorDialog
+      setErrorContext(errorContext);
+      
       setLoadingState({
         isLoading: false,
         progress: 0,
         message: '',
-        error: err instanceof Error ? err.message : 'Failed to load script',
+        error: errorContext.message,
         loadType: null
       });
-      toast.error('Failed to load script');
+      
+      // Show toast with contextual message
+      toast.error(errorContext.message, {
+        description: errorContext.details,
+      });
     }
-  }, [store, loadingState.isLoading]);
+  }, [store, loadingState.isLoading, setErrorContext]);
   
   // Retry function for error recovery
   const handleRetry = useCallback(() => {
@@ -394,6 +446,13 @@ function StudioLogic() {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Error Dialog for contextual error messages */}
+      <ErrorDialog
+        errorContext={errorContext}
+        onRetry={handleRetry}
+        scriptId={scriptIdRef.current || undefined}
+      />
       
       <AnimatePresence mode="wait">
         {store.mode === 'setup' ? <Editor key="editor" /> : <Runner key="runner" />}

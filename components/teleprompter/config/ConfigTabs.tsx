@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Type,
   Palette,
@@ -9,11 +10,15 @@ import {
   Wand2,
   FolderOpen,
   Film,
+  ChevronRight,
+  MoreHorizontal,
+  X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
 import { useTranslations } from 'next-intl'
 import { ARIA_LABELS } from '@/lib/a11y/ariaLabels'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { TypographyTab } from './typography/TypographyTab'
 import { ColorsTab } from './colors/ColorsTab'
 import { EffectsTab } from './effects/EffectsTab'
@@ -21,6 +26,7 @@ import { LayoutTab } from './layout/LayoutTab'
 import { AnimationsTab } from './animations/AnimationsTab'
 import { PresetsTab } from './presets/PresetsTab'
 import { MediaTab } from './media/MediaTab'
+import { TabBottomSheet } from './TabBottomSheet'
 
 type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations' | 'presets' | 'media'
 
@@ -80,9 +86,74 @@ export function ConfigTabs() {
   const t = useTranslations('Config')
   const { activeTab, setActiveTab } = useConfigStore()
   const [hoveredTab, setHoveredTab] = useState<TabId | null>(null)
-  const tabs = getTabConfig(t)
+  const tabs = useMemo(() => getTabConfig(t), [t])
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const tabScrollContainerRef = useRef<HTMLDivElement>(null)
+
+  // T057: Scroll detection state
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false)
+  
+  // T064: Bottom sheet state
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
+
+  // T060: Swipe gesture state
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+
+  // T065: Tablet viewport detection
+  const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1024px)')
+
+  // T057: Check if tabs overflow viewport
+  useEffect(() => {
+    const checkOverflow = () => {
+      const container = tabScrollContainerRef.current
+      if (container) {
+        setShowScrollIndicator(container.scrollWidth > container.clientWidth)
+      }
+    }
+
+    checkOverflow()
+    
+    // Re-check on window resize
+    window.addEventListener('resize', checkOverflow)
+    return () => window.removeEventListener('resize', checkOverflow)
+  }, [tabs])
+
+  // T060: Handle swipe gesture
+  const minSwipeDistance = 50
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }, [])
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }, [])
+
+  const onTouchEnd = useCallback(() => {
+    if (!touchStart || !touchEnd) return
+
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe || isRightSwipe) {
+      const currentIndex = tabs.findIndex(tab => tab.id === activeTab)
+      let newIndex = currentIndex
+
+      if (isLeftSwipe) {
+        // Swipe left - go to next tab
+        newIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0
+      } else if (isRightSwipe) {
+        // Swipe right - go to previous tab
+        newIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1
+      }
+
+      setActiveTab(tabs[newIndex].id)
+    }
+  }, [touchStart, touchEnd, tabs, activeTab, setActiveTab, minSwipeDistance])
 
   // Handle arrow key navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -115,10 +186,28 @@ export function ConfigTabs() {
     tabRefs.current[newIndex]?.focus()
   }
 
+  // T064: Handle tab selection from bottom sheet
+  const handleTabSelect = (tabId: TabId) => {
+    setActiveTab(tabId)
+    setBottomSheetOpen(false)
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Tab Navigation */}
-      <div role="tablist" aria-label="Configuration tabs" className="flex border-b border-border overflow-x-auto">
+      <div 
+        ref={tabScrollContainerRef}
+        role="tablist" 
+        aria-label="Configuration tabs" 
+        className={cn(
+          'relative flex border-b border-border overflow-x-auto',
+          // T065: Wrap tabs on tablet viewport
+          isTablet && showScrollIndicator && 'flex-wrap'
+        )}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         {tabs.map((tab, index) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
@@ -155,6 +244,35 @@ export function ConfigTabs() {
             </button>
           )
         })}
+
+        {/* T061: "More" button for bottom sheet */}
+        {showScrollIndicator && (
+          <button
+            onClick={() => setBottomSheetOpen(true)}
+            className={cn(
+              'flex items-center gap-2 px-3 py-3 text-sm font-medium transition-colors',
+              'border-b-2 -mb-px border-transparent text-muted-foreground hover:text-foreground',
+              'md:hidden'
+            )}
+            aria-label="Show all tabs"
+          >
+            <MoreHorizontal className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* T058 & T059: Gradient fade overlay with chevron indicator */}
+        <AnimatePresence>
+          {showScrollIndicator && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent pointer-events-none flex items-center justify-end pr-2"
+            >
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       
       {/* Tab Content */}
@@ -165,6 +283,16 @@ export function ConfigTabs() {
           </div>
         )}
       </div>
+
+      {/* T062-T064: TabBottomSheet component */}
+      <TabBottomSheet
+        isOpen={bottomSheetOpen}
+        onClose={() => setBottomSheetOpen(false)}
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabSelect={handleTabSelect}
+        t={t}
+      />
     </div>
   )
 }
