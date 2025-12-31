@@ -45,5 +45,43 @@
   "Common": {
     "loading": "Đang tải...",
     "defaultText": "Chào mừng! Hãy nhập nội dung của bạn vào đây..."
+  },
+  "Auth": {
+    "login": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "repeatPassword": "Nhập lại mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "loginTitle": "Đăng nhập",
+    "loginDescription": "Nhập email bên dưới để đăng nhập vào tài khoản của bạn",
+    "loggingIn": "Đang đăng nhập...",
+    "noAccount": "Chưa có tài khoản?",
+    "hasAccount": "Đã có tài khoản?",
+    "signUpTitle": "Đăng ký",
+    "signUpDescription": "Tạo tài khoản mới",
+    "creatingAccount": "Đang tạo tài khoản...",
+    "passwordMismatch": "Mật khẩu không khớp",
+    "resetPasswordTitle": "Đặt lại mật khẩu",
+    "resetPasswordDescription": "Nhập email của bạn và chúng tôi sẽ gửi liên kết để đặt lại mật khẩu",
+    "sendResetEmail": "Gửi email đặt lại",
+    "sending": "Đang gửi...",
+    "checkEmailTitle": "Kiểm tra email của bạn",
+    "checkEmailDescription": "Đã gửi hướng dẫn đặt lại mật khẩu",
+    "checkEmailMessage": "Nếu bạn đăng ký bằng email và mật khẩu, bạn sẽ nhận được email đặt lại mật khẩu.",
+    "newPassword": "Mật khẩu mới",
+    "updatePasswordTitle": "Đặt lại mật khẩu",
+    "updatePasswordDescription": "Vui lòng nhập mật khẩu mới của bạn bên dưới.",
+    "saveNewPassword": "Lưu mật khẩu mới",
+    "saving": "Đang lưu..."
+  },
+  "Protected": {
+    "welcome": "Xin chào",
+    "description": "Đây là trang được bảo vệ. Thêm nội dung của bạn vào đây."
+  },
+  "SignUpSuccess": {
+    "title": "Cảm ơn bạn đã đăng ký!",
+    "description": "Kiểm tra email để xác nhận",
+    "message": "Bạn đã đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản trước khi đăng nhập."
   }
 }

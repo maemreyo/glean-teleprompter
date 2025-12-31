@@ -45,5 +45,43 @@
   "Common": {
     "loading": "Loading...",
     "defaultText": "Welcome! Enter your text here..."
+  },
+  "Auth": {
+    "login": "Login",
+    "signUp": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "repeatPassword": "Repeat Password",
+    "forgotPassword": "Forgot your password?",
+    "loginTitle": "Login",
+    "loginDescription": "Enter your email below to login to your account",
+    "loggingIn": "Logging in...",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signUpTitle": "Sign up",
+    "signUpDescription": "Create a new account",
+    "creatingAccount": "Creating an account...",
+    "passwordMismatch": "Passwords do not match",
+    "resetPasswordTitle": "Reset Your Password",
+    "resetPasswordDescription": "Type in your email and we'll send you a link to reset your password",
+    "sendResetEmail": "Send reset email",
+    "sending": "Sending...",
+    "checkEmailTitle": "Check Your Email",
+    "checkEmailDescription": "Password reset instructions sent",
+    "checkEmailMessage": "If you registered using your email and password, you will receive a password reset email.",
+    "newPassword": "New password",
+    "updatePasswordTitle": "Reset Your Password",
+    "updatePasswordDescription": "Please enter your new password below.",
+    "saveNewPassword": "Save new password",
+    "saving": "Saving..."
+  },
+  "Protected": {
+    "welcome": "Welcome",
+    "description": "This is a protected page. Add your content here."
+  },
+  "SignUpSuccess": {
+    "title": "Thank you for signing up!",
+    "description": "Check your email to confirm",
+    "message": "You've successfully signed up. Please check your email to confirm your account before signing in."
   }
 }

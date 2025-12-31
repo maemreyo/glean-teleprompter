@@ -14,11 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 export function UpdatePasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const t = useTranslations("Auth");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,16 +48,16 @@ export function UpdatePasswordForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+          <CardTitle className="text-2xl">{t("updatePasswordTitle")}</CardTitle>
           <CardDescription>
-            Please enter your new password below.
+            {t("updatePasswordDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleForgotPassword}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="password">New password</Label>
+                <Label htmlFor="password">{t("newPassword")}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -67,7 +69,7 @@ export function UpdatePasswordForm({
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save new password"}
+                {isLoading ? t("saving") : t("saveNewPassword")}
               </Button>
             </div>
           </form>
