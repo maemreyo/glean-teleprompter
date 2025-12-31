@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 
 export interface PermissionDialogProps {
   /** Whether the dialog is open */
@@ -37,6 +38,8 @@ export function PermissionDialog({
   permissionType,
   error,
 }: PermissionDialogProps) {
+  const t = useTranslations('PermissionDialog');
+
   const handleConfirm = async () => {
     await onConfirm();
     onClose();
@@ -45,32 +48,32 @@ export function PermissionDialog({
   const getTitle = () => {
     switch (permissionType) {
       case 'camera':
-        return 'Camera Permission Required';
+        return t('cameraTitle');
       case 'microphone':
-        return 'Microphone Permission Required';
+        return t('microphoneTitle');
       case 'both':
-        return 'Camera & Microphone Permission Required';
+        return t('bothTitle');
     }
   };
 
   const getDescription = () => {
     switch (permissionType) {
       case 'camera':
-        return 'To use the camera feature, we need access to your camera. This allows you to see yourself while recording.';
+        return t('cameraDesc');
       case 'microphone':
-        return 'To record videos with audio, we need access to your microphone. Your audio will be recorded along with the video.';
+        return t('microphoneDesc');
       case 'both':
-        return 'To record videos, we need access to both your camera and microphone. This allows you to record yourself with audio.';
+        return t('bothDesc');
     }
   };
 
   const getPermissionsList = () => {
     const permissions = [];
     if (permissionType === 'camera' || permissionType === 'both') {
-      permissions.push({ icon: Video, label: 'Camera access', color: 'text-blue-500' });
+      permissions.push({ icon: Video, label: t('cameraAccess'), color: 'text-blue-500' });
     }
     if (permissionType === 'microphone' || permissionType === 'both') {
-      permissions.push({ icon: Mic, label: 'Microphone access', color: 'text-green-500' });
+      permissions.push({ icon: Mic, label: t('microphoneAccess'), color: 'text-green-500' });
     }
     return permissions;
   };
@@ -107,8 +110,7 @@ export function PermissionDialog({
           {/* Privacy Notice */}
           <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
             <p className="text-xs text-blue-700 dark:text-blue-300">
-              <strong>Privacy:</strong> Your camera and microphone data is processed locally and only used for your
-              recordings. We don&apos;t access your media without your permission.
+              <strong>Privacy:</strong> {t('privacy')}
             </p>
           </div>
 
@@ -120,17 +122,17 @@ export function PermissionDialog({
             className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <ExternalLink className="w-3 h-3" />
-            Learn how to manage browser permissions
+            {t('learnMore')}
             <span className="sr-only">(opens in new tab)</span>
           </a>
         </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
           <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
-            Cancel
+            {t('cancel')}
           </Button>
           <Button onClick={handleConfirm} className="w-full sm:w-auto">
-            Allow Permission
+            {t('allow')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -8,6 +8,7 @@
 import React, { useEffect, useState } from 'react';
 import { HardDrive, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { getStorageQuota } from '@/lib/supabase/recordings';
 import type { StorageQuota as StorageQuotaType } from '@/types/recording';
 
@@ -16,6 +17,7 @@ interface StorageQuotaProps {
 }
 
 export function StorageQuota({ className }: StorageQuotaProps) {
+  const t = useTranslations('StorageQuota');
   const [quota, setQuota] = useState<StorageQuotaType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +100,7 @@ export function StorageQuota({ className }: StorageQuotaProps) {
         <HardDrive className={`${styles.icon} flex-shrink-0 mt-0.5`} size={20} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-semibold text-white">Storage Usage</h3>
+            <h3 className="text-sm font-semibold text-white">{t('title')}</h3>
             <span className={`text-xs font-medium ${styles.text}`}>
               {quota.usage_percentage.toFixed(1)}%
             </span>
@@ -117,10 +119,10 @@ export function StorageQuota({ className }: StorageQuotaProps) {
           {/* Storage Details */}
           <div className="flex items-center justify-between text-xs text-gray-400">
             <span>
-              {quota.used_mb.toFixed(1)} MB of {quota.limit_mb} MB used
+              {quota.used_mb.toFixed(1)} MB {t('used')} {quota.limit_mb} {t('limit')}
             </span>
             <span>
-              {(quota.limit_mb - quota.used_mb).toFixed(1)} MB remaining
+              {(quota.limit_mb - quota.used_mb).toFixed(1)} {t('remaining')}
             </span>
           </div>
 
@@ -128,17 +130,13 @@ export function StorageQuota({ className }: StorageQuotaProps) {
           {warningLevel === 'critical' && (
             <div className="mt-3 flex items-center gap-2 text-xs text-red-300">
               <AlertTriangle size={14} />
-              <span>
-                Storage almost full! Delete old recordings or upgrade your plan.
-              </span>
+              <span>{t('critical')}</span>
             </div>
           )}
           {warningLevel === 'warning' && (
             <div className="mt-3 flex items-center gap-2 text-xs text-yellow-300">
               <AlertTriangle size={14} />
-              <span>
-                Running low on storage. Consider managing your recordings.
-              </span>
+              <span>{t('warning')}</span>
             </div>
           )}
         </div>

@@ -8,6 +8,7 @@
 import React, { useEffect, useState } from 'react';
 import { Play, Download, Trash2, Calendar, Clock, HardDrive, Video } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import type { Recording } from '@/types/recording';
 import { listRecordings, deleteRecording } from '@/lib/supabase/recordings';
 import { formatDuration, formatFileSize } from '@/lib/utils/video';
@@ -20,6 +21,7 @@ interface RecordingsLibraryProps {
 }
 
 export function RecordingsLibrary({ className }: RecordingsLibraryProps) {
+  const t = useTranslations('RecordingsLibrary');
   const [recordings, setRecordings] = useState<Recording[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +52,7 @@ export function RecordingsLibrary({ className }: RecordingsLibraryProps) {
   }, [page]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this recording? This action cannot be undone.')) {
+    if (!confirm(t('deleteConfirm'))) {
       return;
     }
 
@@ -97,8 +99,8 @@ export function RecordingsLibrary({ className }: RecordingsLibraryProps) {
       {recordings.length === 0 ? (
         <div className="text-center py-16">
           <Video className="mx-auto h-16 w-16 text-gray-600 mb-4" />
-          <h3 className="text-xl font-semibold text-gray-300 mb-2">No recordings yet</h3>
-          <p className="text-gray-500">Your recordings will appear here once you create them.</p>
+          <h3 className="text-xl font-semibold text-gray-300 mb-2">{t('noRecordings')}</h3>
+          <p className="text-gray-500">{t('noRecordingsDesc')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -152,7 +154,7 @@ export function RecordingsLibrary({ className }: RecordingsLibraryProps) {
                         ? 'bg-blue-500/20 text-blue-300'
                         : 'bg-yellow-500/20 text-yellow-300'
                     }`}>
-                      {recording.recording_quality} quality
+                      {recording.recording_quality} {t('quality')}
                     </span>
                     <span className="text-xs px-2 py-1 rounded bg-gray-500/20 text-gray-300">
                       {recording.file_format.toUpperCase()}
@@ -165,7 +167,7 @@ export function RecordingsLibrary({ className }: RecordingsLibraryProps) {
                   <button
                     onClick={() => handlePlay(recording)}
                     className="p-2 rounded-lg bg-pink-500 hover:bg-pink-600 text-white transition-colors"
-                    title="Play recording"
+                    title={t('playRecording')}
                   >
                     <Play size={18} />
                   </button>
@@ -176,7 +178,7 @@ export function RecordingsLibrary({ className }: RecordingsLibraryProps) {
                   <button
                     onClick={() => handleDelete(recording.id)}
                     className="p-2 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-300 transition-colors"
-                    title="Delete recording"
+                    title={t('deleteRecording')}
                   >
                     <Trash2 size={18} />
                   </button>
@@ -195,17 +197,17 @@ export function RecordingsLibrary({ className }: RecordingsLibraryProps) {
             disabled={page === 1}
             className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Previous
+            {t('previous')}
           </button>
           <span className="text-sm text-gray-400">
-            Page {page} of {totalPages}
+            {t('page')} {page} {t('of')} {totalPages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
             className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Next
+            {t('next')}
           </button>
         </div>
       )}

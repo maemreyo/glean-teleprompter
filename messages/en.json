@@ -83,5 +83,51 @@
     "title": "Thank you for signing up!",
     "description": "Check your email to confirm",
     "message": "You've successfully signed up. Please check your email to confirm your account before signing in."
+  },
+  "StorageQuota": {
+    "title": "Storage Usage",
+    "used": "MB of",
+    "limit": "MB used",
+    "remaining": "MB remaining",
+    "critical": "Storage almost full! Delete old recordings or upgrade your plan.",
+    "warning": "Running low on storage. Consider managing your recordings."
+  },
+  "RecordingsLibrary": {
+    "noRecordings": "No recordings yet",
+    "noRecordingsDesc": "Your recordings will appear here once you create them.",
+    "quality": "quality",
+    "previous": "Previous",
+    "page": "Page",
+    "of": "of",
+    "next": "Next",
+    "deleteConfirm": "Are you sure you want to delete this recording? This action cannot be undone.",
+    "playRecording": "Play recording",
+    "deleteRecording": "Delete recording"
+  },
+  "PermissionDialog": {
+    "cameraTitle": "Camera Permission Required",
+    "microphoneTitle": "Microphone Permission Required",
+    "bothTitle": "Camera & Microphone Permission Required",
+    "cameraDesc": "To use the camera feature, we need access to your camera. This allows you to see yourself while recording.",
+    "microphoneDesc": "To record videos with audio, we need access to your microphone. Your audio will be recorded along with the video.",
+    "bothDesc": "To record videos, we need access to both your camera and microphone. This allows you to record yourself with audio.",
+    "cameraAccess": "Camera access",
+    "microphoneAccess": "Microphone access",
+    "privacy": "Privacy: Your camera and microphone data is processed locally and only used for your recordings. We don't access your media without your permission.",
+    "learnMore": "Learn how to manage browser permissions",
+    "cancel": "Cancel",
+    "allow": "Allow Permission"
+  },
+  "RecordingModal": {
+    "title": "Recording Preview",
+    "description": "Review your recording before saving or discard.",
+    "duration": "Duration:",
+    "size": "Size:",
+    "download": "Download",
+    "recordedScript": "Recorded Script",
+    "characters": "characters",
+    "discard": "Discard",
+    "saving": "Saving...",
+    "saveRecording": "Save Recording"
   }
 }

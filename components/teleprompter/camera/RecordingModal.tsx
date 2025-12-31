@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 import { formatFileSize, formatDuration } from '@/lib/utils/video';
 
 export interface RecordingModalProps {
@@ -48,6 +49,7 @@ export function RecordingModal({
   scriptSnapshot,
   isSaving = false,
 }: RecordingModalProps) {
+  const t = useTranslations('RecordingModal');
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -115,9 +117,9 @@ export function RecordingModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Recording Preview</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Review your recording before saving or discard.
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -164,11 +166,11 @@ export function RecordingModal({
           <div className="flex items-center justify-between text-sm">
             <div className="flex gap-4">
               <div>
-                <span className="text-gray-500">Duration:</span>{' '}
+                <span className="text-gray-500">{t('duration')}</span>{' '}
                 <span className="font-medium">{formatDuration(duration)}</span>
               </div>
               <div>
-                <span className="text-gray-500">Size:</span>{' '}
+                <span className="text-gray-500">{t('size')}</span>{' '}
                 <span className="font-medium">{videoBlob ? formatFileSize(videoBlob.size) : 'N/A'}</span>
               </div>
             </div>
@@ -179,7 +181,7 @@ export function RecordingModal({
               className="gap-1"
             >
               <Download className="w-4 h-4" />
-              Download
+              {t('download')}
             </Button>
           </div>
 
@@ -187,7 +189,7 @@ export function RecordingModal({
           {scriptSnapshot && (
             <details className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
               <summary className="text-sm font-medium cursor-pointer">
-                Recorded Script ({scriptSnapshot.length} characters)
+                {t('recordedScript')} ({scriptSnapshot.length} {t('characters')})
               </summary>
               <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap max-h-32 overflow-y-auto">
                 {scriptSnapshot}
@@ -204,18 +206,18 @@ export function RecordingModal({
             className="border-red-500 text-red-500 hover:bg-red-50"
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            Discard
+            {t('discard')}
           </Button>
           <Button onClick={handleSave} disabled={isSaving}>
             {isSaving ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                Saving...
+                {t('saving')}
               </>
             ) : (
               <>
                 <Save className="w-4 h-4 mr-2" />
-                Save Recording
+                {t('saveRecording')}
               </>
             )}
           </Button>

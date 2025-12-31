@@ -83,5 +83,51 @@
     "title": "Cảm ơn bạn đã đăng ký!",
     "description": "Kiểm tra email để xác nhận",
     "message": "Bạn đã đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản trước khi đăng nhập."
+  },
+  "StorageQuota": {
+    "title": "Sử dụng bộ nhớ",
+    "used": "MB của",
+    "limit": "MB đã dùng",
+    "remaining": "MB còn lại",
+    "critical": "Bộ nhớ gần đầy! Xóa các bản ghi cũ hoặc nâng cấp gói của bạn.",
+    "warning": "Sắp hết bộ nhớ. Hãy cân nhắc quản lý các bản ghi của bạn."
+  },
+  "RecordingsLibrary": {
+    "noRecordings": "Chưa có bản ghi nào",
+    "noRecordingsDesc": "Các bản ghi của bạn sẽ xuất hiện ở đây sau khi bạn tạo chúng.",
+    "quality": "chất lượng",
+    "previous": "Trước",
+    "page": "Trang",
+    "of": "của",
+    "next": "Tiếp",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa bản ghi này không? Hành động này không thể hoàn tác.",
+    "playRecording": "Phát bản ghi",
+    "deleteRecording": "Xóa bản ghi"
+  },
+  "PermissionDialog": {
+    "cameraTitle": "Cần quyền truy cập Camera",
+    "microphoneTitle": "Cần quyền truy cập Microphone",
+    "bothTitle": "Cần quyền truy cập Camera & Microphone",
+    "cameraDesc": "Để sử dụng tính năng camera, chúng tôi cần quyền truy cập camera của bạn. Điều này cho phép bạn thấy mình khi ghi hình.",
+    "microphoneDesc": "Để ghi video có âm thanh, chúng tôi cần quyền truy cập microphone của bạn. Âm thanh của bạn sẽ được ghi cùng với video.",
+    "bothDesc": "Để ghi video, chúng tôi cần quyền truy cập cả camera và microphone của bạn. Điều này cho phép bạn ghi mình có âm thanh.",
+    "cameraAccess": "Quyền truy cập Camera",
+    "microphoneAccess": "Quyền truy cập Microphone",
+    "privacy": "Quyền riêng tư: Dữ liệu camera và microphone của bạn được xử lý cục bộ và chỉ dùng cho bản ghi của bạn. Chúng tôi không truy cập phương tiện của bạn mà không có sự cho phép của bạn.",
+    "learnMore": "Tìm hiểu cách quản lý quyền trình duyệt",
+    "cancel": "Hủy",
+    "allow": "Cho phép"
+  },
+  "RecordingModal": {
+    "title": "Xem trước bản ghi",
+    "description": "Xem lại bản ghi của bạn trước khi lưu hoặc hủy.",
+    "duration": "Thời lượng:",
+    "size": "Kích thước:",
+    "download": "Tải xuống",
+    "recordedScript": "Bản script đã ghi",
+    "characters": "ký tự",
+    "discard": "Hủy bỏ",
+    "saving": "Đang lưu...",
+    "saveRecording": "Lưu bản ghi"
   }
 }
