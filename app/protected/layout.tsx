@@ -1,13 +1,24 @@
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 import { AuthButton } from "@/components/auth/AuthButton";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import Link from "next/link";
 import { Suspense } from "react";
 
-export default function ProtectedLayout({
+export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Check authentication on server side
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    redirect('/auth/login?redirectTo=/protected')
+  }
+
   return (
     <main className="min-h-screen flex flex-col items-center">
       <div className="flex-1 w-full flex flex-col gap-20 items-center">

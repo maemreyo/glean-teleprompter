@@ -46,14 +46,66 @@ export async function updateSession(request: NextRequest) {
   // with the Supabase client, your users may be randomly logged out.
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
+  const isAuthed = !!user;
 
+  const { pathname } = request.nextUrl;
+
+  // Public routes (no auth required)
+  const publicRoutes = [
+    "/",
+    "/demo",
+    "/quickstart",
+    "/auth/login",
+    "/auth/sign-up",
+    "/auth/forgot-password",
+    "/auth/callback",
+    "/auth/confirm",
+    "/auth/error",
+    "/studio", // Studio is publicly accessible
+  ];
+
+  // Protected routes (auth required)
+  const protectedRoutes = ["/dashboard", "/protected"];
+
+  // Check if current path is public or protected
+  const isPublicRoute = publicRoutes.some((path) => pathname.startsWith(path));
+  const isProtectedRoute = protectedRoutes.some((path) =>
+    pathname.startsWith(path),
+  );
+
+  // Redirect to login if accessing protected route without auth
+  if (isProtectedRoute && !isAuthed) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/login";
+    url.searchParams.set("redirectTo", pathname);
+    url.searchParams.set("returnUrl", request.nextUrl.href);
+    return NextResponse.redirect(url);
+  }
+
+  // Redirect to dashboard if accessing login/signup while already authenticated
   if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
+    (pathname === "/auth/login" || pathname === "/auth/sign-up") &&
+    isAuthed
   ) {
-    // no user, potentially respond by redirecting the user to the login page
+    const returnUrl = request.nextUrl.searchParams.get("returnUrl");
+    if (returnUrl && !protectedRoutes.some((path) => returnUrl.includes(path))) {
+      const url = request.nextUrl.clone();
+      url.href = returnUrl;
+      return NextResponse.redirect(url);
+    }
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  // Legacy protection for non-public routes (existing behavior)
+  if (
+    pathname !== "/" &&
+    !isAuthed &&
+    !pathname.startsWith("/login") &&
+    !pathname.startsWith("/auth") &&
+    !isPublicRoute
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
