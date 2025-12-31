@@ -6,6 +6,7 @@ import { FontSizeControl } from './FontSizeControl'
 import { SliderInput } from '../ui/SliderInput'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
 import { useTranslations } from 'next-intl'
+import { ARIA_LABELS } from '@/lib/a11y/ariaLabels'
 
 export function TypographyTab() {
   const t = useTranslations('Config.typography')
@@ -52,18 +53,20 @@ export function TypographyTab() {
         <label className="block text-sm font-medium text-foreground">
           {t('textTransform')}
         </label>
-        <div className="flex gap-2">
+        <div className="flex gap-2" role="group" aria-label={t('textTransform')}>
           {(['none', 'uppercase', 'lowercase', 'capitalize'] as const).map((transform) => (
             <button
               key={transform}
               onClick={() => setTypography({ textTransform: transform })}
               className={cn(
                 'flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-                'border border-border',
+                'border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
                 typography.textTransform === transform
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-background text-foreground hover:bg-secondary'
               )}
+              aria-label={ARIA_LABELS.listItem(t(transform), typography.textTransform === transform)}
+              aria-pressed={typography.textTransform === transform}
             >
               {t(transform)}
             </button>

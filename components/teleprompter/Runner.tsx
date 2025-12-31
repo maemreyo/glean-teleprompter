@@ -72,12 +72,14 @@ export function Runner() {
                 <button
                   onClick={() => setCameraVisible(!cameraVisible)}
                   className={cn(
-                      "p-2 rounded-full transition-all",
+                      "p-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black",
                       cameraVisible
-                          ? "bg-red-500 hover:bg-red-600"
-                          : "bg-black/40 hover:bg-black/60 backdrop-blur"
+                          ? "bg-red-500 hover:bg-red-600 text-white"
+                          : "bg-black/60 hover:bg-black/80 backdrop-blur text-white"
                   )}
                   title={cameraVisible ? "Hide Camera" : "Show Camera"}
+                  aria-label={cameraVisible ? "Hide camera" : "Show camera"}
+                  aria-pressed={cameraVisible}
                 >
                   {cameraVisible ? <CameraOff size={20} /> : <Camera size={20} />}
                 </button>
@@ -116,8 +118,16 @@ export function Runner() {
 
              {/* Bottom Control Bar */}
              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-xl">
-               <div className="bg-black/70 backdrop-blur-2xl border border-white/5 rounded-2xl p-3 shadow-2xl flex items-center justify-between gap-4">
-                  <button onClick={() => setIsPlaying(!isPlaying)} className={cn("w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg", isPlaying ? "bg-white text-black" : "bg-gradient-to-r from-pink-500 to-violet-600 text-white")}>
+               <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-3 shadow-2xl flex items-center justify-between gap-4">
+                  <button
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    className={cn(
+                      "w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black",
+                      isPlaying ? "bg-white text-black hover:bg-white/90" : "bg-gradient-to-r from-pink-500 to-violet-600 text-white hover:from-pink-600 hover:to-violet-700"
+                    )}
+                    aria-label={isPlaying ? "Pause scrolling" : "Start scrolling"}
+                    aria-pressed={isPlaying}
+                  >
                     {isPlaying ? <Pause fill="currentColor" size={24} /> : <Play fill="currentColor" size={24} className="ml-1" />}
                   </button>
 
