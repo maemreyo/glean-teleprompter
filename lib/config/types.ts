@@ -52,7 +52,15 @@ export interface EffectConfig {
   glowBlurRadius: number
   glowIntensity: number
   glowColor: string
+  
+  // Backdrop filter
+  backdropFilterEnabled: boolean
+  backdropBlur: number
+  backdropBrightness: number
+  backdropSaturation: number
 }
+
+export type BackdropFilterType = 'blur' | 'brightness' | 'saturation' | 'none'
 
 export interface LayoutConfig {
   // Margins and padding

@@ -42,6 +42,9 @@ export const constraints = {
     outlineWidth: { min: 1, max: 10 },
     glowBlurRadius: { min: 5, max: 50 },
     glowIntensity: { min: 0, max: 1 },
+    backdropBlur: { min: 0, max: 20 },
+    backdropBrightness: { min: 0, max: 200 },
+    backdropSaturation: { min: 0, max: 200 },
   },
   layout: {
     horizontalMargin: { min: 0, max: 200 },
@@ -204,6 +207,27 @@ export function validateEffects(config: Partial<EffectConfig>): ValidationResult
     const { min, max } = constraints.effects.glowIntensity
     if (config.glowIntensity < min || config.glowIntensity > max) {
       errors.push(`glowIntensity must be between ${min} and ${max}`)
+    }
+  }
+  
+  if (config.backdropBlur !== undefined) {
+    const { min, max } = constraints.effects.backdropBlur
+    if (config.backdropBlur < min || config.backdropBlur > max) {
+      errors.push(`backdropBlur must be between ${min} and ${max}`)
+    }
+  }
+  
+  if (config.backdropBrightness !== undefined) {
+    const { min, max } = constraints.effects.backdropBrightness
+    if (config.backdropBrightness < min || config.backdropBrightness > max) {
+      errors.push(`backdropBrightness must be between ${min} and ${max}`)
+    }
+  }
+  
+  if (config.backdropSaturation !== undefined) {
+    const { min, max } = constraints.effects.backdropSaturation
+    if (config.backdropSaturation < min || config.backdropSaturation > max) {
+      errors.push(`backdropSaturation must be between ${min} and ${max}`)
     }
   }
   

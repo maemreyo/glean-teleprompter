@@ -1,6 +1,6 @@
 // Preset management utilities
 
-import type { Preset, PresetCollection, ConfigSnapshot } from './types'
+import type { Preset, ConfigSnapshot } from './types'
 import type { TypographyConfig, ColorConfig, EffectConfig, LayoutConfig, AnimationConfig } from './types'
 
 // Built-in presets
@@ -41,6 +41,10 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
         glowBlurRadius: 10,
         glowIntensity: 0.5,
         glowColor: '#ffffff',
+        backdropFilterEnabled: false,
+        backdropBlur: 0,
+        backdropBrightness: 100,
+        backdropSaturation: 100,
       },
       layout: {
         horizontalMargin: 0,
@@ -110,6 +114,10 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
         glowBlurRadius: 10,
         glowIntensity: 0.5,
         glowColor: '#ffffff',
+        backdropFilterEnabled: false,
+        backdropBlur: 0,
+        backdropBrightness: 100,
+        backdropSaturation: 100,
       },
       layout: {
         horizontalMargin: 0,
@@ -179,6 +187,10 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
         glowBlurRadius: 20,
         glowIntensity: 0.7,
         glowColor: '#fbbf24',
+        backdropFilterEnabled: false,
+        backdropBlur: 0,
+        backdropBrightness: 100,
+        backdropSaturation: 100,
       },
       layout: {
         horizontalMargin: 40,
@@ -248,6 +260,10 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
         glowBlurRadius: 10,
         glowIntensity: 0.5,
         glowColor: '#1e3a5f',
+        backdropFilterEnabled: false,
+        backdropBlur: 0,
+        backdropBrightness: 100,
+        backdropSaturation: 100,
       },
       layout: {
         horizontalMargin: 20,
@@ -280,7 +296,6 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
     tags: ['corporate', 'business'],
     isShared: false,
     syncStatus: 'synced',
-  },
   },
   {
     name: 'Creative',
@@ -318,6 +333,10 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
         glowBlurRadius: 15,
         glowIntensity: 0.6,
         glowColor: '#f43f5e',
+        backdropFilterEnabled: false,
+        backdropBlur: 0,
+        backdropBrightness: 100,
+        backdropSaturation: 100,
       },
       layout: {
         horizontalMargin: 10,
@@ -350,7 +369,6 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
     tags: ['creative', 'artistic'],
     isShared: false,
     syncStatus: 'synced',
-  },
   },
 ]
 
@@ -406,7 +424,7 @@ export function exportPresetAsJSON(preset: Preset): string {
       config: preset.config,
       tags: preset.tags,
       created_at: preset.createdAt,
-      updated_at: preset.updated_at,
+      updatedAt: preset.updatedAt,
     },
   }, null, 2)
 }
@@ -432,7 +450,7 @@ export function importPresetFromJSON(jsonString: string): Omit<Preset, 'id' | 'u
       isShared: presetData.isShared || false,
       syncStatus: 'synced',
     }
-  } catch (e) {
+  } catch {
     return { error: 'Invalid JSON format' }
   }
 }

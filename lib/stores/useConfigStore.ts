@@ -43,6 +43,10 @@ export const defaultEffects: EffectConfig = {
   glowBlurRadius: 10,
   glowIntensity: 0.5,
   glowColor: '#ffffff',
+  backdropFilterEnabled: false,
+  backdropBlur: 0,
+  backdropBrightness: 100,
+  backdropSaturation: 100,
 }
 
 export const defaultLayout: LayoutConfig = {
