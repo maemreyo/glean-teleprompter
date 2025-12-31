@@ -39,11 +39,11 @@ Each user story phase is independently testable and can be completed in any orde
 
 ### Tasks
 
-- [ ] T001 Create test directory structure at `__tests__/integration/studio/` and `__tests__/mocks/` and `__tests__/utils/`
-- [ ] T002 [P] Configure Jest coverage thresholds for 100% in `jest.config.js`
-- [ ] T003 [P] Create TypeScript type definitions for test mocks in `__tests__/types/test-mocks.ts`
-- [ ] T004 Create shared test setup utilities in `__tests__/utils/test-helpers.tsx`
-- [ ] T005 Create render wrapper with mock providers in `__tests__/utils/test-renderers.tsx`
+- [X] T001 Create test directory structure at `__tests__/integration/studio/` and `__tests__/mocks/` and `__tests__/utils/`
+- [X] T002 [P] Configure Jest coverage thresholds for 100% in `jest.config.js`
+- [X] T003 [P] Create TypeScript type definitions for test mocks in `__tests__/types/test-mocks.ts`
+- [X] T004 Create shared test setup utilities in `__tests__/utils/test-helpers.tsx`
+- [X] T005 Create render wrapper with mock providers in `__tests__/utils/test-renderers.tsx`
 
 ---
 
@@ -59,19 +59,19 @@ Each user story phase is independently testable and can be completed in any orde
 
 ### Tasks
 
-- [ ] T006 [P] Create Teleprompter store mock factory in `__tests__/mocks/stores/teleprompter-store.mock.ts`
-- [ ] T007 [P] Create Config store mock factory in `__tests__/mocks/stores/config-store.mock.ts`
-- [ ] T008 [P] Create Demo store mock factory in `__tests__/mocks/stores/demo-store.mock.ts`
-- [ ] T009 [P] Create React hook mocks for useTeleprompterStore in `__tests__/mocks/hooks/use-teleprompter-store.mock.ts`
-- [ ] T010 [P] Create React hook mocks for useConfigStore in `__tests__/mocks/hooks/use-config-store.mock.ts`
-- [ ] T011 [P] Create React hook mocks for useDemoStore in `__tests__/mocks/hooks/use-demo-store.mock.ts`
-- [ ] T012 [P] Create next/navigation useSearchParams mock in `__tests__/mocks/next-navigation.mock.ts`
-- [ ] T013 [P] Create sonner toast mock with assertion helpers in `__tests__/mocks/toast.mock.ts`
-- [ ] T014 [P] Create localStorage mock with error simulation in `__tests__/mocks/local-storage.mock.ts`
-- [ ] T015 [P] Create Framer Motion AnimatePresence mock in `__tests__/mocks/framer-motion.mock.ts`
-- [ ] T016 [P] Create loadScriptAction mock in `__tests__/mocks/actions/load-script-action.mock.ts`
-- [ ] T017 [P] Create getTemplateById mock in `__tests__/mocks/actions/get-template-by-id.mock.ts`
-- [ ] T018 Create centralized mock setup function in `__tests__/utils/studio-page-mocks.ts`
+- [X] T006 [P] Create Teleprompter store mock factory in `__tests__/mocks/stores/teleprompter-store.mock.ts`
+- [X] T007 [P] Create Config store mock factory in `__tests__/mocks/stores/config-store.mock.ts`
+- [X] T008 [P] Create Demo store mock factory in `__tests__/mocks/stores/demo-store.mock.ts`
+- [X] T009 [P] Create React hook mocks for useTeleprompterStore in `__tests__/mocks/hooks/use-teleprompter-store.mock.ts`
+- [X] T010 [P] Create React hook mocks for useConfigStore in `__tests__/mocks/hooks/use-config-store.mock.ts`
+- [X] T011 [P] Create React hook mocks for useDemoStore in `__tests__/mocks/hooks/use-demo-store.mock.ts`
+- [X] T012 [P] Create next/navigation useSearchParams mock in `__tests__/mocks/next-navigation.mock.ts`
+- [X] T013 [P] Create sonner toast mock with assertion helpers in `__tests__/mocks/toast.mock.ts`
+- [X] T014 [P] Create localStorage mock with error simulation in `__tests__/mocks/local-storage.mock.ts`
+- [X] T015 [P] Create Framer Motion AnimatePresence mock in `__tests__/mocks/framer-motion.mock.tsx`
+- [X] T016 [P] Create loadScriptAction mock in `__tests__/mocks/actions/load-script-action.mock.ts`
+- [X] T017 [P] Create getTemplateById mock in `__tests__/mocks/actions/get-template-by-id.mock.ts`
+- [X] T018 Create centralized mock setup function in `__tests__/utils/studio-page-mocks.ts`
 
 ---
 
@@ -115,7 +115,7 @@ Each user story phase is independently testable and can be completed in any orde
 ### Tasks
 
 - [ ] T025 [US2] Create test file `__tests__/integration/studio/template-loading.test.tsx` with describe blocks
-- [ ] T026 [P] [US2] Create template fixture data in `__tests__/fixtures/templates.ts`
+- [X] T026 [P] [US2] Create template fixture data in `__tests__/fixtures/templates.ts`
 - [ ] T027 [US2] Write test: "should load template content when ?template parameter present"
 - [ ] T028 [US2] Write test: "should apply all template settings to teleprompter store"
 - [ ] T029 [US2] Write test: "should show success toast with template name after loading"
@@ -142,7 +142,7 @@ Each user story phase is independently testable and can be completed in any orde
 ### Tasks
 
 - [ ] T033 [US3] Create test file `__tests__/integration/studio/script-loading.test.tsx` with describe blocks
-- [ ] T034 [P] [US3] Create script fixture data in `__tests__/fixtures/scripts.ts`
+- [X] T034 [P] [US3] Create script fixture data in `__tests__/fixtures/scripts.ts`
 - [ ] T035 [US3] Write test: "should load script with modern config format"
 - [ ] T036 [US3] Write test: "should apply script config to config store"
 - [ ] T037 [US3] Write test: "should show success toast for script with config"
@@ -171,7 +171,7 @@ Each user story phase is independently testable and can be completed in any orde
 ### Tasks
 
 - [ ] T043 [US4] Create test file `__tests__/integration/studio/local-draft.test.tsx` with describe blocks
-- [ ] T044 [P] [US4] Create draft fixture data in `__tests__/fixtures/drafts.ts`
+- [X] T044 [P] [US4] Create draft fixture data in `__tests__/fixtures/drafts.ts`
 - [ ] T045 [US4] Write test: "should auto-save to localStorage after 5 seconds in setup mode"
 - [ ] T046 [US4] Write test: "should persist all required properties to localStorage"
 - [ ] T047 [US4] Write test: "should not auto-save when in run mode"

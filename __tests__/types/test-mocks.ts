@@ -91,18 +91,19 @@ export interface MockToast {
 
 /**
  * Mock localStorage interface
+ * Note: Methods are actual functions, not jest.Mock types
  */
 export interface MockLocalStorage {
-  getItem: jest.Mock;
-  setItem: jest.Mock;
-  removeItem: jest.Mock;
-  clear: jest.Mock;
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => void;
+  removeItem: (key: string) => void;
+  clear: () => void;
   length: number;
-  key: jest.Mock;
+  key: (index: number) => string | null;
   
   // Error simulation methods
   simulateQuotaExceeded: () => void;
-  simulateCorruptedData: (key: string) => void;
+  simulateCorruptedData: (key: string, data: string) => void;
   simulateDisabled: () => void;
   reset: () => void;
 }
@@ -115,13 +116,13 @@ export interface MockLocalStorage {
  * Mock SearchParams interface
  */
 export interface MockSearchParams {
-  get: jest.Mock;
-  has: jest.Mock;
-  entries: jest.Mock;
-  keys: jest.Mock;
-  values: jest.Mock;
-  forEach: jest.Mock;
-  toString: jest.Mock;
+  get: (key: string) => string | null;
+  has: (key: string) => boolean;
+  entries: () => [string, string | null][];
+  keys: () => string[];
+  values: () => string[];
+  forEach: (callback: (value: string, key: string) => void) => void;
+  toString: () => string;
 }
 
 // ============================================================================
