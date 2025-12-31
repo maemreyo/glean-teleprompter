@@ -3,6 +3,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { useConfigStore } from '@/lib/stores/useConfigStore';
+import { FontLoader } from '@/components/teleprompter/config/typography/FontLoader';
 
 interface TeleprompterTextProps {
   text: string;
@@ -33,9 +34,13 @@ export const TeleprompterText: React.FC<TeleprompterTextProps> = ({
     colors,
     effects
   });
-  
+
   return (
-    <div
+    <>
+      {/* Load the selected font */}
+      <FontLoader fontFamily={typography.fontFamily} />
+
+      <div
         className={cn(
           "w-full transition-all duration-300",
           layout.textAlign === 'center' ? 'text-center' :
@@ -77,9 +82,9 @@ export const TeleprompterText: React.FC<TeleprompterTextProps> = ({
             )}
             style={{
               // Typography - CRITICAL: These override theme fonts
-              fontFamily: `${typography.fontFamily} !important`,
+              fontFamily: typography.fontFamily,
               fontWeight: typography.fontWeight,
-              fontSize: `${typography.fontSize}px !important`,
+              fontSize: `${typography.fontSize}px`,
               lineHeight: String(typography.lineHeight),
               letterSpacing: `${typography.letterSpacing}px`,
               textTransform: typography.textTransform,
@@ -99,7 +104,7 @@ export const TeleprompterText: React.FC<TeleprompterTextProps> = ({
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               } : {
-                color: `${colors.primaryColor} !important`,
+                color: colors.primaryColor,
               }),
               
               // Effects - Shadow (combined with outline/glow handling)
@@ -146,5 +151,6 @@ export const TeleprompterText: React.FC<TeleprompterTextProps> = ({
             {text || "..."}
         </p>
     </div>
+    </>
   );
 };

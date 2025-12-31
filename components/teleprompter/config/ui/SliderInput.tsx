@@ -83,11 +83,12 @@ export function SliderInput({
               "w-full px-2 py-1 text-sm border rounded-lg",
               "focus:ring-2 focus:ring-primary focus:border-transparent",
               "bg-background text-foreground",
-              "border-border"
+              "border-border",
+              unit ? "pr-8" : ""
             )}
           />
           {unit && (
-            <span className="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
               {unit}
             </span>
           )}

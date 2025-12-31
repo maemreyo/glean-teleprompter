@@ -75,7 +75,7 @@ describe('Config Store to TeleprompterText Integration', () => {
 
       render(<TeleprompterText text="Test text" />)
 
-      const textElement = screen.getByText('TEST TEXT') // Should be uppercase
+      const textElement = screen.getByText('Test text') // CSS text-transform doesn't change DOM text
       const computedStyle = window.getComputedStyle(textElement)
       expect(computedStyle.textTransform).toBe('uppercase')
     })

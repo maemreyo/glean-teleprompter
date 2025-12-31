@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Check, ChevronDown, Type, Heading, Code, PenTool, TextCursorInput } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
+import { FontLoader } from './FontLoader'
 import {
   fontLibrary,
   categoryDisplayNames,
