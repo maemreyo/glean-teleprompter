@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { AuthButton } from "@/components/auth/AuthButton";
+import { NavAuth } from "@/components/auth/NavAuth";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -14,10 +14,13 @@ export default async function ProtectedLayout({
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Redirect to login if not authenticated
-  if (!user) {
-    redirect('/auth/login?redirectTo=/protected')
+  // Redirect to dashboard if authenticated (since /protected is deprecated)
+  if (user) {
+    redirect('/dashboard')
   }
+
+  // Redirect to login if not authenticated
+  redirect('/auth/login?redirectTo=/dashboard')
 
   return (
     <main className="min-h-screen flex flex-col items-center">
@@ -28,7 +31,7 @@ export default async function ProtectedLayout({
               <Link href={"/"}>Teleprompter</Link>
             </div>
             <Suspense>
-              <AuthButton />
+              <NavAuth />
             </Suspense>
           </div>
         </nav>

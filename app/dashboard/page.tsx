@@ -119,7 +119,7 @@ export default async function DashboardPage() {
           </Link>
 
           <Link
-            href="/protected"
+            href="/dashboard/recordings"
             className="flex items-center gap-3 p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
           >
             <div className="h-10 w-10 bg-blue-500/20 rounded-lg flex items-center justify-center">

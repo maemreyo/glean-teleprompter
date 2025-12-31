@@ -22,8 +22,8 @@ function ProtectedContent() {
         return;
       }
 
-      setEmail(data.claims.email || "");
-      setLoading(false);
+      // Redirect to dashboard since /protected is deprecated
+      router.push("/dashboard");
     }
 
     checkAuth();
@@ -33,15 +33,7 @@ function ProtectedContent() {
     return <div className="flex-1 w-full flex items-center justify-center">Loading...</div>;
   }
 
-  // TODO: Replace with your actual protected page content
-  return (
-    <div className="flex-1 w-full flex flex-col gap-12 items-center justify-center">
-      <h1 className="text-4xl font-bold">{t("welcome")}, {email}</h1>
-      <p className="text-muted-foreground">
-        {t("description")}
-      </p>
-    </div>
-  );
+  return null;
 }
 
 export default function ProtectedPage() {

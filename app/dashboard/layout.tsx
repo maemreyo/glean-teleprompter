@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { AuthButton } from '@/components/auth/AuthButton'
+import { NavAuth } from '@/components/auth/NavAuth'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import Link from 'next/link'
 
@@ -49,7 +49,7 @@ export default async function DashboardLayout({
           </div>
           
           <div className="flex items-center gap-4">
-            <AuthButton />
+            <NavAuth />
             <ThemeSwitcher />
           </div>
         </div>

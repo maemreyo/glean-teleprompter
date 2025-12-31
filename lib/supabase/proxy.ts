@@ -65,7 +65,7 @@ export async function updateSession(request: NextRequest) {
   ];
 
   // Protected routes (auth required)
-  const protectedRoutes = ["/dashboard", "/protected"];
+  const protectedRoutes = ["/dashboard"];
 
   // Check if current path is public or protected
   const isPublicRoute = publicRoutes.some((path) => pathname.startsWith(path));
