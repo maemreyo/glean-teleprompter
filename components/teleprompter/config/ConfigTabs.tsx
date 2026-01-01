@@ -36,7 +36,7 @@ interface TabConfig {
   component: React.ComponentType
 }
 
-const getTabConfig = (t: (key: string) => string): TabConfig[] => [
+export const getTabConfig = (t: (key: string) => string): TabConfig[] => [
   {
     id: 'typography',
     labelKey: 'tabs.typography',
@@ -193,19 +193,27 @@ export function ConfigTabs() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Tab Navigation */}
-      <div 
+      {/* T071: Tab Navigation with horizontally scrollable tab pills */}
+      <div
         ref={tabScrollContainerRef}
-        role="tablist" 
-        aria-label="Configuration tabs" 
+        role="tablist"
+        aria-label="Configuration tabs"
         className={cn(
           'relative flex border-b border-border overflow-x-auto',
           // T065: Wrap tabs on tablet viewport
-          isTablet && showScrollIndicator && 'flex-wrap'
+          isTablet && showScrollIndicator && 'flex-wrap',
+          // T071: Hide scrollbars for horizontal tab pills on mobile
+          'scrollbar-hide',
+          // T071: Enable horizontal scrolling on mobile
+          'snap-x snap-mandatory'
         )}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
       >
         {tabs.map((tab, index) => {
           const Icon = tab.icon

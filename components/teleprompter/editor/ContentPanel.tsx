@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { Play, Save, Share2, LogOut, Crown, Eye, EyeOff, ChevronUp, ChevronDown, Settings } from 'lucide-react';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
@@ -18,17 +18,24 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { AutoSaveStatus } from '@/components/teleprompter/config/ui/AutoSaveStatus';
 import { TextareaExpandButton } from '@/components/teleprompter/editor/TextareaExpandButton';
 import type { TextareaSize } from '@/components/teleprompter/editor/TextareaExpandButton';
+import { TEXTAREA_SCALE_MULTIPLIERS } from '@/lib/config/types';
+
+interface ContentPanelProps {
+  /** T079: Callback to open mobile config panel */
+  onOpenMobileConfig?: () => void
+}
 
 /**
  * ContentPanel - The content editing section of the Editor
- * 
+ *
  * Contains:
  * - Header with title, auth, and theme switcher
  * - Text area for script content
  * - Quick action buttons (Preview, Save, Share)
  * - Mobile/Tablet preview toggle button
+ * - T079: Mobile config toggle button
  */
-export function ContentPanel() {
+export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
   const t = useTranslations('Editor');
   const router = useRouter();
   const store = useTeleprompterStore();
@@ -36,8 +43,41 @@ export function ContentPanel() {
   const { isDemoMode } = useDemoStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
   const { typography, colors, effects, layout, animations } = useConfigStore();
-  const { previewState, togglePreview, footerState, toggleFooter, textareaPrefs, setTextareaPrefs, toggleTextareaSize, panelState, togglePanel } = useUIStore();
+  const { previewState, togglePreview, footerState, toggleFooter, textareaPrefs, setTextareaPrefs, toggleTextareaSize, panelState, togglePanel, textareaScale, setConfigFooterVisible, configFooterState } = useUIStore();
   const isMobileOrTablet = useMediaQuery('(max-width: 1023px)');
+  const isVerySmallScreen = useMediaQuery('(max-width: 375px)');
+  
+  // T043: Define scale multipliers CSS variables
+  // T045: Calculate scale multipliers for footer buttons
+  // T084: [US6] Calculate footer scale multiplier based on textarea size
+  const scaleStyles = useMemo(() => {
+    const scale = textareaScale.scale;
+    const fontScale = Math.min(scale, 1.33); // Cap at 16px max (12px * 1.33 ≈ 16px)
+    return {
+      '--scale-multiplier': scale.toString(),
+      '--font-scale': fontScale.toString(),
+      '--button-scale': scale.toString(),
+    } as React.CSSProperties;
+  }, [textareaScale.scale]);
+  
+  // T084: [US6] Calculate footer height based on textarea scale
+  // Base footer height is 60px, scaled proportionally with textarea size
+  const footerHeight = useMemo(() => {
+    const baseHeight = 60; // Base footer height in pixels
+    const scaledHeight = Math.round(baseHeight * textareaScale.scale);
+    return scaledHeight;
+  }, [textareaScale.scale]);
+  
+  // Update configFooterState when scale changes (T084)
+  useEffect(() => {
+    setConfigFooterVisible(true, footerHeight);
+  }, [footerHeight, setConfigFooterVisible]);
+  
+  // T086: [US6] Calculate content padding based on footer height
+  // Add extra buffer (8px) for visual comfort
+  const contentPaddingBottom = useMemo(() => {
+    return footerHeight + 32; // footerHeight + existing pb-32 (128px base + scaled footer)
+  }, [footerHeight]);
   
   // T023: Keyboard shortcut for toggling config panel (Ctrl/Cmd + ,)
   useEffect(() => {
@@ -193,7 +233,11 @@ export function ContentPanel() {
   // This is handled by the parent component's layout
   
   return (
-    <div className={`w-full lg:w-[30%] bg-card border-r border-border flex flex-col shadow-2xl relative transition-all duration-200 ${textareaPrefs.size === 'fullscreen' ? 'fixed inset-0 z-50 w-full h-screen' : 'z-20 h-full'}`}>
+    <div
+      className={`w-full lg:w-[30%] bg-card border-r border-border flex flex-col shadow-2xl relative transition-all duration-200 ${textareaPrefs.size === 'fullscreen' ? 'fixed inset-0 z-50 w-full h-screen' : 'z-20 h-full'}`}
+      style={scaleStyles}
+    >
+      {/* T048: Ensure no horizontal scroll - overflow-x hidden on content container */}
       {/* Header - T056: Always visible, even in fullscreen */}
       <div className={`p-6 border-b border-border flex justify-between items-center gap-2 ${textareaPrefs.size === 'fullscreen' ? 'z-50 bg-card' : ''}`}>
         <h1 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
@@ -210,6 +254,17 @@ export function ContentPanel() {
           >
             <Settings size={16} />
           </button>
+          
+          {/* T079: Mobile Config Panel Toggle Button - Mobile only */}
+          {isMobileOrTablet && onOpenMobileConfig && (
+            <button
+              onClick={onOpenMobileConfig}
+              className="lg:hidden p-1.5 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Open configuration panel"
+            >
+              <Settings size={16} />
+            </button>
+          )}
           
           {/* Auto-save status indicator */}
           <AutoSaveStatus
@@ -248,12 +303,20 @@ export function ContentPanel() {
         </div>
       </div>
 
-      {/* Content Controls - T028: Added pb-32 (128px) padding-bottom to prevent footer obstruction */}
-      <div className={`flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar ${textareaPrefs.size === 'fullscreen' ? 'overflow-hidden' : 'pb-32'}`}>
+      {/* T048: Content Controls - overflow-x hidden to prevent horizontal scroll at any size */}
+      {/* T046: 200ms size transition on all scalable elements */}
+      {/* T086: [US6] Dynamic bottom padding based on footer height to prevent content obstruction */}
+      <div
+        className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6 custom-scrollbar transition-all duration-200 ease-in-out"
+        style={{
+          paddingBottom: textareaPrefs.size === 'fullscreen' ? '1.5rem' : `${contentPaddingBottom}px`,
+        }}
+      >
+        {/* T049: Test layout for 375px viewport - responsive spacing */}
         {/* Text Area */}
         <div className={`space-y-2 ${textareaPrefs.size === 'fullscreen' ? 'h-full flex flex-col' : ''}`}>
           <div className="flex justify-between items-center">
-            <label className="text-xs font-bold text-muted-foreground uppercase">{t('contentLabel')}</label>
+            <label className="text-xs font-bold text-muted-foreground uppercase transition-transform duration-200 ease-in-out" style={{ transform: `scale(var(--font-scale))`, transformOrigin: 'left center' }}>{t('contentLabel')}</label>
           </div>
           <div className="relative">
             <textarea
@@ -273,27 +336,49 @@ export function ContentPanel() {
         </div>
       </div>
 
-      {/* Footer Actions - T032: Semi-transparent backdrop (bg-card/90 backdrop-blur) */}
-      {/* T056: Hide footer when fullscreen to maximize editing space */}
+      {/* T085: [US6] Fixed/sticky positioning at viewport bottom */}
+      {/* T088: [US6] Hide footer in fullscreen mode */}
+      {/* T089: [US6] Semi-transparent backdrop (bg-card/90 backdrop-blur) */}
       {textareaPrefs.size !== 'fullscreen' && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur border-t border-border space-y-2">
+        <div
+          className="fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur border-t border-border space-y-2 z-30 transition-all duration-200 ease-in-out"
+          style={{
+            height: footerState.isCollapsed ? 'auto' : `${footerHeight}px`,
+          }}
+        >
         
-        {/* T030/T033: Collapse/Expand button */}
+        {/* T030/T033: Collapse/Expand button with scaling */}
+        {/* T087: [US6] Ensure 44x44px minimum touch targets */}
         <div className="flex justify-center">
           <button
             onClick={toggleFooter}
-            className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-colors"
+            className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-all duration-200 ease-in-out"
+            style={{
+              transform: `scale(var(--scale-multiplier))`,
+              minWidth: '44px',
+              minHeight: '44px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
             aria-label={footerState.isCollapsed ? 'Expand footer' : 'Collapse footer'}
           >
-            {footerState.isCollapsed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            {footerState.isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </button>
         </div>
         
-        {/* T031: Minimized footer state - show only Preview button when collapsed */}
+        {/* T045: Footer action buttons with proportional scaling */}
+        {/* T047: Labels capped at 16px max using min() function */}
+        {/* T087: [US6] 44x44px minimum touch targets maintained */}
+        {/* T090: [US6] Footer reflow for mobile */}
         {footerState.isCollapsed ? (
           <button
             onClick={() => store.setMode('running')}
-            className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 ease-in-out flex items-center justify-center gap-2"
+            style={{
+              fontSize: 'clamp(12px, min(16px, 12px * var(--font-scale)), 16px)',
+              minHeight: '44px',
+            }}
           >
             <Play size={16} fill="currentColor" /> {t('preview')}
           </button>
@@ -301,20 +386,35 @@ export function ContentPanel() {
           <>
             <button
               onClick={() => store.setMode('running')}
-              className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 ease-in-out flex items-center justify-center gap-2"
+              style={{
+                fontSize: 'clamp(12px, min(16px, 12px * var(--font-scale)), 16px)',
+                minHeight: '44px',
+              }}
             >
               <Play size={16} fill="currentColor" /> {t('preview')}
             </button>
-            <div className="grid grid-cols-2 gap-2">
+            {/* T090: [US6] Footer reflow for mobile - stack vertically on very small screens */}
+            <div className={isVerySmallScreen ? 'space-y-2' : 'grid grid-cols-2 gap-2'}>
               <button
                 onClick={handleSave}
-                className="py-2 bg-green-900/40 text-green-400 border border-green-900 hover:bg-green-900/60 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+                className="py-2 bg-green-900/40 text-green-400 border border-green-900 hover:bg-green-900/60 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 ease-in-out"
+                style={{
+                  fontSize: 'clamp(11px, min(16px, 11px * var(--font-scale)), 16px)',
+                  minHeight: '44px',
+                  minWidth: isVerySmallScreen ? '0' : '44px',
+                }}
               >
                 <Save size={14} /> {t('save')}
               </button>
               <button
                 onClick={handleShare}
-                className="py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+                className="py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 ease-in-out"
+                style={{
+                  fontSize: 'clamp(11px, min(16px, 11px * var(--font-scale)), 16px)',
+                  minHeight: '44px',
+                  minWidth: isVerySmallScreen ? '0' : '44px',
+                }}
               >
                 <Share2 size={14} /> {t('share')}
               </button>

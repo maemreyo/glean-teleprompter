@@ -13,10 +13,11 @@ import type {
 } from '@/lib/config/types'
 import type { StateCreator } from 'zustand'
 
-// Import TeleprompterConfig for history entries
-import type { TeleprompterConfig } from '@/lib/templates/templateConfig'
-
+// ============================================================================
 // T035: [US2] Debounce utility for batch updates
+// T057: [US4] Enhanced with hybrid recording logic for undo/redo
+// ============================================================================
+
 const debounceTimeouts: Map<string, NodeJS.Timeout> = new Map()
 
 function debounce<T extends (...args: any[]) => void>(
@@ -102,6 +103,15 @@ export const defaultAnimations: AnimationConfig = {
   autoScrollAcceleration: 0,
 }
 
+// T055: [US4] Type for history config partial
+type HistoryConfig = {
+  typography?: TypographyConfig
+  colors?: ColorConfig
+  effects?: EffectConfig
+  layout?: LayoutConfig
+  animations?: AnimationConfig
+}
+
 interface ConfigState {
   // Configuration state
   typography: TypographyConfig
@@ -119,10 +129,12 @@ interface ConfigState {
   futureStates: ConfigSnapshot[]
 
   // T012: Phase 2 - History management interface
+  // T055: [US4] Complete HistoryStack implementation
   historyStack: HistoryStack
   currentHistoryIndex: number
   isUndoing: boolean
   isRedoing: boolean
+  isRecording: boolean // T057: Flag to prevent recording during undo/redo
 
   // Actions
   setTypography: (config: Partial<TypographyConfig>) => void
@@ -150,11 +162,21 @@ interface ConfigState {
   canUndo: () => boolean
   canRedo: () => boolean
 
-  // T013: Phase 2 - History middleware skeleton actions
-  // These are placeholders - full implementation will be in US4
+  // T055-T062: [US4] Complete history management actions
   pushHistoryEntry: (entry: HistoryEntry) => void
   clearHistory: () => void
   getCurrentHistoryEntry: () => HistoryEntry | null
+  resetHistory: () => void // T061: Reset on preset/template/script load
+  
+  // T056: [US4] Undo/redo with proper state restoration
+  performUndo: () => void
+  performRedo: () => void
+  canUndoHistory: () => boolean
+  canRedoHistory: () => boolean
+  
+  // T057: [US4] Hybrid recording methods
+  recordDiscreteChange: (action: string, config: HistoryConfig) => void
+  recordContinuousChange: (action: string, config: HistoryConfig) => void
 
   // Reset to defaults
   resetTypography: () => void
@@ -166,9 +188,8 @@ interface ConfigState {
 }
 
 // ============================================================================
-// T013: Phase 2 - History Middleware Skeleton
-// This middleware wraps config updates to track history
-// Full recording logic will be implemented in US4
+// T055-T062: [US4] Complete History Management Implementation
+// Includes FIFO logic, hybrid recording, undo/redo, and persistence
 // ============================================================================
 
 type ConfigStoreMiddleware = <
@@ -178,18 +199,312 @@ type ConfigStoreMiddleware = <
 ) => StateCreator<T>
 
 /**
- * History middleware skeleton
- * Wraps store to track configuration changes for undo/redo
- * Recording logic will be added in User Story 4
+ * T055: [US4] Helper class to manage HistoryStack with FIFO logic
+ * Maintains up to 50 states with automatic removal of oldest entries
+ */
+class HistoryManager {
+  private stack: HistoryStack
+  private currentIndex: number
+  
+  constructor(maxSize: number = 50) {
+    this.stack = {
+      past: [],
+      future: [],
+      maxSize
+    }
+    this.currentIndex = -1
+  }
+  
+  /**
+   * T055: Push a new entry to history with FIFO removal
+   * Removes oldest entry when limit is exceeded
+   */
+  push(entry: HistoryEntry): void {
+    // Clear future when new change is made
+    this.stack.future = []
+    
+    // Add to past
+    this.stack.past.push(entry)
+    
+    // FIFO: Remove oldest if limit exceeded
+    if (this.stack.past.length > this.stack.maxSize) {
+      this.stack.past.shift()
+    } else {
+      this.currentIndex++
+    }
+  }
+  
+  /**
+   * T055: Get current state
+   */
+  getCurrent(): HistoryEntry | null {
+    if (this.currentIndex < 0 || this.currentIndex >= this.stack.past.length) {
+      return null
+    }
+    return this.stack.past[this.currentIndex]
+  }
+  
+  /**
+   * T055: Check if undo is possible
+   */
+  canUndo(): boolean {
+    return this.currentIndex > 0
+  }
+  
+  /**
+   * T055: Check if redo is possible
+   */
+  canRedo(): boolean {
+    return this.stack.future.length > 0
+  }
+  
+  /**
+   * T056: Undo - move to previous state
+   */
+  undo(): HistoryEntry | null {
+    if (!this.canUndo()) return null
+    
+    const currentEntry = this.stack.past[this.currentIndex]
+    this.stack.future.unshift(currentEntry)
+    this.currentIndex--
+    
+    return this.getCurrent()
+  }
+  
+  /**
+   * T056: Redo - move to next state
+   */
+  redo(): HistoryEntry | null {
+    if (!this.canRedo()) return null
+    
+    const nextEntry = this.stack.future.shift()!
+    this.stack.past.push(nextEntry)
+    this.currentIndex++
+    
+    return nextEntry
+  }
+  
+  /**
+   * T060: Clear all history
+   */
+  clear(): void {
+    this.stack.past = []
+    this.stack.future = []
+    this.currentIndex = -1
+  }
+  
+  /**
+   * T061: Reset history (same as clear but semantically different)
+   */
+  reset(): void {
+    this.clear()
+  }
+  
+  /**
+   * Get stack info for UI display
+   */
+  getInfo(): { past: number; future: number; current: number; total: number } {
+    return {
+      past: this.stack.past.length,
+      future: this.stack.future.length,
+      current: this.currentIndex + 1,
+      total: this.stack.past.length + this.stack.future.length
+    }
+  }
+  
+  /**
+   * Get the raw stack for persistence
+   */
+  getStack(): HistoryStack {
+    return { ...this.stack }
+  }
+  
+  /**
+   * Restore stack from persistence
+   */
+  restoreStack(stack: HistoryStack, index: number): void {
+    this.stack = stack
+    this.currentIndex = index
+  }
+}
+
+/**
+ * T056: [US4] History middleware with complete recording logic
+ * Wraps config updates to track all changes for undo/redo
  */
 const historyMiddleware: ConfigStoreMiddleware = (config) => (set, get, api) => {
-  // Create the base store with original config
+  // Create history manager instance
+  const historyManager = new HistoryManager(50)
+  
+  // Create the base store
   const baseStore = config(set, get, api)
-
-  // Wrap actions to track history
-  // For now, we just return the base store without modifications
-  // This ensures existing functionality is not broken
-  return baseStore
+  
+  // T057: Track debounced changes for batch recording
+  let pendingChange: { action: string; config: HistoryConfig } | null = null
+  
+  return {
+    ...baseStore,
+    
+    // T055: Push history entry
+    pushHistoryEntry: (entry) => {
+      const state = get()
+      if (!state.isRecording && !state.isUndoing && !state.isRedoing) {
+        historyManager.push(entry)
+        ;(set as (s: Partial<ConfigState>) => void)({
+          historyStack: historyManager.getStack(),
+          currentHistoryIndex: historyManager['currentIndex']
+        })
+      }
+    },
+    
+    // T060: Clear history
+    clearHistory: () => {
+      historyManager.clear()
+      ;(set as (s: Partial<ConfigState>) => void)({
+        historyStack: historyManager.getStack(),
+        currentHistoryIndex: -1
+      })
+    },
+    
+    // T061: Reset history
+    resetHistory: () => {
+      historyManager.reset()
+      ;(set as (s: Partial<ConfigState>) => void)({
+        historyStack: historyManager.getStack(),
+        currentHistoryIndex: -1
+      })
+    },
+    
+    // T055: Get current history entry
+    getCurrentHistoryEntry: () => {
+      return historyManager.getCurrent()
+    },
+    
+    // T056: Perform undo
+    performUndo: () => {
+      const state = get()
+      if (!historyManager.canUndo()) return
+      
+      const previousEntry = historyManager.undo()
+      if (!previousEntry) return
+      
+      // Restore the config from history entry
+      const restoredState: Partial<ConfigState> = {}
+      if (previousEntry.config.typography) {
+        restoredState.typography = previousEntry.config.typography
+      }
+      if (previousEntry.config.colors) {
+        restoredState.colors = previousEntry.config.colors
+      }
+      if (previousEntry.config.effects) {
+        restoredState.effects = previousEntry.config.effects
+      }
+      if (previousEntry.config.layout) {
+        restoredState.layout = previousEntry.config.layout
+      }
+      if (previousEntry.config.animations) {
+        restoredState.animations = previousEntry.config.animations
+      }
+      
+      ;(set as (s: Partial<ConfigState>) => void)({
+        ...restoredState,
+        historyStack: historyManager.getStack(),
+        currentHistoryIndex: historyManager['currentIndex'],
+        isUndoing: false
+      })
+    },
+    
+    // T056: Perform redo
+    performRedo: () => {
+      const state = get()
+      if (!historyManager.canRedo()) return
+      
+      const nextEntry = historyManager.redo()
+      if (!nextEntry) return
+      
+      // Restore the config from history entry
+      const restoredState: Partial<ConfigState> = {}
+      if (nextEntry.config.typography) {
+        restoredState.typography = nextEntry.config.typography
+      }
+      if (nextEntry.config.colors) {
+        restoredState.colors = nextEntry.config.colors
+      }
+      if (nextEntry.config.effects) {
+        restoredState.effects = nextEntry.config.effects
+      }
+      if (nextEntry.config.layout) {
+        restoredState.layout = nextEntry.config.layout
+      }
+      if (nextEntry.config.animations) {
+        restoredState.animations = nextEntry.config.animations
+      }
+      
+      ;(set as (s: Partial<ConfigState>) => void)({
+        ...restoredState,
+        historyStack: historyManager.getStack(),
+        currentHistoryIndex: historyManager['currentIndex'],
+        isRedoing: false
+      })
+    },
+    
+    // T055: Can undo
+    canUndoHistory: () => {
+      return historyManager.canUndo()
+    },
+    
+    // T055: Can redo
+    canRedoHistory: () => {
+      return historyManager.canRedo()
+    },
+    
+    // T057: Record discrete change (immediate)
+    recordDiscreteChange: (action, config) => {
+      const state = get()
+      if (state.isUndoing || state.isRedoing || state.isRecording) return
+      
+      const entry: HistoryEntry = {
+        timestamp: Date.now(),
+        config,
+        action
+      }
+      
+      historyManager.push(entry)
+      
+      ;(set as (s: Partial<ConfigState>) => void)({
+        historyStack: historyManager.getStack(),
+        currentHistoryIndex: historyManager['currentIndex']
+      })
+    },
+    
+    // T057: Record continuous change (batched with 50ms debounce)
+    recordContinuousChange: (action, config) => {
+      // Store pending change
+      pendingChange = { action, config }
+      
+      // Debounce the actual recording
+      setTimeout(() => {
+        if (pendingChange && pendingChange.config === config) {
+          const state = get()
+          if (!state.isUndoing && !state.isRedoing && !state.isRecording) {
+            const entry: HistoryEntry = {
+              timestamp: Date.now(),
+              config: pendingChange.config!,
+              action: pendingChange.action
+            }
+            
+            historyManager.push(entry)
+            
+            ;(set as (s: Partial<ConfigState>) => void)({
+              historyStack: historyManager.getStack(),
+              currentHistoryIndex: historyManager['currentIndex']
+            })
+          }
+          pendingChange = null
+        }
+      }, 50)
+    }
+  }
 }
 
 // Helper to create snapshot from current state
@@ -215,7 +530,7 @@ const createSnapshot = (
 
 export const useConfigStore = create<ConfigState>()(
   persist(
-    historyMiddleware((set, get) => ({
+    historyMiddleware((set, get, api) => ({
       // Initial state
       typography: defaultTypography,
       colors: defaultColors,
@@ -228,6 +543,7 @@ export const useConfigStore = create<ConfigState>()(
       futureStates: [],
 
       // T012: Phase 2 - History management initial state
+      // T055: [US4] Complete HistoryStack implementation
       historyStack: {
         past: [],
         future: [],
@@ -236,73 +552,139 @@ export const useConfigStore = create<ConfigState>()(
       currentHistoryIndex: -1,
       isUndoing: false,
       isRedoing: false,
+      isRecording: false,
       
       // Actions
-      setTypography: (config) => set((state) => {
-        const newTypography = { ...state.typography, ...config }
-        console.log('[useConfigStore] setTypography called:', { config, newTypography })
-        return {
-          typography: newTypography,
+      // T057: [US4] Enhanced with history recording
+      setTypography: (config) => {
+        set((state) => {
+          const newTypography = { ...state.typography, ...config }
+          return { typography: newTypography }
+        })
+        
+        // Record to history after state update
+        const currentState = useConfigStore.getState()
+        if (!currentState.isUndoing && !currentState.isRedoing && !currentState.isRecording) {
+          setTimeout(() => {
+            const state = useConfigStore.getState()
+            state.recordDiscreteChange('Changed typography', { typography: state.typography })
+          }, 0)
         }
-      }),
+      },
       
-      setColors: (config) => set((state) => {
-        const newColors = { ...state.colors, ...config }
-        console.log('[useConfigStore] setColors called:', { config, newColors })
-        return { colors: newColors }
-      }),
+      setColors: (config) => {
+        set((state) => {
+          const newColors = { ...state.colors, ...config }
+          return { colors: newColors }
+        })
+        
+        // Record to history after state update
+        const currentState = useConfigStore.getState()
+        if (!currentState.isUndoing && !currentState.isRedoing && !currentState.isRecording) {
+          setTimeout(() => {
+            const state = useConfigStore.getState()
+            state.recordDiscreteChange('Changed colors', { colors: state.colors })
+          }, 0)
+        }
+      },
       
-      setEffects: (config) => set((state) => {
-        const newEffects = { ...state.effects, ...config }
-        console.log('[useConfigStore] setEffects called:', { config, newEffects })
-        return { effects: newEffects }
-      }),
+      setEffects: (config) => {
+        set((state) => {
+          const newEffects = { ...state.effects, ...config }
+          return { effects: newEffects }
+        })
+        
+        // Record to history after state update
+        const currentState = useConfigStore.getState()
+        if (!currentState.isUndoing && !currentState.isRedoing && !currentState.isRecording) {
+          setTimeout(() => {
+            const state = useConfigStore.getState()
+            state.recordDiscreteChange('Changed effects', { effects: state.effects })
+          }, 0)
+        }
+      },
       
-      setLayout: (config) => set((state) => {
-        const newLayout = { ...state.layout, ...config }
-        console.log('[useConfigStore] setLayout called:', { config, newLayout })
-        return { layout: newLayout }
-      }),
+      setLayout: (config) => {
+        set((state) => {
+          const newLayout = { ...state.layout, ...config }
+          return { layout: newLayout }
+        })
+        
+        // Record to history after state update
+        const currentState = useConfigStore.getState()
+        if (!currentState.isUndoing && !currentState.isRedoing && !currentState.isRecording) {
+          setTimeout(() => {
+            const state = useConfigStore.getState()
+            state.recordDiscreteChange('Changed layout', { layout: state.layout })
+          }, 0)
+        }
+      },
       
-      setAnimations: (config) => set((state) => {
-        const newAnimations = { ...state.animations, ...config }
-        console.log('[useConfigStore] setAnimations called:', { config, newAnimations })
-        return { animations: newAnimations }
-      }),
+      setAnimations: (config) => {
+        set((state) => {
+          const newAnimations = { ...state.animations, ...config }
+          return { animations: newAnimations }
+        })
+        
+        // Record to history after state update
+        const currentState = useConfigStore.getState()
+        if (!currentState.isUndoing && !currentState.isRedoing && !currentState.isRecording) {
+          setTimeout(() => {
+            const state = useConfigStore.getState()
+            state.recordDiscreteChange('Changed animations', { animations: state.animations })
+          }, 0)
+        }
+      },
 
       // T035: [US2] Debounced versions for batch updates (50ms window)
+      // T057: [US4] Enhanced with hybrid recording for continuous changes
       setTypographyDebounced: debounce((config: Partial<TypographyConfig>) => {
         const state = useConfigStore.getState()
         const newTypography = { ...state.typography, ...config }
-        console.log('[useConfigStore] setTypographyDebounced called:', { config, newTypography })
+        
+        // Record as continuous (batched) change
+        state.recordContinuousChange('Changed typography', { typography: newTypography })
+        
         useConfigStore.setState({ typography: newTypography })
       }, 50, 'typography'),
 
       setColorsDebounced: debounce((config: Partial<ColorConfig>) => {
         const state = useConfigStore.getState()
         const newColors = { ...state.colors, ...config }
-        console.log('[useConfigStore] setColorsDebounced called:', { config, newColors })
+        
+        // Record as continuous (batched) change
+        state.recordContinuousChange('Changed colors', { colors: newColors })
+        
         useConfigStore.setState({ colors: newColors })
       }, 50, 'colors'),
 
       setEffectsDebounced: debounce((config: Partial<EffectConfig>) => {
         const state = useConfigStore.getState()
         const newEffects = { ...state.effects, ...config }
-        console.log('[useConfigStore] setEffectsDebounced called:', { config, newEffects })
+        
+        // Record as continuous (batched) change
+        state.recordContinuousChange('Changed effects', { effects: newEffects })
+        
         useConfigStore.setState({ effects: newEffects })
       }, 50, 'effects'),
 
       setLayoutDebounced: debounce((config: Partial<LayoutConfig>) => {
         const state = useConfigStore.getState()
         const newLayout = { ...state.layout, ...config }
-        console.log('[useConfigStore] setLayoutDebounced called:', { config, newLayout })
+        
+        // Record as continuous (batched) change
+        state.recordContinuousChange('Changed layout', { layout: newLayout })
+        
         useConfigStore.setState({ layout: newLayout })
       }, 50, 'layout'),
 
       setAnimationsDebounced: debounce((config: Partial<AnimationConfig>) => {
         const state = useConfigStore.getState()
         const newAnimations = { ...state.animations, ...config }
-        console.log('[useConfigStore] setAnimationsDebounced called:', { config, newAnimations })
+        
+        // Record as continuous (batched) change
+        state.recordContinuousChange('Changed animations', { animations: newAnimations })
+        
         useConfigStore.setState({ animations: newAnimations })
       }, 50, 'animations'),
       
@@ -312,13 +694,26 @@ export const useConfigStore = create<ConfigState>()(
         isPanelOpen: !state.isPanelOpen
       })),
       
-      setAll: (config) => set({
-        typography: config.typography,
-        colors: config.colors,
-        effects: config.effects,
-        layout: config.layout,
-        animations: config.animations,
-      }),
+      // T061: [US4] Reset history when loading preset/template/script
+      setAll: (config) => {
+        const currentState = useConfigStore.getState()
+        
+        // Mark as recording to prevent history entry during load
+        useConfigStore.setState({ isRecording: true })
+        
+        setTimeout(() => {
+          currentState.resetHistory()
+          useConfigStore.setState({ isRecording: false })
+        }, 0)
+        
+        set({
+          typography: config.typography,
+          colors: config.colors,
+          effects: config.effects,
+          layout: config.layout,
+          animations: config.animations,
+        })
+      },
       
       undo: () => set((state) => {
         const previous = state.pastStates[state.pastStates.length - 1]
@@ -390,41 +785,41 @@ export const useConfigStore = create<ConfigState>()(
         animations: defaultAnimations,
       }),
 
-      // T013: Phase 2 - History management skeleton actions
-      // Full implementation will be added in US4
-
-      /**
-       * Push a new entry to the history stack
-       * Recording logic will be implemented in US4
-       */
-      pushHistoryEntry: (entry) => set((state) => {
-        // For now, just log the entry
-        console.log('[useConfigStore] pushHistoryEntry called (skeleton):', entry)
-        return state
-      }),
-
-      /**
-       * Clear all history
-       */
-      clearHistory: () => set((state) => ({
-        historyStack: {
-          past: [],
-          future: [],
-          maxSize: state.historyStack.maxSize,
-        },
-        currentHistoryIndex: -1,
-      })),
-
-      /**
-       * Get the current history entry
-       * Returns null if no history exists
-       */
+      // T055-T062: [US4] Complete history management actions
+      // These are implemented in the historyMiddleware
+      // and are here for TypeScript interface compatibility
+      pushHistoryEntry: (entry) => {
+        // Implemented in middleware
+      },
+      clearHistory: () => {
+        // Implemented in middleware
+      },
       getCurrentHistoryEntry: () => {
-        const state = get()
-        if (state.currentHistoryIndex < 0 || state.currentHistoryIndex >= state.historyStack.past.length) {
-          return null
-        }
-        return state.historyStack.past[state.currentHistoryIndex]
+        // Implemented in middleware
+        return null
+      },
+      resetHistory: () => {
+        // Implemented in middleware
+      },
+      performUndo: () => {
+        // Implemented in middleware
+      },
+      performRedo: () => {
+        // Implemented in middleware
+      },
+      canUndoHistory: () => {
+        // Implemented in middleware
+        return false
+      },
+      canRedoHistory: () => {
+        // Implemented in middleware
+        return false
+      },
+      recordDiscreteChange: (action, config) => {
+        // Implemented in middleware
+      },
+      recordContinuousChange: (action, config) => {
+        // Implemented in middleware
       },
     })),
     {
@@ -438,6 +833,9 @@ export const useConfigStore = create<ConfigState>()(
         animations: state.animations,
         activeTab: state.activeTab,
         isPanelOpen: state.isPanelOpen,
+        // T062: [US4] Persist history state to localStorage
+        historyStack: state.historyStack,
+        currentHistoryIndex: state.currentHistoryIndex,
       }),
     }
   )

@@ -188,9 +188,6 @@ export type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations
 // Specification: specs/005-config-panel-improvements/
 // ============================================================================
 
-// Import TeleprompterConfig for use in HistoryEntry
-import { TeleprompterConfig } from '../templates/templateConfig'
-
 /**
  * T001: PanelState interface
  * Manages the visibility and animation state of the configuration panel
@@ -206,13 +203,20 @@ export interface PanelState {
 
 /**
  * T002: HistoryEntry interface
+ * T055: [US4] Updated to use config store types instead of TeleprompterConfig
  * Represents a single entry in the configuration undo/redo history
  */
 export interface HistoryEntry {
   /** Timestamp when this configuration state was recorded */
   timestamp: number
   /** The partial configuration state stored in this history entry */
-  config: Partial<TeleprompterConfig>
+  config: Partial<{
+    typography: TypographyConfig
+    colors: ColorConfig
+    effects: EffectConfig
+    layout: LayoutConfig
+    animations: AnimationConfig
+  }>
   /** Description of the action that created this history entry */
   action: string
 }

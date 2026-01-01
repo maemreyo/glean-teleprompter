@@ -9,6 +9,7 @@ import { validateContrast } from '@/lib/config/contrast'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import { ARIA_LABELS } from '@/lib/a11y/ariaLabels'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 
 // Color palettes
 const getColorPalettes = (t: (key: string) => string) => [
@@ -34,11 +35,21 @@ const getColorPalettes = (t: (key: string) => string) => [
   },
 ]
 
+/**
+ * ColorsTab - Color configuration with native picker on mobile
+ *
+ * T073: [US5] Mobile native color picker
+ * - Uses native <input type="color"> on mobile
+ * - Keeps custom ColorPicker on desktop
+ */
 export function ColorsTab() {
   const t = useTranslations('Config.colors')
   const { colors, setColors } = useConfigStore()
   const colorPalettes = getColorPalettes(t)
   const [focusedPaletteIndex, setFocusedPaletteIndex] = useState<number | null>(null)
+  
+  // T073: Detect mobile for native color picker
+  const isMobile = useMediaQuery('(max-width: 1023px)')
 
   // Calculate contrast validation (against black background for now)
   const contrastValidation = validateContrast(
@@ -117,12 +128,35 @@ export function ColorsTab() {
         </div>
       </div>
       
-      {/* Primary Color */}
-      <ColorPicker
-        label={t('primaryTextColor')}
-        value={colors.primaryColor}
-        onChange={(value) => setColors({ primaryColor: value })}
-      />
+      {/* T073: Primary Color - Native picker on mobile */}
+      {isMobile ? (
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-foreground">
+            {t('primaryTextColor')}
+          </label>
+          <div className="flex items-center gap-3">
+            <input
+              type="color"
+              value={colors.primaryColor}
+              onChange={(e) => setColors({ primaryColor: e.target.value })}
+              className={cn(
+                "w-12 h-12 rounded-lg border-2 border-border cursor-pointer",
+                "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              )}
+              aria-label={`${t('primaryTextColor')}, current color ${colors.primaryColor}`}
+            />
+            <span className="text-sm text-muted-foreground font-mono">
+              {colors.primaryColor}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <ColorPicker
+          label={t('primaryTextColor')}
+          value={colors.primaryColor}
+          onChange={(value) => setColors({ primaryColor: value })}
+        />
+      )}
       
       {/* Contrast Validation */}
       <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
@@ -184,17 +218,66 @@ export function ColorsTab() {
           {t('effectColors')}
         </h4>
         
-        <ColorPicker
-          label={t('outlineColor')}
-          value={colors.outlineColor}
-          onChange={(value) => setColors({ outlineColor: value })}
-        />
-        
-        <ColorPicker
-          label={t('glowColor')}
-          value={colors.glowColor}
-          onChange={(value) => setColors({ glowColor: value })}
-        />
+        {/* T073: Effect Colors - Native picker on mobile */}
+        {isMobile ? (
+          <>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-foreground">
+                {t('outlineColor')}
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={colors.outlineColor}
+                  onChange={(e) => setColors({ outlineColor: e.target.value })}
+                  className={cn(
+                    "w-12 h-12 rounded-lg border-2 border-border cursor-pointer",
+                    "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  )}
+                  aria-label={`${t('outlineColor')}, current color ${colors.outlineColor}`}
+                />
+                <span className="text-sm text-muted-foreground font-mono">
+                  {colors.outlineColor}
+                </span>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-foreground">
+                {t('glowColor')}
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={colors.glowColor}
+                  onChange={(e) => setColors({ glowColor: e.target.value })}
+                  className={cn(
+                    "w-12 h-12 rounded-lg border-2 border-border cursor-pointer",
+                    "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  )}
+                  aria-label={`${t('glowColor')}, current color ${colors.glowColor}`}
+                />
+                <span className="text-sm text-muted-foreground font-mono">
+                  {colors.glowColor}
+                </span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <ColorPicker
+              label={t('outlineColor')}
+              value={colors.outlineColor}
+              onChange={(value) => setColors({ outlineColor: value })}
+            />
+            
+            <ColorPicker
+              label={t('glowColor')}
+              value={colors.glowColor}
+              onChange={(value) => setColors({ glowColor: value })}
+            />
+          </>
+        )}
       </div>
     </div>
   )

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { ARIA_LABELS } from '@/lib/a11y/ariaLabels'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 
 interface SliderInputProps {
   value: number
@@ -15,6 +16,14 @@ interface SliderInputProps {
   className?: string
 }
 
+/**
+ * SliderInput - Touch-optimized slider with 48px minimum touch targets
+ *
+ * T072: [US5] Mobile touch optimization
+ * - 48px minimum touch target size on mobile
+ * - Increased slider thumb size for better touch interaction
+ * - Enhanced padding for touch targets
+ */
 export function SliderInput({
   value,
   min,
@@ -26,6 +35,9 @@ export function SliderInput({
   className,
 }: SliderInputProps) {
   const [inputValue, setInputValue] = useState(value.toString())
+  
+  // T072: Detect mobile for touch optimization
+  const isMobile = useMediaQuery('(max-width: 1023px)')
   
   useEffect(() => {
     setInputValue(value.toString())
@@ -56,7 +68,11 @@ export function SliderInput({
           {label}
         </label>
       )}
-      <div className="flex items-center gap-3">
+      <div className={cn(
+        "flex items-center gap-3",
+        // T072: Increased gap for better touch spacing on mobile
+        isMobile && "gap-4"
+      )}>
         <input
           type="range"
           min={min}
@@ -64,14 +80,31 @@ export function SliderInput({
           step={step}
           value={value}
           onChange={(e) => handleSliderChange(parseFloat(e.target.value))}
-          className="flex-1 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary hover:accent-primary/80 transition-colors"
+          className={cn(
+            "flex-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary hover:accent-primary/80 transition-colors",
+            // T072: Larger slider track on mobile (height: h-3 = 12px)
+            isMobile ? "h-3" : "h-2"
+          )}
+          style={{
+            // T072: 48px minimum touch target for slider thumb on mobile
+            ...(isMobile && {
+              '--thumb-height': '48px',
+              '--thumb-width': '48px',
+            } as React.CSSProperties),
+          }}
+          // T072: Add custom slider styles via data attribute
+          data-touch-optimized={isMobile}
           aria-label={ariaLabel}
           aria-valuenow={value}
           aria-valuemin={min}
           aria-valuemax={max}
           aria-valuetext={ariaLabel}
         />
-        <div className="relative w-20 sm:w-24 flex items-center">
+        <div className={cn(
+          "relative flex items-center",
+          // T072: Larger number input on mobile
+          isMobile ? "w-24" : "w-20 sm:w-24"
+        )}>
           <input
             type="number"
             min={min}
@@ -80,15 +113,22 @@ export function SliderInput({
             value={inputValue}
             onChange={handleInputChange}
             className={cn(
-              "w-full px-2 py-1 text-sm border rounded-lg",
+              "w-full border rounded-lg",
               "focus:ring-2 focus:ring-primary focus:border-transparent",
               "bg-background text-foreground",
               "border-border",
-              unit ? "pr-8" : ""
+              // T072: Larger padding and text on mobile for 48px touch target
+              isMobile ? "px-4 py-3 text-base min-h-[48px]" : "px-2 py-1 text-sm",
+              unit && "pr-8"
             )}
+            aria-label={`${label || 'Value'} input`}
           />
           {unit && (
-            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+            <span className={cn(
+              "absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground",
+              // T072: Slightly larger unit text on mobile
+              isMobile ? "text-sm" : "text-xs"
+            )}>
               {unit}
             </span>
           )}

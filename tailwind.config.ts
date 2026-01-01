@@ -60,5 +60,20 @@ export default {
       },
     },
   },
-  plugins: [tailwindAnimate],
+  plugins: [
+    tailwindAnimate,
+    // T071: Plugin for hiding scrollbars on mobile
+    function({ addUtilities }: { addUtilities: any }) {
+      addUtilities({
+        '.scrollbar-hide': {
+          /* Hide scrollbar for Chrome, Safari and Opera */
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+          '&::-webkit-scrollbar': {
+            'display': 'none',
+          },
+        },
+      })
+    },
+  ],
 } satisfies Config;
