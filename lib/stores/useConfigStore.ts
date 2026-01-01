@@ -78,6 +78,7 @@ export const defaultEffects: EffectConfig = {
   backdropBlur: 0,
   backdropBrightness: 100,
   backdropSaturation: 100,
+  overlayOpacity: 0.5,  // 007-unified-state-architecture: Background overlay opacity
 }
 
 export const defaultLayout: LayoutConfig = {

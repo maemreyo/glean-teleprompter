@@ -67,6 +67,7 @@ describe('PreviewPanel - Error States (T031)', () => {
         backdropBlur: 0,
         backdropBrightness: 100,
         backdropSaturation: 100,
+        overlayOpacity: 0.5,
       },
       layout: {
         horizontalMargin: 0,

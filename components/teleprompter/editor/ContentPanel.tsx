@@ -3,7 +3,8 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { Play, Save, Share2, LogOut, Crown, Eye, EyeOff, ChevronUp, ChevronDown, Settings } from 'lucide-react';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
-import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
+// 007-unified-state-architecture: Use useContentStore for content data
+import { useContentStore } from '@/lib/stores/useContentStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { saveScriptAction } from '@/actions/scripts';
@@ -38,12 +39,13 @@ interface ContentPanelProps {
 export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
   const t = useTranslations('Editor');
   const router = useRouter();
-  const store = useTeleprompterStore();
+  // 007-unified-state-architecture: Use useContentStore for content data
+  const contentStore = useContentStore();
   const { user, isPro } = useAuthStore();
   const { isDemoMode } = useDemoStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
   const { typography, colors, effects, layout, animations } = useConfigStore();
-  const { previewState, togglePreview, footerState, toggleFooter, textareaPrefs, setTextareaPrefs, toggleTextareaSize, panelState, togglePanel, textareaScale, setConfigFooterVisible, configFooterState } = useUIStore();
+  const { previewState, togglePreview, footerState, toggleFooter, textareaPrefs, setTextareaPrefs, toggleTextareaSize, panelState, togglePanel, textareaScale, setConfigFooterVisible, configFooterState, mode } = useUIStore();
   const isMobileOrTablet = useMediaQuery('(max-width: 1023px)');
   const isVerySmallScreen = useMediaQuery('(max-width: 375px)');
   
@@ -126,9 +128,10 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
   // Auto-save hook for local draft persistence
   const { status: autoSaveStatus, lastSavedAt, error: autoSaveError, saveNow } = useAutoSave(
     {
-      text: store.text,
-      bgUrl: store.bgUrl,
-      musicUrl: store.musicUrl,
+      // 007-unified-state-architecture: Use contentStore for content data
+      text: contentStore.text,
+      bgUrl: contentStore.bgUrl,
+      musicUrl: contentStore.musicUrl,
     },
     {
       storageKey: 'teleprompter_draft',
@@ -178,9 +181,10 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
     
     const toastId = toast.loading(t('saving'));
     const result = await saveScriptAction({
-      content: store.text,
-      bg_url: store.bgUrl,
-      music_url: store.musicUrl,
+      // 007-unified-state-architecture: Use contentStore for content data
+      content: contentStore.text,
+      bg_url: contentStore.bgUrl,
+      music_url: contentStore.musicUrl,
       
       // NEW: Include full config snapshot from useConfigStore
       config: {
@@ -197,19 +201,10 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
         },
       },
       
-      // DEPRECATED: Keep for backward compatibility with existing scripts
-      settings: {
-        font: store.font,
-        color: store.colorIndex,
-        speed: store.speed,
-        fontSize: store.fontSize,
-        lineHeight: store.lineHeight,
-        margin: store.margin,
-        overlayOpacity: store.overlayOpacity,
-        align: store.align
-      },
+      // DEPRECATED: Legacy settings removed - no longer available in useContentStore
+      // All styling should come from useConfigStore
       
-      title: store.text.substring(0, 30) || "Untitled",
+      title: contentStore.text.substring(0, 30) || "Untitled",
       description: "Created via Web Editor"
     });
 
@@ -321,8 +316,9 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
           <div className="relative">
             <textarea
               ref={textareaRef}
-              value={store.text}
-              onChange={(e) => store.setText(e.target.value)}
+              // 007-unified-state-architecture: Use contentStore for text content
+              value={contentStore.text}
+              onChange={(e) => contentStore.setText(e.target.value)}
               onKeyDown={handleKeyDown}
               className={`${getHeightClass()} transition-all duration-200 w-full bg-secondary rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary outline-none resize-none border border-border placeholder-muted-foreground`}
               placeholder={t('contentPlaceholder')}
@@ -396,7 +392,8 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
               <Share2 size={14} /> {t('share')}
             </button>
             <button
-              onClick={() => store.setMode('running')}
+              // 007-unified-state-architecture: Use useUIStore.mode instead of store.setMode
+              onClick={() => mode === 'setup' ? useUIStore.getState().setMode('running') : useUIStore.getState().setMode('setup')}
               className="py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 ease-in-out flex items-center justify-center gap-2"
               style={{
                 fontSize: 'clamp(12px, min(16px, 12px * var(--font-scale)), 16px)',
@@ -409,7 +406,8 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
         ) : (
           <>
             <button
-              onClick={() => store.setMode('running')}
+              // 007-unified-state-architecture: Use useUIStore.mode instead of store.setMode
+              onClick={() => mode === 'setup' ? useUIStore.getState().setMode('running') : useUIStore.getState().setMode('setup')}
               className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 ease-in-out flex items-center justify-center gap-2"
               style={{
                 fontSize: 'clamp(12px, min(16px, 12px * var(--font-scale)), 16px)',

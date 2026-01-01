@@ -122,6 +122,8 @@ function saveToStorage<T extends Record<string, unknown>>(key: string, value: T)
 
 interface UIStore {
   // State
+  /** App view state - controls which view is displayed */
+  mode: 'setup' | 'running'  // NEW in 007-unified-state-architecture
   textareaPrefs: TextareaPreferences
   footerState: FooterState
   previewState: PreviewPanelState
@@ -168,6 +170,9 @@ interface UIStore {
   // T011: Phase 2 - Config footer actions
   setConfigFooterVisible: (visible: boolean, height?: number) => void
   toggleConfigFooterCollapsed: () => void
+
+  // 007-unified-state-architecture: Mode action
+  setMode: (mode: 'setup' | 'running') => void
 }
 
 // ==================== Create the UI Store ====================
@@ -176,6 +181,7 @@ export const useUIStore = create<UIStore>()(
   persist(
     (set, get) => ({
       // ==================== Initial State ====================
+      mode: 'setup',  // 007-unified-state-architecture: App view mode
       textareaPrefs: DEFAULT_TEXTAREA_PREFS,
       footerState: DEFAULT_FOOTER_STATE,
       previewState: DEFAULT_PREVIEW_STATE,
@@ -401,11 +407,17 @@ export const useUIStore = create<UIStore>()(
           }
         })
       },
+
+      // ==================== 007-unified-state-architecture: Mode Action ====================
+      setMode: (mode) => {
+        set({ mode })
+      },
     }),
     {
       name: 'teleprompter-ui-store',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
+        mode: state.mode,  // 007-unified-state-architecture: Persist mode
         textareaPrefs: state.textareaPrefs,
         footerState: state.footerState,
         previewState: state.previewState,

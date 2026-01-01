@@ -96,6 +96,10 @@ export interface EffectConfig {
   backdropBrightness: number
   /** Backdrop saturation adjustment (0-2, 1 is normal) */
   backdropSaturation: number
+
+  // 007-unified-state-architecture: Background overlay
+  /** Background overlay opacity (0.0-1.0) - controls darkness of background overlay in Runner */
+  overlayOpacity: number
 }
 
 /** Backdrop filter type options (deprecated, use individual settings) */

@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { useFileUpload } from '@/hooks/useFileUpload';
-import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
+// 007-unified-state-architecture: Use useContentStore for content data (bgUrl, musicUrl)
+import { useContentStore } from '@/lib/stores/useContentStore';
 import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { cn } from '@/lib/utils';
@@ -10,7 +11,8 @@ import { UploadCloud, Lock, Music, Image as ImageIcon } from 'lucide-react';
 
 export const MediaInput = () => {
     const t = useTranslations('Editor');
-    const { bgUrl, musicUrl, setBgUrl, setMusicUrl } = useTeleprompterStore();
+    // 007-unified-state-architecture: Use useContentStore for content data
+    const { bgUrl, musicUrl, setBgUrl, setMusicUrl } = useContentStore();
     const { isPro } = useAuthStore();
     const { uploadFile, uploading } = useFileUpload();
     

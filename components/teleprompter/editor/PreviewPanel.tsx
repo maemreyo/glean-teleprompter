@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { X, Maximize2, AlertCircle, Loader2 } from 'lucide-react';
-import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
+// 007-unified-state-architecture: Use useContentStore for content data
+import { useContentStore } from '@/lib/stores/useContentStore';
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
 import { useConfigStore } from '@/lib/stores/useConfigStore';
 import { useUIStore } from '@/stores/useUIStore';
@@ -44,7 +45,8 @@ const areEqual = (prevProps: PreviewPanelProps, nextProps: PreviewPanelProps) =>
 };
 
 export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel({ className = '' }) {
-  const store = useTeleprompterStore();
+  // 007-unified-state-architecture: Use useContentStore for content data
+  const { text, bgUrl } = useContentStore();
   
   // T032: [US2] Subscribe to all config properties that affect preview
   const { typography, colors, effects, layout, animations } = useConfigStore();
@@ -125,8 +127,9 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
   const handleMediaError = useCallback(() => {
     setHasError(true);
     setErrorMessage('Failed to load background image');
-    console.error('[PreviewPanel] Media load error:', store.bgUrl);
-  }, [store.bgUrl]);
+    // 007-unified-state-architecture: Use bgUrl from useContentStore
+    console.error('[PreviewPanel] Media load error:', bgUrl);
+  }, [bgUrl]);
   
   const handleMediaLoad = useCallback(() => {
     setHasError(false);
@@ -134,11 +137,12 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
   }, []);
   
   // Memoized background image style
+  // 007-unified-state-architecture: Use bgUrl from useContentStore
   const backgroundStyle = useMemo(() => ({
-    backgroundImage: `url('${store.bgUrl}')`,
+    backgroundImage: `url('${bgUrl}')`,
     backgroundSize: 'cover' as const,
     backgroundPosition: 'center' as const,
-  }), [store.bgUrl]);
+  }), [bgUrl]);
   
   // Memoized text styles from config
   const textStyle = useMemo(() => ({
@@ -218,10 +222,10 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
         {/* Overlay Layer - dark tint for readability */}
         <div className="absolute inset-0 bg-black/30" />
         
-        {/* Teleprompter Text - uses ONLY useConfigStore for styling */}
+        {/* 007-unified-state-architecture: Use text from useContentStore */}
         <div className="absolute inset-0 flex items-center justify-center p-12 overflow-hidden">
           <TeleprompterText
-            text={store.text}
+            text={text}
             className="max-h-full overflow-hidden"
           />
         </div>
@@ -264,10 +268,10 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
           <X size={20} className="text-white" />
         </button>
         
-        {/* Teleprompter Text */}
+        {/* 007-unified-state-architecture: Use text from useContentStore */}
         <div className="absolute inset-0 flex items-center justify-center p-8 overflow-hidden">
           <TeleprompterText
-            text={store.text}
+            text={text}
             className="max-h-full overflow-hidden"
           />
         </div>
@@ -341,10 +345,10 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
             {/* Overlay Layer - dark tint for readability */}
             <div className="absolute inset-0 bg-black/30" />
             
-            {/* Teleprompter Text */}
+            {/* 007-unified-state-architecture: Use text from useContentStore */}
             <div className="absolute inset-0 flex items-center justify-center p-6 overflow-hidden">
               <TeleprompterText
-                text={store.text}
+                text={text}
                 className="max-h-full overflow-hidden"
               />
             </div>

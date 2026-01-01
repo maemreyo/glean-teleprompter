@@ -66,6 +66,7 @@ describe('PreviewPanel - Update Latency (T028)', () => {
         backdropBlur: 0,
         backdropBrightness: 100,
         backdropSaturation: 100,
+        overlayOpacity: 0.5,
       },
       layout: {
         horizontalMargin: 0,
