@@ -12,6 +12,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-31
 - TypeScript 5.3+ (strict mode) + React 18.2+, Next.js 14+, Zustand 4.4+, Framer Motion, Sonner (toasts), Supabase 2.39+, Tailwind CSS, shadcn/ui (004-studio-ui-ux-improvements)
 - localStorage (for auto-save status, textarea preferences, keyboard shortcuts stats), Supabase (existing auth/data, no changes) (004-studio-ui-ux-improvements)
 - localStorage (primary draft storage), Supabase (optional cloud backup) (006-autosave-improvements)
+- TypeScript 5.3+ (strict mode) + React 18.2+, Next.js 14+, Zustand 4.4+, Supabase 2.39+, Tailwind CSS, shadcn/ui, Radix UI components, Framer Motion, Sonner (toasts) (007-unified-state-architecture)
+- localStorage for persistence (primary), Supabase (optional cloud backup) (007-unified-state-architecture)
 
 - TypeScript 5.3+ with strict mode + React 18.2+, Next.js 14+, Zustand 4.4+, Supabase 2.39+, Google Fonts API, react-colorful (001-ui-config-system)
 
@@ -32,9 +34,9 @@ npm test && npm run lint
 TypeScript 5.3+ with strict mode: Follow standard conventions
 
 ## Recent Changes
+- 007-unified-state-architecture: Added TypeScript 5.3+ (strict mode) + React 18.2+, Next.js 14+, Zustand 4.4+, Supabase 2.39+, Tailwind CSS, shadcn/ui, Radix UI components, Framer Motion, Sonner (toasts)
 - 006-autosave-improvements: Added TypeScript 5.3+ (strict mode) + React 18.2+, Next.js 14+, Zustand 4.4+, Framer Motion, Sonner (toasts), Supabase 2.39+, Tailwind CSS, shadcn/ui
 - 004-studio-ui-ux-improvements: Added TypeScript 5.3+ (strict mode) + React 18.2+, Next.js 14+, Zustand 4.4+, Framer Motion, Sonner (toasts), Supabase 2.39+, Tailwind CSS, shadcn/ui
-- 003-studio-page-tests: Added TypeScript 5.3+ (strict mode)
 
 
 <!-- MANUAL ADDITIONS START -->
