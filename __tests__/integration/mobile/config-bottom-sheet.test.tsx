@@ -28,8 +28,8 @@ describe('TabBottomSheet - Mobile (T064)', () => {
   it('should render bottom sheet when open', () => {
     // Given: Open state
     const tabs = [
-      { id: 'typography', label: 'Typography' },
-      { id: 'colors', label: 'Colors' },
+      { id: 'typography' as const, labelKey: 'typography', icon: () => null, component: () => null },
+      { id: 'colors' as const, labelKey: 'colors', icon: () => null, component: () => null },
     ];
 
     // When: Rendering
@@ -56,7 +56,7 @@ describe('TabBottomSheet - Mobile (T064)', () => {
    */
   it('should have 90% viewport height', () => {
     // Given: Open state
-    const tabs = [{ id: 'typography', label: 'Typography' }];
+    const tabs = [{ id: 'typography' as const, labelKey: 'typography', icon: () => null, component: () => null }];
 
     const { container } = render(
       <TabBottomSheet
@@ -85,7 +85,7 @@ describe('TabBottomSheet - Mobile (T064)', () => {
   it('should call onClose when closed', () => {
     // Given: Open with close handler
     const mockClose = jest.fn();
-    const tabs = [{ id: 'typography', label: 'Typography' }];
+    const tabs = [{ id: 'typography' as const, labelKey: 'typography', icon: () => null, component: () => null }];
 
     render(
       <TabBottomSheet
@@ -115,8 +115,8 @@ describe('TabBottomSheet - Mobile (T064)', () => {
     // Given: Open with tabs
     const mockTabSelect = jest.fn();
     const tabs = [
-      { id: 'typography', label: 'Typography' },
-      { id: 'colors', label: 'Colors' },
+      { id: 'typography' as const, labelKey: 'typography', icon: () => null, component: () => null },
+      { id: 'colors' as const, labelKey: 'colors', icon: () => null, component: () => null },
     ];
 
     render(
@@ -143,7 +143,7 @@ describe('TabBottomSheet - Mobile (T064)', () => {
    */
   it('should display Done button', () => {
     // Given: Open state
-    const tabs = [{ id: 'typography', label: 'Typography' }];
+    const tabs = [{ id: 'typography' as const, labelKey: 'typography', icon: () => null, component: () => null }];
 
     render(
       <TabBottomSheet

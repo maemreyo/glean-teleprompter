@@ -6,6 +6,11 @@ import type {
   FooterState as ConfigFooterState,
 } from '@/lib/config/types'
 import { TEXTAREA_SCALE_MULTIPLIERS } from '@/lib/config/types'
+import {
+  secureLoadFromStorage,
+  secureSaveToStorage,
+  secureRemoveFromStorage,
+} from '@/lib/utils/secureStorage'
 
 // ==================== Interfaces from data-model.md ====================
 
@@ -94,26 +99,23 @@ const DEFAULT_AUTOSAVE_STATUS: AutoSaveStatus = {
   status: 'idle',
 }
 
-// ==================== localStorage Helpers ====================
+// ==================== localStorage Helpers (T096: Security Hardening) ====================
+// Using secure storage utilities with XSS protection and data validation
 
-function loadFromStorage<T>(key: string, defaultValue: T): T {
-  try {
-    if (typeof window === 'undefined') return defaultValue
-    const stored = localStorage.getItem(key)
-    return stored ? JSON.parse(stored) : defaultValue
-  } catch (error) {
-    console.warn(`Failed to load ${key} from localStorage:`, error)
-    return defaultValue
-  }
+/**
+ * Legacy loadFromStorage - kept for backward compatibility
+ * @deprecated Use secureLoadFromStorage for new code
+ */
+function loadFromStorage<T extends Record<string, unknown>>(key: string, defaultValue: T): T {
+  return secureLoadFromStorage<T>(key, defaultValue)
 }
 
-function saveToStorage<T>(key: string, value: T): void {
-  try {
-    if (typeof window === 'undefined') return
-    localStorage.setItem(key, JSON.stringify(value))
-  } catch (error) {
-    console.warn(`Failed to save ${key} to localStorage:`, error)
-  }
+/**
+ * Legacy saveToStorage - kept for backward compatibility
+ * @deprecated Use secureSaveToStorage for new code
+ */
+function saveToStorage<T extends Record<string, unknown>>(key: string, value: T): void {
+  secureSaveToStorage<T>(key, value)
 }
 
 // ==================== Main UI Store Interface ====================

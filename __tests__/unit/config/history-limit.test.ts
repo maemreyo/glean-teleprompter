@@ -41,7 +41,14 @@ describe('History Limit (T050)', () => {
     // When: Adding 50 entries
     for (let i = 0; i < 50; i++) {
       state.recordDiscreteChange(`Change ${i}`, {
-        typography: { fontSize: 48 + i } as any,
+        typography: {
+          fontSize: 48 + i,
+          fontFamily: 'Arial',
+          fontWeight: 400,
+          letterSpacing: 0,
+          lineHeight: 1.5,
+          textTransform: 'none',
+        },
       });
     }
 
@@ -63,13 +70,27 @@ describe('History Limit (T050)', () => {
     // When: Adding 50 entries
     for (let i = 0; i < 50; i++) {
       state.recordDiscreteChange(`Change ${i}`, {
-        typography: { fontSize: 48 + i },
+        typography: {
+          fontSize: 48 + i,
+          fontFamily: 'Arial',
+          fontWeight: 400,
+          letterSpacing: 0,
+          lineHeight: 1.5,
+          textTransform: 'none',
+        },
       });
     }
 
     // Add 51st entry
     state.recordDiscreteChange('Change 50', {
-      typography: { fontSize: 98 } as any,
+      typography: {
+        fontSize: 98,
+        fontFamily: 'Arial',
+        fontWeight: 400,
+        letterSpacing: 0,
+        lineHeight: 1.5,
+        textTransform: 'none',
+      },
     });
 
     // Then: Should still have 50 entries
@@ -90,7 +111,14 @@ describe('History Limit (T050)', () => {
     // When: Adding 25 entries
     for (let i = 0; i < 25; i++) {
       state.recordDiscreteChange(`Change ${i}`, {
-        typography: { fontSize: 48 + i } as any,
+        typography: {
+          fontSize: 48 + i,
+          fontFamily: 'Arial',
+          fontWeight: 400,
+          letterSpacing: 0,
+          lineHeight: 1.5,
+          textTransform: 'none',
+        },
       });
     }
 
@@ -110,7 +138,14 @@ describe('History Limit (T050)', () => {
     const state = useConfigStore.getState();
     for (let i = 0; i < 30; i++) {
       state.recordDiscreteChange(`Change ${i}`, {
-        typography: { fontSize: 48 + i } as any,
+        typography: {
+          fontSize: 48 + i,
+          fontFamily: 'Arial',
+          fontWeight: 400,
+          letterSpacing: 0,
+          lineHeight: 1.5,
+          textTransform: 'none',
+        },
       });
     }
 
@@ -134,7 +169,14 @@ describe('History Limit (T050)', () => {
     const state = useConfigStore.getState();
     for (let i = 0; i < 30; i++) {
       state.recordDiscreteChange(`Change ${i}`, {
-        typography: { fontSize: 48 + i } as any,
+        typography: {
+          fontSize: 48 + i,
+          fontFamily: 'Arial',
+          fontWeight: 400,
+          letterSpacing: 0,
+          lineHeight: 1.5,
+          textTransform: 'none',
+        },
       });
     }
 
@@ -146,7 +188,14 @@ describe('History Limit (T050)', () => {
 
     // When: Adding new entry (clears future)
     state.recordDiscreteChange('New change', {
-      typography: { fontSize: 78 } as any,
+      typography: {
+        fontSize: 78,
+        fontFamily: 'Arial',
+        fontWeight: 400,
+        letterSpacing: 0,
+        lineHeight: 1.5,
+        textTransform: 'none',
+      },
     });
 
     // Then: Future should be cleared
