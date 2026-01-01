@@ -69,7 +69,26 @@ export const useTeleprompterStore = create<TeleprompterState>((set) => ({
   setMode: (mode) => set({ mode }),
   setIsReadOnly: (isReadOnly) => set({ isReadOnly }),
   
-  setAll: (newState) => set((state) => ({ ...state, ...newState })),
+  setAll: (newState) => set((state) => {
+    // Only update data properties, not function properties
+    // This prevents infinite loops when setAll is called
+    const dataState = {
+      text: newState.text ?? state.text,
+      bgUrl: newState.bgUrl ?? state.bgUrl,
+      musicUrl: newState.musicUrl ?? state.musicUrl,
+      font: newState.font ?? state.font,
+      colorIndex: newState.colorIndex ?? state.colorIndex,
+      align: newState.align ?? state.align,
+      speed: newState.speed ?? state.speed,
+      fontSize: newState.fontSize ?? state.fontSize,
+      lineHeight: newState.lineHeight ?? state.lineHeight,
+      margin: newState.margin ?? state.margin,
+      overlayOpacity: newState.overlayOpacity ?? state.overlayOpacity,
+      isReadOnly: newState.isReadOnly ?? state.isReadOnly,
+      mode: newState.mode ?? state.mode,
+    };
+    return { ...state, ...dataState };
+  }),
   
   reset: () => set({
     text: DEFAULT_TEXT,

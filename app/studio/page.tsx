@@ -45,6 +45,9 @@ function StudioLogic() {
   // Track if we've already initialized to prevent infinite loops
   const initializedRef = useRef(false);
   
+  // Track if we've already loaded the local draft to prevent infinite loops from auto-save
+  const localDraftLoadedRef = useRef(false);
+  
   // Loading state for progress bar and error handling
   const [loadingState, setLoadingState] = useState<LoadingState>({
     isLoading: false,
@@ -60,6 +63,9 @@ function StudioLogic() {
   
   // Ref to track the original error for logging
   const originalErrorRef = useRef<Error | unknown>(null);
+  
+  // Ref to track if loading is in progress (to avoid circular dependency)
+  const isLoadingRef = useRef(false);
 
   useEffect(() => {
     // Only run initialization once on mount
@@ -157,7 +163,15 @@ function StudioLogic() {
   
   // Function to load script with progress tracking
   const loadScript = useCallback(async (scriptId: string) => {
+    // Prevent concurrent loading
+    if (isLoadingRef.current) {
+      console.log('[Studio] Script loading already in progress, skipping');
+      return;
+    }
+    
     console.log('[Studio] Loading script:', scriptId);
+    isLoadingRef.current = true;
+    
     setLoadingState({
       isLoading: true,
       progress: 0,
@@ -179,8 +193,9 @@ function StudioLogic() {
     
     // Timeout for 3 seconds
     const timeoutId = setTimeout(() => {
-      if (loadingState.isLoading) {
+      if (isLoadingRef.current) {
         clearInterval(progressInterval);
+        isLoadingRef.current = false;
         setLoadingState({
           isLoading: false,
           progress: 0,
@@ -198,6 +213,7 @@ function StudioLogic() {
       
       if (result.error) {
         clearInterval(progressInterval);
+        isLoadingRef.current = false;
         
         // Get contextual error information
         const errorContext = getErrorContext(result.error);
@@ -264,6 +280,8 @@ function StudioLogic() {
         }
         
         clearInterval(progressInterval);
+        isLoadingRef.current = false;
+        
         setLoadingState({
           isLoading: false,
           progress: 100,
@@ -288,6 +306,7 @@ function StudioLogic() {
     } catch (err) {
       clearTimeout(timeoutId);
       clearInterval(progressInterval);
+      isLoadingRef.current = false;
       
       // Get contextual error information
       const errorContext = getErrorContext(err);
@@ -320,7 +339,7 @@ function StudioLogic() {
         description: errorContext.details,
       });
     }
-  }, [store, loadingState.isLoading, setErrorContext]);
+  }, [store, setErrorContext]);
   
   // Retry function for error recovery
   const handleRetry = useCallback(() => {
@@ -350,16 +369,20 @@ function StudioLogic() {
     }
 
     // Otherwise start fresh or load from localStorage
-    const localDraft = localStorage.getItem('teleprompter_draft');
-    if (localDraft) {
-      try {
-        const parsed = JSON.parse(localDraft);
-        store.setAll({
-          ...parsed,
-          mode: 'setup'
-        });
-      } catch (e) {
-        console.error('Error loading local draft', e);
+    // Only load local draft once to prevent infinite loop from auto-save triggering re-renders
+    if (!localDraftLoadedRef.current) {
+      localDraftLoadedRef.current = true;
+      const localDraft = localStorage.getItem('teleprompter_draft');
+      if (localDraft) {
+        try {
+          const parsed = JSON.parse(localDraft);
+          store.setAll({
+            ...parsed,
+            mode: 'setup'
+          });
+        } catch (e) {
+          console.error('Error loading local draft', e);
+        }
       }
     }
     // Only depend on searchParams and callback functions
@@ -367,27 +390,41 @@ function StudioLogic() {
   }, [searchParams, loadTemplate, loadScript]);
 
   // Auto-save to localStorage
+  // Use refs to track previous values and only recreate interval when mode/readonly change
+  const prevModeRef = useRef(store.mode);
+  const prevIsReadOnlyRef = useRef(store.isReadOnly);
+  
   useEffect(() => {
+    // Only recreate interval if mode or isReadOnly actually changed
+    const modeChanged = prevModeRef.current !== store.mode;
+    const readonlyChanged = prevIsReadOnlyRef.current !== store.isReadOnly;
+    
+    if (modeChanged) prevModeRef.current = store.mode;
+    if (readonlyChanged) prevIsReadOnlyRef.current = store.isReadOnly;
+    
+    if (!modeChanged && !readonlyChanged) return;
+    
     const interval = setInterval(() => {
-      if (store.mode === 'setup' && !store.isReadOnly) {
+      const currentState = useTeleprompterStore.getState();
+      if (currentState.mode === 'setup' && !currentState.isReadOnly) {
         localStorage.setItem('teleprompter_draft', JSON.stringify({
-          text: store.text,
-          bgUrl: store.bgUrl,
-          musicUrl: store.musicUrl,
-          font: store.font,
-          colorIndex: store.colorIndex,
-          speed: store.speed,
-          fontSize: store.fontSize,
-          align: store.align,
-          lineHeight: store.lineHeight,
-          margin: store.margin,
-          overlayOpacity: store.overlayOpacity
+          text: currentState.text,
+          bgUrl: currentState.bgUrl,
+          musicUrl: currentState.musicUrl,
+          font: currentState.font,
+          colorIndex: currentState.colorIndex,
+          speed: currentState.speed,
+          fontSize: currentState.fontSize,
+          align: currentState.align,
+          lineHeight: currentState.lineHeight,
+          margin: currentState.margin,
+          overlayOpacity: currentState.overlayOpacity
         }));
       }
     }, 5000); // Save every 5 seconds
 
     return () => clearInterval(interval);
-  }, [store]);
+  }, [store.mode, store.isReadOnly]);
 
   return (
     <>

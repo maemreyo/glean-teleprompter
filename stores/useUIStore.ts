@@ -184,9 +184,9 @@ export const useUIStore = create<UIStore>()(
       errorContext: null,
 
       // T025: Phase 2 - Configuration Panel UI/UX initial state
-      // Panel hidden by default on mobile/tablet (< 1024px), visible on desktop
+      // Panel hidden by default on all screen sizes
       panelState: {
-        visible: typeof window !== 'undefined' && window.innerWidth >= 1024,
+        visible: false,
         isAnimating: false,
         lastToggled: null,
       },

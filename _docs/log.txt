@@ -1,0 +1,13 @@
+ Error loading local draft Error: Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.
+    getRootForUpdatedFiber react-dom-client.development.js:4901
+    enqueueConcurrentRenderForLane react-dom-client.development.js:4865
+    forceStoreRerender react-dom-client.development.js:8583
+    subscribeToStore react-dom-client.development.js:8569
+    setState vanilla.mjs:9
+    setState vanilla.mjs:9
+    setAll useTeleprompterStore.ts:72
+    useEffect page.tsx:357
+intercept-console-error.ts:42:26
+
+​
+

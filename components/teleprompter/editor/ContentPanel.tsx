@@ -372,16 +372,40 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
         {/* T087: [US6] 44x44px minimum touch targets maintained */}
         {/* T090: [US6] Footer reflow for mobile */}
         {footerState.isCollapsed ? (
-          <button
-            onClick={() => store.setMode('running')}
-            className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 ease-in-out flex items-center justify-center gap-2"
-            style={{
-              fontSize: 'clamp(12px, min(16px, 12px * var(--font-scale)), 16px)',
-              minHeight: '44px',
-            }}
-          >
-            <Play size={16} fill="currentColor" /> {t('preview')}
-          </button>
+          <div className={isVerySmallScreen ? 'space-y-2' : 'grid grid-cols-3 gap-2'}>
+            <button
+              onClick={handleSave}
+              className="py-2 bg-green-900/40 text-green-400 border border-green-900 hover:bg-green-900/60 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 ease-in-out"
+              style={{
+                fontSize: 'clamp(11px, min(16px, 11px * var(--font-scale)), 16px)',
+                minHeight: '44px',
+                minWidth: isVerySmallScreen ? '0' : '44px',
+              }}
+            >
+              <Save size={14} /> {t('save')}
+            </button>
+            <button
+              onClick={handleShare}
+              className="py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 ease-in-out"
+              style={{
+                fontSize: 'clamp(11px, min(16px, 11px * var(--font-scale)), 16px)',
+                minHeight: '44px',
+                minWidth: isVerySmallScreen ? '0' : '44px',
+              }}
+            >
+              <Share2 size={14} /> {t('share')}
+            </button>
+            <button
+              onClick={() => store.setMode('running')}
+              className="py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 ease-in-out flex items-center justify-center gap-2"
+              style={{
+                fontSize: 'clamp(12px, min(16px, 12px * var(--font-scale)), 16px)',
+                minHeight: '44px',
+              }}
+            >
+              <Play size={16} fill="currentColor" /> {t('preview')}
+            </button>
+          </div>
         ) : (
           <>
             <button
