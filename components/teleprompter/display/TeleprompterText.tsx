@@ -1,8 +1,9 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useConfigStore } from '@/lib/stores/useConfigStore';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { FontLoader } from '@/components/teleprompter/config/typography/FontLoader';
 
 interface TeleprompterTextProps {
@@ -13,12 +14,16 @@ interface TeleprompterTextProps {
 
 /**
  * TeleprompterText Component
- * 
+ *
+ * T009-T018: [US1] Enhanced with two-column preview layout support
+ *
  * This component displays teleprompter text using ONLY useConfigStore for styling.
  * Config settings have absolute priority - they override theme-based styling completely.
- * 
+ *
  * IMPORTANT: This component does NOT accept legacy props (fontName, colorIndex, etc.)
  * All styling comes from useConfigStore to ensure config settings are the single source of truth.
+ *
+ * T015: [US1] Responsive breakpoint - falls back to single column on mobile (< 768px)
  */
 export const TeleprompterText: React.FC<TeleprompterTextProps> = ({
   text,
@@ -27,13 +32,27 @@ export const TeleprompterText: React.FC<TeleprompterTextProps> = ({
 }) => {
   const { typography, layout, colors, effects } = useConfigStore();
   
-  // Log config on render for debugging
-  console.log('[TeleprompterText] Config received:', {
-    typography,
-    layout,
-    colors,
-    effects
-  });
+  // T015: [US1] Mobile breakpoint - force single column on small screens
+  const isMobile = useMediaQuery('(max-width: 767px)');
+  
+  // T014: [US1] Memoized column layout configuration with mobile fallback
+  const columnLayout = useMemo(() => {
+    // Force single column on mobile for better readability
+    if (isMobile) {
+      return {
+        columnCount: 1,
+        columnGap: '0px',
+        useColumns: false,
+      }
+    }
+    
+    // Use config values for desktop/tablet
+    return {
+      columnCount: layout.columnCount,
+      columnGap: `${layout.columnGap}px`,
+      useColumns: layout.columnCount > 1,
+    }
+  }, [isMobile, layout.columnCount, layout.columnGap]);
 
   return (
     <>
@@ -78,7 +97,8 @@ export const TeleprompterText: React.FC<TeleprompterTextProps> = ({
         <p
             className={cn(
               "leading-relaxed whitespace-pre-wrap",
-              layout.columnCount > 1 && "break-inside-avoid"
+              // T014: [US1] Add break-inside-avoid only when using multi-column layout
+              columnLayout.useColumns && "break-inside-avoid"
             )}
             style={{
               // Typography - CRITICAL: These override theme fonts
@@ -89,10 +109,10 @@ export const TeleprompterText: React.FC<TeleprompterTextProps> = ({
               letterSpacing: `${typography.letterSpacing}px`,
               textTransform: typography.textTransform,
               
-              // Column layout
-              ...(layout.columnCount > 1 ? {
-                columnCount: layout.columnCount,
-                columnGap: `${layout.columnGap}px`,
+              // T014: [US1] Column layout with responsive mobile fallback
+              ...(columnLayout.useColumns ? {
+                columnCount: columnLayout.columnCount,
+                columnGap: columnLayout.columnGap,
               } : {}),
               
               // Colors - CRITICAL: These override theme text colors

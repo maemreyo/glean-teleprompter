@@ -81,14 +81,38 @@ export const defaultEffects: EffectConfig = {
   overlayOpacity: 0.5,  // 007-unified-state-architecture: Background overlay opacity
 }
 
+// T006: [008] Updated default layout values for two-column preview
 export const defaultLayout: LayoutConfig = {
   horizontalMargin: 0,
   verticalPadding: 0,
   textAlign: 'center',
-  columnCount: 1,
-  columnGap: 20,
+  columnCount: 2,    // T006: Changed from 1 to 2 for two-column layout
+  columnGap: 32,     // T006: Changed from 20 to 32 for wider gap
   textAreaWidth: 100,
   textAreaPosition: 'center',
+}
+
+/**
+ * T005: [008] Migration function for legacy configs
+ * Migrates configs from single-column to two-column layout
+ * @param legacyConfig - Legacy config without columnCount/columnGap
+ * @returns Migrated config with default two-column layout values
+ */
+export function migrateLegacyLayoutConfig(legacyConfig?: Partial<LayoutConfig>): LayoutConfig {
+  const baseConfig = legacyConfig || {}
+  
+  // If columnCount is not set or is legacy value (1), migrate to 2
+  const columnCount = baseConfig.columnCount ?? 2
+  
+  // If columnGap is not set or is legacy value (20), migrate to 32
+  const columnGap = baseConfig.columnGap ?? 32
+  
+  return {
+    ...defaultLayout,
+    ...baseConfig,
+    columnCount,
+    columnGap,
+  }
 }
 
 export const defaultAnimations: AnimationConfig = {

@@ -190,11 +190,12 @@ export const useUIStore = create<UIStore>()(
       errorContext: null,
 
       // T025: Phase 2 - Configuration Panel UI/UX initial state
-      // Panel hidden by default on all screen sizes
+      // T008: [008] Panel is overlay by default, hidden by default on all screen sizes
       panelState: {
         visible: false,
         isAnimating: false,
         lastToggled: null,
+        isOverlay: true,
       },
       textareaScale: {
         size: 'medium',
@@ -349,6 +350,7 @@ export const useUIStore = create<UIStore>()(
       },
 
       // T024: Debounce togglePanel to prevent animation glitches (150ms debounce)
+      // T008: [008] Preserves isOverlay property when toggling
       togglePanel: () => {
         set((state) => {
           const now = Date.now()
@@ -363,6 +365,7 @@ export const useUIStore = create<UIStore>()(
           const newVisible = !state.panelState.visible
           return {
             panelState: {
+              ...state.panelState,
               visible: newVisible,
               isAnimating: true, // Start animation
               lastToggled: now,

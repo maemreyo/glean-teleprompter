@@ -338,6 +338,7 @@ export type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations
 
 /**
  * T001: PanelState interface
+ * T007: [008] Extended with isOverlay flag for floating overlay mode
  * Manages the visibility and animation state of the configuration panel
  */
 export interface PanelState {
@@ -347,6 +348,8 @@ export interface PanelState {
   isAnimating: boolean
   /** Timestamp of the last toggle action (null if never toggled) */
   lastToggled: number | null
+  /** Whether the panel renders as a floating overlay (true) or inline panel (false) */
+  isOverlay: boolean
 }
 
 /**
