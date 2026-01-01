@@ -2,7 +2,10 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTeleprompterStore } from '@/stores/useTeleprompterStore'
+// 007-unified-state-architecture: Use new stores with single responsibility
+import { useContentStore } from '@/lib/stores/useContentStore'
+import { useConfigStore } from '@/lib/stores/useConfigStore'
+import { useUIStore } from '@/stores/useUIStore'
 import { Editor } from '@/components/teleprompter/Editor'
 import { Runner } from '@/components/teleprompter/Runner'
 import { AppProvider } from '@/components/AppProvider'
@@ -41,7 +44,10 @@ export default function SharedScriptPage({ params }: { params: { id: string } })
   const [script, setScript] = useState<SharedScript | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const store = useTeleprompterStore()
+  // 007-unified-state-architecture: Use new stores with single responsibility
+  const { setAll: setContentAll, setIsReadOnly } = useContentStore()
+  const { setAll: setConfigAll } = useConfigStore()
+  const { setMode } = useUIStore()
   const router = useRouter()
 
   useEffect(() => {
@@ -69,20 +75,86 @@ export default function SharedScriptPage({ params }: { params: { id: string } })
         const validAligns = ['left', 'center'] as const
         const align = validAligns.includes(alignValue as typeof validAligns[number]) ? alignValue as typeof validAligns[number] : 'center'
 
-        store.setAll({
+        // 007-unified-state-architecture: Use new stores - set content in useContentStore
+        setContentAll({
           text: data.script.content,
           bgUrl: data.script.bg_url || '',
-          musicUrl: data.script.music_url || '',
-          font,
-          colorIndex: data.script.settings?.colorIndex || 0,
-          align,
-          speed: data.script.settings?.speed || 2,
-          fontSize: data.script.settings?.fontSize || 48,
-          lineHeight: data.script.settings?.lineHeight || 1.5,
-          margin: data.script.settings?.margin || 0,
-          mode: 'running',
-          isReadOnly: true
+          musicUrl: data.script.music_url || ''
         })
+        
+        // Set read-only mode
+        setIsReadOnly(true)
+        
+        // 007-unified-state-architecture: Set config in useConfigStore
+        setConfigAll({
+          version: '1.0.0',
+          typography: {
+            fontFamily: font,
+            fontSize: data.script.settings?.fontSize || 48,
+            fontWeight: 400,
+            letterSpacing: 0,
+            lineHeight: data.script.settings?.lineHeight || 1.5,
+            textTransform: 'none'
+          },
+          colors: {
+            primaryColor: '#ffffff',
+            gradientEnabled: false,
+            gradientType: 'linear',
+            gradientColors: ['#ffffff'],
+            gradientAngle: 0,
+            outlineColor: '#000000',
+            glowColor: '#ffffff'
+          },
+          effects: {
+            shadowEnabled: false,
+            shadowColor: '#000000',
+            shadowBlur: 0,
+            shadowOffsetX: 0,
+            shadowOffsetY: 0,
+            shadowOpacity: 1,
+            outlineEnabled: false,
+            outlineColor: '#000000',
+            outlineWidth: 0,
+            glowEnabled: false,
+            glowColor: '#ffffff',
+            glowIntensity: 0.5,
+            glowBlurRadius: 20,
+            backdropFilterEnabled: false,
+            backdropBlur: 0,
+            backdropBrightness: 100,
+            backdropSaturation: 100,
+            overlayOpacity: data.script.settings?.overlayOpacity || 0.5
+          },
+          layout: {
+            textAlign: align,
+            horizontalMargin: data.script.settings?.margin || 20,
+            verticalPadding: 20,
+            columnCount: 1,
+            columnGap: 20,
+            textAreaWidth: 100,
+            textAreaPosition: 'center'
+          },
+          animations: {
+            smoothScrollEnabled: true,
+            scrollDamping: 0.95,
+            entranceAnimation: 'none',
+            entranceDuration: 300,
+            wordHighlightEnabled: false,
+            highlightColor: '#ffff00',
+            highlightSpeed: 3,
+            autoScrollEnabled: true,
+            autoScrollSpeed: (data.script.settings?.speed || 2) * 10,
+            autoScrollAcceleration: 0
+          },
+          metadata: {
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            appVersion: '1.0.0'
+          }
+        })
+        
+        // Set mode to running
+        setMode('running')
       } catch (err) {
         console.error('Error loading shared script:', err)
         setError('Failed to load script')
@@ -92,7 +164,7 @@ export default function SharedScriptPage({ params }: { params: { id: string } })
     }
 
     loadSharedScript()
-  }, [params.id, store])
+  }, [params.id, setContentAll, setIsReadOnly, setConfigAll, setMode])
 
   if (loading) {
     return (
@@ -130,7 +202,8 @@ export default function SharedScriptPage({ params }: { params: { id: string } })
     <AppProvider>
       <Toaster position="top-center" richColors />
       <AnimatePresence mode="wait">
-        {store.mode === 'setup' ? <Editor key="editor" /> : <Runner key="runner" />}
+        {/* 007-unified-state-architecture: Shared scripts always run in Runner mode */}
+        <Runner key="runner" />
       </AnimatePresence>
     </AppProvider>
   )

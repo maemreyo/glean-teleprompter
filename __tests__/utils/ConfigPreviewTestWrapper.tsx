@@ -1,7 +1,8 @@
 import React from 'react'
 import { ConfigPanel } from '@/components/teleprompter/config/ConfigPanel'
 import { PreviewPanel } from '@/components/teleprompter/editor/PreviewPanel'
-import { useTeleprompterStore } from '@/stores/useTeleprompterStore'
+// 007-unified-state-architecture: Use new stores with single responsibility
+import { useContentStore } from '@/lib/stores/useContentStore'
 
 interface ConfigPreviewTestWrapperProps {
   bgUrl?: string
@@ -18,11 +19,13 @@ export const ConfigPreviewTestWrapper: React.FC<ConfigPreviewTestWrapperProps> =
   text = 'Test teleprompter text',
   className = ''
 }) => {
-  // Initialize teleprompter store for testing
+  // 007-unified-state-architecture: Use useContentStore for content initialization
+  const { setText, setBgUrl } = useContentStore()
+  
   React.useEffect(() => {
-    useTeleprompterStore.getState().setText(text)
-    useTeleprompterStore.getState().setBgUrl(bgUrl)
-  }, [text, bgUrl])
+    setText(text)
+    setBgUrl(bgUrl)
+  }, [text, bgUrl, setText, setBgUrl])
 
   return (
     <div className={`flex h-screen ${className}`}>
@@ -51,10 +54,13 @@ export const PreviewOnlyTestWrapper: React.FC<{
   text = 'Test teleprompter text',
   className = ''
 }) => {
+  // 007-unified-state-architecture: Use useContentStore for content initialization
+  const { setText, setBgUrl } = useContentStore()
+  
   React.useEffect(() => {
-    useTeleprompterStore.getState().setText(text)
-    useTeleprompterStore.getState().setBgUrl(bgUrl)
-  }, [text, bgUrl])
+    setText(text)
+    setBgUrl(bgUrl)
+  }, [text, bgUrl, setText, setBgUrl])
 
   return (
     <div className={`h-screen ${className}`}>

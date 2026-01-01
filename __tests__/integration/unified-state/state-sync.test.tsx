@@ -35,16 +35,22 @@ describe('State Synchronization Between Editor and Runner', () => {
       let updateCount = 0
       const { result: editorResult, unmount } = renderHook(() => useConfigStore())
 
-      // Subscribe to changes
+      // Get initial value to ensure we're testing an actual change
+      const initialValue = editorResult.current.typography.fontSize
+      const newValue = initialValue === 48 ? 60 : 48
+
+      // Subscribe to changes - use getState() to check actual value change
       const unsubscribe = useConfigStore.subscribe(
-        (state) => state.typography.fontSize,
-        () => {
-          updateCount++
+        (state) => {
+          // Only count updates when fontSize actually changes to our target value
+          if (state.typography.fontSize === newValue) {
+            updateCount++
+          }
         }
       )
 
       act(() => {
-        editorResult.current.setTypography({ fontSize: 72 })
+        editorResult.current.setTypography({ fontSize: newValue })
       })
 
       expect(updateCount).toBeGreaterThan(0)

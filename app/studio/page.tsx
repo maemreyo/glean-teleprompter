@@ -2,10 +2,11 @@
 
 import React, { useEffect, useRef, Suspense, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
-import { useDemoStore } from '@/stores/useDemoStore';
+// 007-unified-state-architecture: Use new stores with single responsibility
+import { useContentStore } from '@/lib/stores/useContentStore';
 import { useConfigStore } from '@/lib/stores/useConfigStore';
 import { useUIStore } from '@/stores/useUIStore';
+import { useDemoStore } from '@/stores/useDemoStore';
 import { Editor } from '@/components/teleprompter/Editor';
 import { Runner } from '@/components/teleprompter/Runner';
 import { AppProvider } from '@/components/AppProvider';
@@ -38,7 +39,10 @@ type LoadingState = {
  */
 function StudioLogic() {
   const searchParams = useSearchParams();
-  const store = useTeleprompterStore();
+  // 007-unified-state-architecture: Use new stores with single responsibility
+  const { setText, setBgUrl, setMusicUrl, setAll: setContentAll, isReadOnly } = useContentStore();
+  const { setAll: setConfigAll } = useConfigStore();
+  const { mode, setMode } = useUIStore();
   const { setDemoMode } = useDemoStore();
   const { errorContext, setErrorContext } = useUIStore();
   
@@ -102,19 +106,83 @@ function StudioLogic() {
       if (template) {
         setLoadingState(prev => ({ ...prev, progress: 90 }));
         
-        store.setAll({
+        // 007-unified-state-architecture: Use new stores - set content in useContentStore
+        setContentAll({
           text: template.content,
-          font: template.settings.font as FontStyle,
-          colorIndex: template.settings.colorIndex || 0,
-          speed: template.settings.speed || 2,
-          fontSize: template.settings.fontSize || 48,
-          align: template.settings.align || 'center' as TextAlign,
-          lineHeight: template.settings.lineHeight || 1.5,
-          margin: template.settings.margin || 0,
-          overlayOpacity: template.settings.overlayOpacity || 0.5,
-          mode: 'setup',
-          isReadOnly: false
+          bgUrl: '',
+          musicUrl: ''
         });
+        
+        // 007-unified-state-architecture: Set config in useConfigStore
+        setConfigAll({
+          version: '1.0.0',
+          typography: {
+            fontFamily: template.settings.font || 'Classic',
+            fontSize: template.settings.fontSize || 48,
+            fontWeight: 400,
+            letterSpacing: 0,
+            lineHeight: template.settings.lineHeight || 1.5,
+            textTransform: 'none'
+          },
+          colors: {
+            primaryColor: '#ffffff',
+            gradientEnabled: false,
+            gradientType: 'linear',
+            gradientColors: ['#ffffff'],
+            gradientAngle: 0,
+            outlineColor: '#000000',
+            glowColor: '#ffffff'
+          },
+          effects: {
+            shadowEnabled: false,
+            shadowColor: '#000000',
+            shadowBlur: 0,
+            shadowOffsetX: 0,
+            shadowOffsetY: 0,
+            shadowOpacity: 1,
+            outlineEnabled: false,
+            outlineColor: '#000000',
+            outlineWidth: 0,
+            glowEnabled: false,
+            glowColor: '#ffffff',
+            glowIntensity: 0.5,
+            glowBlurRadius: 20,
+            backdropFilterEnabled: false,
+            backdropBlur: 0,
+            backdropBrightness: 100,
+            backdropSaturation: 100,
+            overlayOpacity: template.settings.overlayOpacity || 0.5
+          },
+          layout: {
+            textAlign: template.settings.align || 'center' as TextAlign,
+            horizontalMargin: template.settings.margin || 20,
+            verticalPadding: 20,
+            columnCount: 1,
+            columnGap: 20,
+            textAreaWidth: 100,
+            textAreaPosition: 'center'
+          },
+          animations: {
+            smoothScrollEnabled: true,
+            scrollDamping: 0.95,
+            entranceAnimation: 'none',
+            entranceDuration: 300,
+            wordHighlightEnabled: false,
+            highlightColor: '#ffff00',
+            highlightSpeed: 3,
+            autoScrollEnabled: true,
+            autoScrollSpeed: (template.settings.speed || 2) * 10,
+            autoScrollAcceleration: 0
+          },
+          metadata: {
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            appVersion: '1.0.0'
+          }
+        });
+        
+        // Ensure mode is set to setup
+        setMode('setup');
         
         clearInterval(progressInterval);
         setLoadingState({
@@ -159,7 +227,7 @@ function StudioLogic() {
       });
       toast.error('Failed to load template');
     }
-  }, [store]);
+  }, [setContentAll, setConfigAll, setMode]);
   
   // Function to load script with progress tracking
   const loadScript = useCallback(async (scriptId: string) => {
@@ -253,29 +321,85 @@ function StudioLogic() {
         const script = result.script;
         console.log('[Studio] Script loaded:', script);
         
-        // Set basic teleprompter data
-        store.setText(script.content || '');
-        store.setBgUrl(script.bg_url || '');
-        store.setMusicUrl(script.music_url || '');
+        // 007-unified-state-architecture: Set content in useContentStore
+        setText(script.content || '');
+        setBgUrl(script.bg_url || '');
+        setMusicUrl(script.music_url || '');
         
         // Load config if present
         if (script.config) {
           console.log('[Studio] Loading config from script:', script.config);
-          useConfigStore.getState().setAll(script.config);
+          setConfigAll(script.config);
         } else {
-          // Fall back to legacy settings
+          // Fall back to legacy settings - migrate to new config structure
           if (script.settings) {
             console.log('[Studio] Loading legacy settings:', script.settings);
-            store.setAll({
-              font: script.settings.font || 'Classic',
-              colorIndex: script.settings.colorIndex || 0,
-              speed: script.settings.speed || 2,
-              fontSize: script.settings.fontSize || 48,
-              align: script.settings.align || 'center',
-              lineHeight: script.settings.lineHeight || 1.5,
-              margin: script.settings.margin || 0,
-              overlayOpacity: script.settings.overlayOpacity || 0.5,
-            });
+              setConfigAll({
+                version: '1.0.0',
+                typography: {
+                  fontFamily: script.settings.font || 'Classic',
+                  fontSize: script.settings.fontSize || 48,
+                  fontWeight: 400,
+                  letterSpacing: 0,
+                  lineHeight: script.settings.lineHeight || 1.5,
+                  textTransform: 'none'
+                },
+                colors: {
+                  primaryColor: '#ffffff',
+                  gradientEnabled: false,
+                  gradientType: 'linear',
+                  gradientColors: ['#ffffff'],
+                  gradientAngle: 0,
+                  outlineColor: '#000000',
+                  glowColor: '#ffffff'
+                },
+                effects: {
+                  shadowEnabled: false,
+                  shadowColor: '#000000',
+                  shadowBlur: 0,
+                  shadowOffsetX: 0,
+                  shadowOffsetY: 0,
+                  shadowOpacity: 1,
+                  outlineEnabled: false,
+                  outlineColor: '#000000',
+                  outlineWidth: 0,
+                  glowEnabled: false,
+                  glowColor: '#ffffff',
+                  glowIntensity: 0.5,
+                  glowBlurRadius: 20,
+                  backdropFilterEnabled: false,
+                  backdropBlur: 0,
+                  backdropBrightness: 100,
+                  backdropSaturation: 100,
+                  overlayOpacity: script.settings.overlayOpacity || 0.5
+                },
+                layout: {
+                  textAlign: script.settings.align || 'center',
+                  horizontalMargin: script.settings.margin || 20,
+                  verticalPadding: 20,
+                  columnCount: 1,
+                  columnGap: 20,
+                  textAreaWidth: 100,
+                  textAreaPosition: 'center'
+                },
+                animations: {
+                  smoothScrollEnabled: true,
+                  scrollDamping: 0.95,
+                  entranceAnimation: 'none',
+                  entranceDuration: 300,
+                  wordHighlightEnabled: false,
+                  highlightColor: '#ffff00',
+                  highlightSpeed: 3,
+                  autoScrollEnabled: true,
+                  autoScrollSpeed: (script.settings.speed || 2) * 10,
+                  autoScrollAcceleration: 0
+                },
+                metadata: {
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  appVersion: '1.0.0'
+                }
+              });
           }
         }
         
@@ -339,7 +463,7 @@ function StudioLogic() {
         description: errorContext.details,
       });
     }
-  }, [store, setErrorContext]);
+  }, [setText, setBgUrl, setMusicUrl, setConfigAll, setErrorContext]);
   
   // Retry function for error recovery
   const handleRetry = useCallback(() => {
@@ -376,10 +500,15 @@ function StudioLogic() {
       if (localDraft) {
         try {
           const parsed = JSON.parse(localDraft);
-          store.setAll({
-            ...parsed,
-            mode: 'setup'
+          // 007-unified-state-architecture: Load content and config separately
+          setContentAll({
+            text: parsed.text || '',
+            bgUrl: parsed.bgUrl || '',
+            musicUrl: parsed.musicUrl || ''
           });
+          
+          // Config is handled by useConfigStore's persistence
+          // Mode is handled by useUIStore's persistence
         } catch (e) {
           console.error('Error loading local draft', e);
         }
@@ -390,41 +519,13 @@ function StudioLogic() {
   }, [searchParams, loadTemplate, loadScript]);
 
   // Auto-save to localStorage
-  // Use refs to track previous values and only recreate interval when mode/readonly change
-  const prevModeRef = useRef(store.mode);
-  const prevIsReadOnlyRef = useRef(store.isReadOnly);
-  
+  // Note: Content and config are now auto-saved by their respective stores' persistence middleware
+  // This effect is only for legacy compatibility with old localStorage drafts
   useEffect(() => {
-    // Only recreate interval if mode or isReadOnly actually changed
-    const modeChanged = prevModeRef.current !== store.mode;
-    const readonlyChanged = prevIsReadOnlyRef.current !== store.isReadOnly;
-    
-    if (modeChanged) prevModeRef.current = store.mode;
-    if (readonlyChanged) prevIsReadOnlyRef.current = store.isReadOnly;
-    
-    if (!modeChanged && !readonlyChanged) return;
-    
-    const interval = setInterval(() => {
-      const currentState = useTeleprompterStore.getState();
-      if (currentState.mode === 'setup' && !currentState.isReadOnly) {
-        localStorage.setItem('teleprompter_draft', JSON.stringify({
-          text: currentState.text,
-          bgUrl: currentState.bgUrl,
-          musicUrl: currentState.musicUrl,
-          font: currentState.font,
-          colorIndex: currentState.colorIndex,
-          speed: currentState.speed,
-          fontSize: currentState.fontSize,
-          align: currentState.align,
-          lineHeight: currentState.lineHeight,
-          margin: currentState.margin,
-          overlayOpacity: currentState.overlayOpacity
-        }));
-      }
-    }, 5000); // Save every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [store.mode, store.isReadOnly]);
+    // Content is auto-saved by useContentStore's persistence
+    // Config is auto-saved by useConfigStore's persistence
+    // No manual interval needed anymore
+  }, []);
 
   return (
     <>
@@ -492,7 +593,7 @@ function StudioLogic() {
       />
       
       <AnimatePresence mode="wait">
-        {store.mode === 'setup' ? <Editor key="editor" /> : <Runner key="runner" />}
+        {mode === 'setup' ? <Editor key="editor" /> : <Runner key="runner" />}
       </AnimatePresence>
     </>
   );
