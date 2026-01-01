@@ -275,6 +275,95 @@ export function cleanupOldDrafts(count?: number): string {
 }
 
 /**
+ * T045 [Phase 6]: Generate ARIA label for Quick Settings panel
+ * @param isOpen - Whether the panel is currently open
+ * @returns ARIA label string
+ *
+ * @example
+ * quickSettingsPanel(true) // "Quick Settings panel, open"
+ * quickSettingsPanel(false) // "Quick Settings panel, closed"
+ */
+export function quickSettingsPanel(isOpen: boolean): string {
+  return `Quick Settings panel, ${isOpen ? 'open' : 'closed'}`
+}
+
+/**
+ * T045 [Phase 6]: Generate ARIA label for Quick Settings controls
+ */
+
+/**
+ * Generate ARIA label for scroll speed control
+ * @param speed - Current scroll speed value
+ * @returns ARIA label string
+ *
+ * @example
+ * quickSettingsScrollSpeed(50) // "Scroll speed, 50 pixels per second"
+ */
+export function quickSettingsScrollSpeed(speed: number): string {
+  return `Scroll speed, ${speed} pixels per second`
+}
+
+/**
+ * Generate ARIA label for font size control
+ * @param fontSize - Current font size in pixels
+ * @returns ARIA label string
+ *
+ * @example
+ * quickSettingsFontSize(60) // "Font size, 60 pixels"
+ */
+export function quickSettingsFontSize(fontSize: number): string {
+  return `Font size, ${fontSize} pixels`
+}
+
+/**
+ * Generate ARIA label for text alignment control
+ * @param align - Current text alignment
+ * @returns ARIA label string
+ *
+ * @example
+ * quickSettingsTextAlign('left') // "Text alignment, left"
+ * quickSettingsTextAlign('center') // "Text alignment, center"
+ * quickSettingsTextAlign('right') // "Text alignment, right"
+ */
+export function quickSettingsTextAlign(align: 'left' | 'center' | 'right'): string {
+  return `Text alignment, ${align}`
+}
+
+/**
+ * Generate ARIA label for background URL input
+ * @param hasUrl - Whether a URL is currently set
+ * @returns ARIA label string
+ *
+ * @example
+ * quickSettingsBgUrl(true) // "Background image, URL set"
+ * quickSettingsBgUrl(false) // "Background image, no URL"
+ */
+export function quickSettingsBgUrl(hasUrl: boolean): string {
+  return `Background image, ${hasUrl ? 'URL set' : 'no URL'}`
+}
+
+/**
+ * Generate ARIA label for Quick Settings modified indicator
+ * @param isModified - Whether settings have been modified from defaults
+ * @returns ARIA label string
+ *
+ * @example
+ * quickSettingsModified(true) // "Settings modified from defaults"
+ * quickSettingsModified(false) // "Settings at default values"
+ */
+export function quickSettingsModified(isModified: boolean): string {
+  return `Settings ${isModified ? 'modified from defaults' : 'at default values'}`
+}
+
+/**
+ * Generate ARIA label for Quick Settings close button
+ * @returns ARIA label string
+ */
+export function quickSettingsClose(): string {
+  return 'Close Quick Settings panel'
+}
+
+/**
  * Format relative time for accessibility
  * @param date - Date to format
  * @returns Relative time string
@@ -316,4 +405,12 @@ export const ARIA_LABELS = {
   storageQuotaWarning,
   privateBrowsingWarning,
   cleanupOldDrafts,
+  // T045 [Phase 6]: Quick Settings labels
+  quickSettingsPanel,
+  quickSettingsScrollSpeed,
+  quickSettingsFontSize,
+  quickSettingsTextAlign,
+  quickSettingsBgUrl,
+  quickSettingsModified,
+  quickSettingsClose,
 } as const

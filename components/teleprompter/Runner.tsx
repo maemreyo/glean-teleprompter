@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Edit3, Pause, Play, Music, Camera, CameraOff } from 'lucide-react';
+import { ArrowLeft, Edit3, Pause, Play, Music, Camera, CameraOff, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 // 007-unified-state-architecture: Import new stores
 import { useContentStore } from '@/lib/stores/useContentStore';
@@ -19,6 +19,8 @@ import { TeleprompterText } from '@/components/teleprompter/display/Teleprompter
 import { UniversalAudioPlayer } from '@/components/teleprompter/audio/AudioPlayer';
 import { DraggableCamera } from '@/components/teleprompter/camera/DraggableCamera';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
+// T032 [US2]: Import QuickSettingsPanel for quick adjustments in Runner
+import { QuickSettingsPanel } from '@/components/teleprompter/runner/QuickSettingsPanel';
 
 export function Runner() {
     const t = useTranslations('Runner');
@@ -33,10 +35,28 @@ export function Runner() {
 
     const [isMusicPlaying, setIsMusicPlaying] = useState(false);
     const [cameraVisible, setCameraVisible] = useState(false);
+    // T032 [US2]: Quick Settings panel state
+    const [quickSettingsOpen, setQuickSettingsOpen] = useState(false);
     
-    // Auto-start music if URL exists? Or wait for user? 
+    // Auto-start music if URL exists? Or wait for user?
     // Usually teleprompter should auto start everything on play?
     // Let's start music stopped.
+
+    // T046 [Phase 6]: Keyboard shortcut (Ctrl/Cmd+K) to open Quick Settings
+    useEffect(() => {
+      const handleKeyPress = (e: KeyboardEvent) => {
+        // Ctrl+K or Cmd+K to toggle Quick Settings
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault()
+          setQuickSettingsOpen(prev => !prev)
+        }
+      }
+
+      document.addEventListener('keydown', handleKeyPress)
+      return () => {
+        document.removeEventListener('keydown', handleKeyPress)
+      }
+    }, [])
 
     // Auto-scroll logic
     // 007-unified-state-architecture: Use animations.autoScrollSpeed from config
@@ -79,6 +99,18 @@ export function Runner() {
              {/* Top Control */}
              <div className="absolute top-6 left-6 z-50 flex gap-2 items-center">
                 <ThemeSwitcher />
+                {/* T032 [US2]: Quick Settings Trigger Button */}
+                <button
+                  onClick={() => setQuickSettingsOpen(true)}
+                  className={cn(
+                      "p-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black",
+                      "bg-black/60 hover:bg-black/80 backdrop-blur text-white"
+                  )}
+                  title="Quick Settings"
+                  aria-label="Open quick settings"
+                >
+                  <Settings size={20} />
+                </button>
                 {/* Camera Toggle Button */}
                 <button
                   onClick={() => setCameraVisible(!cameraVisible)}
@@ -217,6 +249,12 @@ export function Runner() {
                isVisible={cameraVisible}
                onToggle={() => setCameraVisible(!cameraVisible)}
                quality="standard"
+             />
+             
+             {/* T032 [US2]: Quick Settings Panel */}
+             <QuickSettingsPanel
+               open={quickSettingsOpen}
+               onOpenChange={setQuickSettingsOpen}
              />
         </motion.div>
     );
