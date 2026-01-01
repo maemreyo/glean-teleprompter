@@ -281,3 +281,4 @@ describe('Studio - Overlay Panel Integration (US2)', () => {
     })
   })
 })
+})
