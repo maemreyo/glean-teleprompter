@@ -182,3 +182,84 @@ export interface ContrastValidation {
 
 // UI Tab types
 export type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations' | 'presets' | 'media'
+
+// ============================================================================
+// Configuration Panel UI/UX Improvements - Phase 1: Setup Types
+// Specification: specs/005-config-panel-improvements/
+// ============================================================================
+
+// Import TeleprompterConfig for use in HistoryEntry
+import { TeleprompterConfig } from '../templates/templateConfig'
+
+/**
+ * T001: PanelState interface
+ * Manages the visibility and animation state of the configuration panel
+ */
+export interface PanelState {
+  /** Whether the panel is currently visible */
+  visible: boolean
+  /** Whether the panel is currently being animated */
+  isAnimating: boolean
+  /** Timestamp of the last toggle action (null if never toggled) */
+  lastToggled: number | null
+}
+
+/**
+ * T002: HistoryEntry interface
+ * Represents a single entry in the configuration undo/redo history
+ */
+export interface HistoryEntry {
+  /** Timestamp when this configuration state was recorded */
+  timestamp: number
+  /** The partial configuration state stored in this history entry */
+  config: Partial<TeleprompterConfig>
+  /** Description of the action that created this history entry */
+  action: string
+}
+
+/**
+ * T003: HistoryStack interface
+ * Manages the undo/redo history stack for configuration changes
+ */
+export interface HistoryStack {
+  /** Array of past configuration states (for undo) */
+  past: HistoryEntry[]
+  /** Array of future configuration states (for redo) */
+  future: HistoryEntry[]
+  /** Maximum number of history entries to retain */
+  maxSize: number
+}
+
+/**
+ * T004: TextareaScaleState interface
+ * Manages the scale level and multiplier for the editor textarea
+ */
+export interface TextareaScaleState {
+  /** Current size level of the textarea */
+  size: 'compact' | 'medium' | 'large'
+  /** Scale multiplier applied to the textarea base size */
+  scale: number
+}
+
+/**
+ * T005: FooterState interface
+ * Manages the visibility and layout state of the configuration panel footer
+ */
+export interface FooterState {
+  /** Whether the footer is currently visible */
+  visible: boolean
+  /** Whether the footer is in collapsed state */
+  collapsed: boolean
+  /** Current height of the footer in pixels */
+  height: number
+}
+
+/**
+ * T006: Scale multipliers constant
+ * Maps textarea size levels to their corresponding scale multipliers
+ */
+export const TEXTAREA_SCALE_MULTIPLIERS: Record<'compact' | 'medium' | 'large', number> = {
+  compact: 1,
+  medium: 1.1,
+  large: 1.2,
+} as const

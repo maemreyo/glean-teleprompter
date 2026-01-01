@@ -8,7 +8,36 @@ import type {
   AnimationConfig,
   ConfigSnapshot,
   TabId,
+  HistoryEntry,
+  HistoryStack,
 } from '@/lib/config/types'
+import type { StateCreator } from 'zustand'
+
+// Import TeleprompterConfig for history entries
+import type { TeleprompterConfig } from '@/lib/templates/templateConfig'
+
+// T035: [US2] Debounce utility for batch updates
+const debounceTimeouts: Map<string, NodeJS.Timeout> = new Map()
+
+function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  wait: number,
+  key: string = 'default'
+): T {
+  return ((...args: Parameters<T>) => {
+    const existingTimeout = debounceTimeouts.get(key)
+    if (existingTimeout) {
+      clearTimeout(existingTimeout)
+    }
+    
+    const timeout = setTimeout(() => {
+      func(...args)
+      debounceTimeouts.delete(key)
+    }, wait)
+    
+    debounceTimeouts.set(key, timeout)
+  }) as T
+}
 
 // Default configurations
 export const defaultTypography: TypographyConfig = {
@@ -80,33 +109,53 @@ interface ConfigState {
   effects: EffectConfig
   layout: LayoutConfig
   animations: AnimationConfig
-  
+
   // UI state
   activeTab: TabId
   isPanelOpen: boolean
-  
-  // Undo/Redo
+
+  // Legacy Undo/Redo (for backward compatibility)
   pastStates: ConfigSnapshot[]
   futureStates: ConfigSnapshot[]
-  
+
+  // T012: Phase 2 - History management interface
+  historyStack: HistoryStack
+  currentHistoryIndex: number
+  isUndoing: boolean
+  isRedoing: boolean
+
   // Actions
   setTypography: (config: Partial<TypographyConfig>) => void
   setColors: (config: Partial<ColorConfig>) => void
   setEffects: (config: Partial<EffectConfig>) => void
   setLayout: (config: Partial<LayoutConfig>) => void
   setAnimations: (config: Partial<AnimationConfig>) => void
-  
+
+  // T035: [US2] Debounced versions for batch updates (50ms window)
+  setTypographyDebounced: (config: Partial<TypographyConfig>) => void
+  setColorsDebounced: (config: Partial<ColorConfig>) => void
+  setEffectsDebounced: (config: Partial<EffectConfig>) => void
+  setLayoutDebounced: (config: Partial<LayoutConfig>) => void
+  setAnimationsDebounced: (config: Partial<AnimationConfig>) => void
+
   setActiveTab: (tab: TabId) => void
   togglePanel: () => void
-  
+
   // Set all config at once (for loading from saved scripts)
   setAll: (config: ConfigSnapshot) => void
-  
+
+  // Legacy undo/redo (for backward compatibility)
   undo: () => void
   redo: () => void
   canUndo: () => boolean
   canRedo: () => boolean
-  
+
+  // T013: Phase 2 - History middleware skeleton actions
+  // These are placeholders - full implementation will be in US4
+  pushHistoryEntry: (entry: HistoryEntry) => void
+  clearHistory: () => void
+  getCurrentHistoryEntry: () => HistoryEntry | null
+
   // Reset to defaults
   resetTypography: () => void
   resetColors: () => void
@@ -114,6 +163,33 @@ interface ConfigState {
   resetLayout: () => void
   resetAnimations: () => void
   resetAll: () => void
+}
+
+// ============================================================================
+// T013: Phase 2 - History Middleware Skeleton
+// This middleware wraps config updates to track history
+// Full recording logic will be implemented in US4
+// ============================================================================
+
+type ConfigStoreMiddleware = <
+  T extends ConfigState,
+>(
+  config: StateCreator<T>
+) => StateCreator<T>
+
+/**
+ * History middleware skeleton
+ * Wraps store to track configuration changes for undo/redo
+ * Recording logic will be added in User Story 4
+ */
+const historyMiddleware: ConfigStoreMiddleware = (config) => (set, get, api) => {
+  // Create the base store with original config
+  const baseStore = config(set, get, api)
+
+  // Wrap actions to track history
+  // For now, we just return the base store without modifications
+  // This ensures existing functionality is not broken
+  return baseStore
 }
 
 // Helper to create snapshot from current state
@@ -139,7 +215,7 @@ const createSnapshot = (
 
 export const useConfigStore = create<ConfigState>()(
   persist(
-    (set, get) => ({
+    historyMiddleware((set, get) => ({
       // Initial state
       typography: defaultTypography,
       colors: defaultColors,
@@ -150,6 +226,16 @@ export const useConfigStore = create<ConfigState>()(
       isPanelOpen: false,
       pastStates: [],
       futureStates: [],
+
+      // T012: Phase 2 - History management initial state
+      historyStack: {
+        past: [],
+        future: [],
+        maxSize: 50,
+      },
+      currentHistoryIndex: -1,
+      isUndoing: false,
+      isRedoing: false,
       
       // Actions
       setTypography: (config) => set((state) => {
@@ -183,6 +269,42 @@ export const useConfigStore = create<ConfigState>()(
         console.log('[useConfigStore] setAnimations called:', { config, newAnimations })
         return { animations: newAnimations }
       }),
+
+      // T035: [US2] Debounced versions for batch updates (50ms window)
+      setTypographyDebounced: debounce((config: Partial<TypographyConfig>) => {
+        const state = useConfigStore.getState()
+        const newTypography = { ...state.typography, ...config }
+        console.log('[useConfigStore] setTypographyDebounced called:', { config, newTypography })
+        useConfigStore.setState({ typography: newTypography })
+      }, 50, 'typography'),
+
+      setColorsDebounced: debounce((config: Partial<ColorConfig>) => {
+        const state = useConfigStore.getState()
+        const newColors = { ...state.colors, ...config }
+        console.log('[useConfigStore] setColorsDebounced called:', { config, newColors })
+        useConfigStore.setState({ colors: newColors })
+      }, 50, 'colors'),
+
+      setEffectsDebounced: debounce((config: Partial<EffectConfig>) => {
+        const state = useConfigStore.getState()
+        const newEffects = { ...state.effects, ...config }
+        console.log('[useConfigStore] setEffectsDebounced called:', { config, newEffects })
+        useConfigStore.setState({ effects: newEffects })
+      }, 50, 'effects'),
+
+      setLayoutDebounced: debounce((config: Partial<LayoutConfig>) => {
+        const state = useConfigStore.getState()
+        const newLayout = { ...state.layout, ...config }
+        console.log('[useConfigStore] setLayoutDebounced called:', { config, newLayout })
+        useConfigStore.setState({ layout: newLayout })
+      }, 50, 'layout'),
+
+      setAnimationsDebounced: debounce((config: Partial<AnimationConfig>) => {
+        const state = useConfigStore.getState()
+        const newAnimations = { ...state.animations, ...config }
+        console.log('[useConfigStore] setAnimationsDebounced called:', { config, newAnimations })
+        useConfigStore.setState({ animations: newAnimations })
+      }, 50, 'animations'),
       
       setActiveTab: (tab) => set({ activeTab: tab }),
       
@@ -267,7 +389,44 @@ export const useConfigStore = create<ConfigState>()(
         layout: defaultLayout,
         animations: defaultAnimations,
       }),
-    }),
+
+      // T013: Phase 2 - History management skeleton actions
+      // Full implementation will be added in US4
+
+      /**
+       * Push a new entry to the history stack
+       * Recording logic will be implemented in US4
+       */
+      pushHistoryEntry: (entry) => set((state) => {
+        // For now, just log the entry
+        console.log('[useConfigStore] pushHistoryEntry called (skeleton):', entry)
+        return state
+      }),
+
+      /**
+       * Clear all history
+       */
+      clearHistory: () => set((state) => ({
+        historyStack: {
+          past: [],
+          future: [],
+          maxSize: state.historyStack.maxSize,
+        },
+        currentHistoryIndex: -1,
+      })),
+
+      /**
+       * Get the current history entry
+       * Returns null if no history exists
+       */
+      getCurrentHistoryEntry: () => {
+        const state = get()
+        if (state.currentHistoryIndex < 0 || state.currentHistoryIndex >= state.historyStack.past.length) {
+          return null
+        }
+        return state.historyStack.past[state.currentHistoryIndex]
+      },
+    })),
     {
       name: 'teleprompter-config',
       storage: createJSONStorage(() => localStorage),

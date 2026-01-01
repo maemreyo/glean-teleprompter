@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Play, Save, Share2, LogOut, Crown, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react';
+import { Play, Save, Share2, LogOut, Crown, Eye, EyeOff, ChevronUp, ChevronDown, Settings } from 'lucide-react';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -36,8 +36,22 @@ export function ContentPanel() {
   const { isDemoMode } = useDemoStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
   const { typography, colors, effects, layout, animations } = useConfigStore();
-  const { previewState, togglePreview, footerState, toggleFooter, textareaPrefs, setTextareaPrefs, toggleTextareaSize } = useUIStore();
+  const { previewState, togglePreview, footerState, toggleFooter, textareaPrefs, setTextareaPrefs, toggleTextareaSize, panelState, togglePanel } = useUIStore();
   const isMobileOrTablet = useMediaQuery('(max-width: 1023px)');
+  
+  // T023: Keyboard shortcut for toggling config panel (Ctrl/Cmd + ,)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + , to toggle config panel
+      if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+        e.preventDefault();
+        togglePanel();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [togglePanel]);
   
   // Ref for textarea element
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -187,6 +201,16 @@ export function ContentPanel() {
         </h1>
         
         <div className="flex items-center gap-2">
+          {/* T019/T025/T026: Config Panel Toggle Button with ARIA labels - Desktop only */}
+          <button
+            onClick={togglePanel}
+            className="hidden lg:block p-1.5 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Toggle configuration panel"
+            aria-pressed={panelState.visible}
+          >
+            <Settings size={16} />
+          </button>
+          
           {/* Auto-save status indicator */}
           <AutoSaveStatus
             status={autoSaveStatus}

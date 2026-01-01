@@ -1,1019 +1,398 @@
-# Implementation Tasks: Configuration Panel UI/UX Improvements
+# Tasks: Configuration Panel UI/UX Improvements
 
-**Feature Branch**: `005-config-panel-improvements`  
-**Created**: 2026-01-01  
-**Status**: Draft  
-**Plan**: [plan.md](plan.md)
+> **🎉 MVP COMPLETED**: Phase 1 (Setup), Phase 2 (Foundational), User Story 1 (Config Panel Toggle), and User Story 2 (Real-Time Preview) implementation tasks are all complete. Optional test tasks remain unimplemented.
 
-## Task Organization
+**Input**: Design documents from `/specs/005-config-panel-improvements/`
+**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md
 
-Tasks are organized by phase and user story, with dependencies clearly marked. Each task includes:
-- **Priority**: P1 (Critical), P2 (Important), P3 (Enhancement)
-- **Estimated Effort**: In days
-- **Dependencies**: Tasks that must be completed first
-- **Acceptance Criteria**: Specific conditions for task completion
+**Tests**: Tests are OPTIONAL for this feature. The specification mentions testing requirements but does not explicitly request TDD approach. Test tasks are included as optional items that can be completed alongside or after implementation.
 
-## Phase 1: Critical Features
+**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
-### Story 1.1: Config Panel Toggle
+## Format: `[ID] [P?] [Story] Description`
 
-#### Task 1.1.1: Add Panel Visibility State to UI Store
-**Priority**: P1  
-**Estimated Effort**: 0.5 days  
-**Dependencies**: None
+- **[P]**: Can run in parallel (different files, no dependencies)
+- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
+- Include exact file paths in descriptions
 
-**Description**: Add `configPanelVisible` state to UI store with localStorage persistence
+## Path Conventions
 
-**Implementation Steps**:
-1. Add `configPanelVisible` boolean to UI store state
-2. Add `toggleConfigPanel()` action to flip state
-3. Add `setConfigPanelVisible(visible)` action to set specific state
-4. Implement localStorage persistence on state change
-5. Load initial state from localStorage on mount
-
-**Acceptance Criteria**:
-- [ ] `configPanelVisible` defaults to `false` for first-time users
-- [ ] State persists to localStorage with key 'configPanelVisible'
-- [ ] State loads correctly from localStorage on page refresh
-- [ ] Toggle action flips state correctly
-
-**Files**: `stores/useUIStore.ts`
+- **Components**: `components/teleprompter/`
+- **State**: `stores/`, `lib/stores/`
+- **Types**: `lib/config/types.ts`
+- **Tests**: `__tests__/`
 
 ---
 
-#### Task 1.1.2: Create Config Toggle Button Component
-**Priority**: P1  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 1.1.1
+## Phase 1: Setup (Shared Infrastructure)
 
-**Description**: Create toggle button in content panel header with Settings icon
+**Purpose**: Type definitions and utility functions required by multiple user stories
 
-**Implementation Steps**:
-1. Create `ConfigToggleButton.tsx` component
-2. Add Settings icon from lucide-react
-3. Style: 44x44px minimum, positioned in header
-4. Add hover/focus states with proper contrast
-5. Add ARIA labels for accessibility
-6. Wire click handler to `toggleConfigPanel()` action
-
-**Acceptance Criteria**:
-- [ ] Button renders in content panel header next to existing controls
-- [ ] Button has minimum 44x44px touch target
-- [ ] Settings icon displays correctly
-- [ ] Hover/focus states provide visual feedback
-- [ ] ARIA labels pass accessibility audit
-- [ ] Click toggles panel visibility
-
-**Files**: `components/teleprompter/editor/ContentPanel.tsx`, `components/teleprompter/editor/ConfigToggleButton.tsx` (new)
+- [x] T001 Create PanelState interface in lib/config/types.ts
+- [x] T002 [P] Create HistoryEntry interface in lib/config/types.ts
+- [x] T003 [P] Create HistoryStack interface in lib/config/types.ts
+- [x] T004 [P] Create TextareaScaleState interface in lib/config/types.ts
+- [x] T005 [P] Create FooterState interface in lib/config/types.ts
+- [x] T006 [P] Create scale multipliers constant in lib/config/types.ts
+- [x] T007 [P] Create useMediaQuery hook in hooks/useMediaQuery.ts
 
 ---
 
-#### Task 1.1.3: Implement Panel Animation with Framer Motion
-**Priority**: P1  
-**Estimated Effort**: 1.5 days  
-**Dependencies**: Task 1.1.1, Task 1.1.2
+## Phase 2: Foundational (Blocking Prerequisites)
 
-**Description**: Add smooth slide-in/slide-out animation for config panel
+**Purpose**: Core store extensions that ALL user stories depend on
 
-**Implementation Steps**:
-1. Wrap ConfigPanel with `AnimatePresence` and `motion.div`
-2. Configure initial, animate, exit variants for slide animation
-3. Set transition duration to 300ms with ease-out timing
-4. Add `prefers-reduced-motion` detection
-5. Implement debounce mechanism (300ms lock)
-6. Test animation performance on target devices
+**⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-**Acceptance Criteria**:
-- [ ] Panel slides in from right edge when opening
-- [ ] Panel slides out to right edge when closing
-- [ ] Animation completes in 300ms
-- [ ] Animation respects `prefers-reduced-motion`
-- [ ] Rapid toggles don't break animation (debounce works)
-- [ ] No frame drops during animation (60 FPS)
+- [x] T008 Extend useUIStore with panelState, textareaScale, footerState in stores/useUIStore.ts
+- [x] T009 [P] Add setPanelVisible, togglePanel actions to useUIStore in stores/useUIStore.ts
+- [x] T010 [P] Add setTextareaSize action to useUIStore in stores/useUIStore.ts
+- [x] T011 [P] Add setFooterVisible, toggleFooterCollapsed actions to useUIStore in stores/useUIStore.ts
+- [x] T012 Extend useConfigStore with history management interface in lib/stores/useConfigStore.ts
+- [x] T013 Create history middleware skeleton for useConfigStore in lib/stores/useConfigStore.ts
 
-**Files**: `components/teleprompter/Editor.tsx`, `components/teleprompter/config/ConfigPanel.tsx`
+**Checkpoint**: ✅ Foundation ready - user story implementation can now begin in parallel
 
 ---
 
-#### Task 1.1.4: Adjust Layout for Panel Visibility
-**Priority**: P1  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 1.1.1
+## Phase 3: User Story 1 - Config Panel Toggle with Smooth Animation (Priority: P1) 🎯 MVP
 
-**Description**: Update layout to expand content/preview panels when config is hidden
+**Goal**: Enable users to toggle configuration panel visibility with smooth 300ms animation, keyboard shortcuts, and persistent state
 
-**Implementation Steps**:
-1. Update `Editor.tsx` flex layout to use dynamic widths
-2. Content panel: 30% → 50% when config hidden
-3. Preview panel: 35% → 50% when config hidden
-4. Add smooth width transitions (300ms)
-5. Test on various viewport sizes
+**Independent Test**: Toggle panel open/closed and verify (1) button in correct position, (2) smooth 300ms animation, (3) state persists across reloads, (4) content/preview panels expand to fill space
 
-**Acceptance Criteria**:
-- [ ] Content panel expands to 50% when config hidden
-- [ ] Preview panel expands to 50% when config hidden
-- [ ] Both panels contract to original sizes when config visible
-- [ ] Width transitions are smooth (300ms)
-- [ ] No layout breaks on mobile/tablet viewports
+### Tests for User Story 1 (OPTIONAL) ⚠️
 
-**Files**: `components/teleprompter/Editor.tsx`
+> **NOTE: Tests can be written alongside or after implementation**
 
----
+- [ ] T014 [P] [US1] Unit test: Panel toggle button click updates state in __tests__/unit/config/panel-toggle.test.tsx
+- [ ] T015 [P] [US1] Unit test: localStorage persistence across reloads in __tests__/unit/config/panel-persistence.test.tsx
+- [ ] T016 [P] [US1] Unit test: Keyboard shortcut (Ctrl/Cmd + ,) functionality in __tests__/unit/config/panel-keyboard-shortcut.test.tsx
+- [ ] T017 [US1] Integration test: Panel animation smoothness in __tests__/integration/config/panel-animation.test.tsx
+- [ ] T018 [US1] Accessibility test: ARIA labels and announcements in __tests__/a11y/config/panel-a11y.test.tsx
 
-#### Task 1.1.5: Add Keyboard Shortcut for Panel Toggle
-**Priority**: P1  
-**Estimated Effort**: 0.5 days  
-**Dependencies**: Task 1.1.1
+### Implementation for User Story 1
 
-**Description**: Implement Ctrl/Cmd + , keyboard shortcut to toggle config panel
+- [x] T019 [US1] Add toggle button (Settings icon) to ContentPanel header in components/teleprompter/editor/ContentPanel.tsx
+- [x] T020 [US1] Implement panel slide animation with Framer Motion in components/teleprompter/config/ConfigPanel.tsx
+- [x] T021 [US1] Wrap ConfigPanel with AnimatePresence in components/teleprompter/Editor.tsx
+- [x] T022 [US1] Add localStorage persistence for 'configPanelVisible' in stores/useUIStore.ts
+- [x] T023 [US1] Implement keyboard shortcut (Ctrl/Cmd + ,) in components/teleprompter/editor/ContentPanel.tsx
+- [x] T024 [US1] Add debounce mechanism for rapid toggle clicks in stores/useUIStore.ts
+- [x] T025 [US1] Ensure responsive behavior (hidden by default on mobile/tablet) in components/teleprompter/Editor.tsx
+- [x] T026 [US1] Add ARIA labels and screen reader announcements in components/teleprompter/editor/ContentPanel.tsx
+- [x] T027 [US1] Respect prefers-reduced-motion for panel animation in components/teleprompter/config/ConfigPanel.tsx
 
-**Implementation Steps**:
-1. Add global keydown listener in `Editor.tsx`
-2. Detect Ctrl/Cmd + , combination
-3. Call `toggleConfigPanel()` action
-4. Prevent default browser behavior
-5. Add documentation to keyboard shortcuts
-
-**Acceptance Criteria**:
-- [ ] Ctrl/Cmd + , toggles panel visibility
-- [ ] Works on both Windows (Ctrl) and Mac (Cmd)
-- [ ] Doesn't conflict with existing shortcuts
-- [ ] Prevents default browser action
-
-**Files**: `components/teleprompter/Editor.tsx`
+**Checkpoint**: ✅ User Story 1 complete - fully functional and testable independently
 
 ---
 
-### Story 1.2: Real-Time Configuration Preview
+## Phase 4: User Story 2 - Real-Time Configuration Preview (Priority: P1) 🎯 MVP
 
-#### Task 1.2.1: Subscribe Preview Panel to Config Changes
-**Priority**: P1  
-**Estimated Effort**: 1 day  
-**Dependencies**: None
+**Goal**: Configuration changes appear in preview panel within 100ms with loading/error states for slow operations
 
-**Description**: Make preview panel react to configuration store changes
+**Independent Test**: Make configuration changes (typography, colors, layout, effects) and verify (1) all changes appear in preview within 100ms, (2) changes apply when config panel hidden, (3) loading states appear for slow operations
 
-**Implementation Steps**:
-1. Import `useConfigStore` in `PreviewPanel.tsx`
-2. Add config state as dependencies to useEffect
-3. Implement 100ms debounce for updates
-4. Test update timing with performance monitoring
+### Tests for User Story 2 (OPTIONAL) ⚠️
 
-**Acceptance Criteria**:
-- [ ] Preview updates within 100ms of config change
-- [ ] Preview updates for all config categories (typography, colors, layout, effects, animations, media)
-- [ ] Preview updates even when config panel hidden
-- [ ] Multiple rapid changes are batched efficiently
+- [ ] T028 [P] [US2] Integration test: Preview updates within 100ms in __tests__/integration/config/preview-update-latency.test.tsx
+- [ ] T029 [P] [US2] Performance test: 60 FPS during rapid changes in __tests__/performance/config/preview-fps.test.tsx
+- [ ] T030 [US2] Unit test: Loading states display correctly in __tests__/unit/config/preview-loading.test.tsx
+- [ ] T031 [US2] Unit test: Error states for invalid media URLs in __tests__/unit/config/preview-error.test.tsx
 
-**Files**: `components/teleprompter/editor/PreviewPanel.tsx`, `lib/stores/useConfigStore.ts`
+### Implementation for User Story 2
 
----
+- [x] T032 [US2] Ensure PreviewPanel subscribes to useConfigStore in components/teleprompter/editor/PreviewPanel.tsx
+- [x] T033 [US2] Add loading state indicators to PreviewPanel in components/teleprompter/editor/PreviewPanel.tsx
+- [x] T034 [US2] Add error state handling for invalid media URLs in components/teleprompter/editor/PreviewPanel.tsx
+- [x] T035 [US2] Implement batch update debouncing (50ms window) in lib/stores/useConfigStore.ts
+- [x] T036 [US2] Create "Test" button for entrance animations in components/teleprompter/config/animations/AnimationsTab.tsx
+- [x] T037 [US2] Optimize PreviewPanel with React.memo in components/teleprompter/editor/PreviewPanel.tsx
+- [x] T038 [US2] Add performance monitoring for preview updates in components/teleprompter/editor/PreviewPanel.tsx
 
-#### Task 1.2.2: Add Loading Indicator for Slow Operations
-**Priority**: P1  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 1.2.1
-
-**Description**: Show loading state when fonts or media are loading
-
-**Implementation Steps**:
-1. Create `LoadingIndicator.tsx` component
-2. Add loading state to preview panel
-3. Detect font loading in `FontLoader.tsx`
-4. Detect media loading in preview
-5. Show "Updating..." message during loads
-6. Hide indicator when complete
-
-**Acceptance Criteria**:
-- [ ] Loading indicator appears when fonts are loading
-- [ ] Loading indicator appears when media URLs are being fetched
-- [ ] "Updating..." message displays clearly
-- [ ] Indicator disappears when load completes
-- [ ] Indicator doesn't interfere with preview display
-
-**Files**: `components/teleprompter/editor/PreviewPanel.tsx`, `components/teleprompter/config/ui/LoadingIndicator.tsx` (new), `components/teleprompter/config/typography/FontLoader.tsx`
+**Checkpoint**: ✅ MVP COMPLETE! User Stories 1 AND 2 both work independently
 
 ---
 
-#### Task 1.2.3: Implement Batch Update Mechanism
-**Priority**: P1  
-**Estimated Effort**: 1.5 days  
-**Dependencies**: None
+## Phase 5: User Story 3 - Proportional UI Scaling with Textarea Expansion (Priority: P2)
 
-**Description**: Batch rapid config changes to prevent performance issues
+**Goal**: All UI elements (buttons, icons, labels) scale proportionally with textarea size without horizontal scroll
 
-**Implementation Steps**:
-1. Add batching mechanism to config store
-2. Collect changes within 50ms window
-3. Apply batched changes as single update
-4. Use requestAnimationFrame for smooth updates
-5. Test with rapid slider adjustments
+**Independent Test**: Expand textarea to each size level and verify (1) all buttons scale proportionally, (2) no horizontal scroll appears, (3) expand/collapse button remains centered, (4) footer actions remain accessible
 
-**Acceptance Criteria**:
-- [ ] Changes within 50ms are batched together
-- [ ] Batched updates apply efficiently
-- [ ] No performance degradation with rapid changes
-- [ ] Preview updates smoothly during batching
+### Tests for User Story 3 (OPTIONAL) ⚠️
 
-**Files**: `lib/stores/useConfigStore.ts`
+- [ ] T039 [P] [US3] Visual regression test: Button scaling at each size level in __tests__/visual/config/scaling-buttons.test.tsx
+- [ ] T040 [P] [US3] Unit test: Scale multipliers calculated correctly in __tests__/unit/config/scale-calculations.test.ts
+- [ ] T041 [US3] Integration test: No horizontal scroll appears in __tests__/integration/config/scaling-scroll.test.tsx
+- [ ] T042 [US3] Responsive test: Layout intact at 375px width in __tests__/responsive/config/scaling-mobile.test.tsx
 
----
+### Implementation for User Story 3
 
-#### Task 1.2.4: Add Test Button for Entrance Animations
-**Priority**: P1  
-**Estimated Effort**: 0.5 days  
-**Dependencies**: Task 1.2.1
+- [ ] T043 [P] [US3] Define scale multipliers CSS variables in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T044 [P] [US3] Update TextareaExpandButton with scale styles in components/teleprompter/editor/TextareaExpandButton.tsx
+- [ ] T045 [US3] Update footer action buttons with proportional scaling in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T046 [US3] Implement 200ms size transition in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T047 [US3] Add cap for label text (16px max) in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T048 [US3] Ensure no horizontal scroll at any size in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T049 [US3] Test and adjust layout for 375px minimum viewport width in components/teleprompter/editor/ContentPanel.tsx
 
-**Description**: Add button to trigger entrance animation for preview
-
-**Implementation Steps**:
-1. Add "Test" button to AnimationsTab
-2. Wire button to trigger entrance animation
-3. Reset animation state after completion
-4. Style button to match other controls
-
-**Acceptance Criteria**:
-- [ ] "Test" button displays in AnimationsTab
-- [ ] Clicking button plays entrance animation in preview
-- [ ] Animation resets after completion
-- [ ] Button can be clicked multiple times
-
-**Files**: `components/teleprompter/config/animations/AnimationsTab.tsx`
+**Checkpoint**: At this point, User Stories 1, 2, AND 3 should all work independently
 
 ---
 
-#### Task 1.2.5: Add Error State for Invalid Media URLs
-**Priority**: P1  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 1.2.1
+## Phase 6: User Story 4 - Configuration Undo/Redo (Priority: P2)
 
-**Description**: Show error in preview when invalid media URLs provided
+**Goal**: Users can undo/redo up to 50 configuration changes with keyboard shortcuts and visual indicator
 
-**Implementation Steps**:
-1. Validate media URLs before loading
-2. Detect load failures for images/audio
-3. Show error state in preview panel
-4. Display error message to user
-5. Fallback to previous valid state
+**Independent Test**: Make multiple configuration changes and verify (1) each change recorded in history, (2) undo restores previous states, (3) redo restores undone states, (4) keyboard shortcuts work, (5) history resets on preset/template load
 
-**Acceptance Criteria**:
-- [ ] Invalid URLs are detected before loading
-- [ ] Error state displays in preview panel
-- [ ] Error message is clear and helpful
-- [ ] Preview reverts to previous state on error
-- [ ] User can recover from error
+### Tests for User Story 4 (OPTIONAL) ⚠️
 
-**Files**: `components/teleprompter/editor/PreviewPanel.tsx`, `components/teleprompter/config/media/MediaTab.tsx`
+- [ ] T050 [P] [US4] Unit test: History stack maintains 50-state limit in __tests__/unit/config/history-limit.test.ts
+- [ ] T051 [P] [US4] Unit test: FIFO removal when limit exceeded in __tests__/unit/config/history-fifo.test.ts
+- [ ] T052 [US4] Integration test: Undo/redo restores correct states in __tests__/integration/config/history-undo-redo.test.tsx
+- [ ] T053 [US4] Unit test: Keyboard shortcuts work correctly in __tests__/unit/config/history-keyboard.test.tsx
+- [ ] T054 [US4] Integration test: History resets on preset/template load in __tests__/integration/config/history-reset.test.tsx
 
----
+### Implementation for User Story 4
 
-## Phase 2: Important Features
+- [ ] T055 [US4] Implement HistoryStack data structure in lib/stores/useConfigStore.ts
+- [ ] T056 [US4] Complete history management middleware in lib/stores/useConfigStore.ts
+- [ ] T057 [US4] Add hybrid recording logic (discrete=immediate, continuous=batched) in lib/stores/useConfigStore.ts
+- [ ] T058 [US4] Implement undo/redo keyboard shortcuts (Ctrl/Cmd + Z, Ctrl/Cmd + Shift + Z) in components/teleprompter/config/ConfigPanel.tsx
+- [ ] T059 [US4] Add visual indicator ("5/10 changes") in components/teleprompter/config/ConfigPanel.tsx
+- [ ] T060 [US4] Create "Clear History" confirmation dialog in components/teleprompter/config/ConfigPanel.tsx
+- [ ] T061 [US4] Implement history reset on preset/template/script load in lib/stores/useConfigStore.ts
+- [ ] T062 [US4] Add localStorage persistence for history in lib/stores/useConfigStore.ts
+- [ ] T063 [US4] Update undo/redo button states in components/teleprompter/config/ConfigPanel.tsx
 
-### Story 2.1: Proportional UI Scaling
-
-#### Task 2.1.1: Define Scaling System in UI Store
-**Priority**: P2  
-**Estimated Effort**: 0.5 days  
-**Dependencies**: None
-
-**Description**: Add scale factors to UI store for different textarea sizes
-
-**Implementation Steps**:
-1. Define scale factors: default (1.0), medium (1.2), large (1.4), fullscreen (1.5)
-2. Add scale factor state to UI store
-3. Update scale factor when textarea size changes
-4. Create CSS custom properties for scaling
-
-**Acceptance Criteria**:
-- [ ] Scale factors defined correctly
-- [ ] Scale factor updates on textarea size change
-- [ ] CSS custom properties are set dynamically
-
-**Files**: `stores/useUIStore.ts`
+**Checkpoint**: At this point, User Stories 1-4 should all work independently
 
 ---
 
-#### Task 2.1.2: Add Scaling to Button Components
-**Priority**: P2  
-**Estimated Effort**: 1.5 days  
-**Dependencies**: Task 2.1.1
+## Phase 7: User Story 5 - Mobile-Optimized Configuration Interface (Priority: P3)
 
-**Description**: Update buttons to scale proportionally with textarea size
+**Goal**: Mobile users access all configuration options through touch-optimized bottom sheet interface
 
-**Implementation Steps**:
-1. Update base Button component to accept scale factor
-2. Scale padding, margins, and icon sizes
-3. Ensure minimum 44x44px at all sizes
-4. Apply scaling to all interactive buttons
-5. Test at each textarea size
+**Independent Test**: On mobile device/simulator verify (1) config panel opens as bottom sheet, (2) all controls touch-optimized (48px), (3) gestures work, (4) panel adapts to orientation changes
 
-**Acceptance Criteria**:
-- [ ] Buttons scale by 1.2x at medium size
-- [ ] Buttons scale by 1.4x at large size
-- [ ] Buttons cap at 1.5x for fullscreen
-- [ ] Minimum 44x44px maintained at all sizes
-- [ ] Button padding and margins scale proportionally
+### Tests for User Story 5 (OPTIONAL) ⚠️
 
-**Files**: `components/ui/button.tsx`, `components/teleprompter/editor/ContentPanel.tsx`
+- [ ] T064 [P] [US5] Mobile integration test: Bottom sheet opens correctly in __tests__/integration/mobile/config-bottom-sheet.test.tsx
+- [ ] T065 [P] [US5] Touch test: Sliders meet 48px touch target in __tests__/touch/config/slider-touch-targets.test.tsx
+- [ ] T066 [US5] Gesture test: Swipe-to-close works at 100px threshold in __tests__/touch/config/swipe-gesture.test.tsx
+- [ ] T067 [US5] Responsive test: Landscape split view activates in __tests__/responsive/mobile/config-landscape.test.tsx
+- [ ] T068 [US5] Accessibility test: "Done" button and gestures accessible in __tests__/a11y/mobile/config-a11y.test.tsx
 
----
+### Implementation for User Story 5
 
-#### Task 2.1.3: Prevent Horizontal Scroll at All Sizes
-**Priority**: P2  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 2.1.1
+- [ ] T069 [P] [US5] Extend TabBottomSheet for mobile config panel in components/teleprompter/config/TabBottomSheet.tsx
+- [ ] T070 [P] [US5] Implement bottom sheet with 90% height in components/teleprompter/config/TabBottomSheet.tsx
+- [ ] T071 [P] [US5] Add horizontally scrollable tab pills in components/teleprompter/config/ConfigTabs.tsx
+- [ ] T072 [P] [US5] Touch-optimize sliders (48px minimum) in components/teleprompter/config/ui/SliderInput.tsx
+- [ ] T073 [US5] Create mobile color picker wrapper (native input) in components/teleprompter/config/colors/ColorsTab.tsx
+- [ ] T074 [US5] Create mobile font picker (native select/modal) in components/teleprompter/config/typography/FontSelector.tsx
+- [ ] T075 [US5] Implement swipe-to-close gesture (100px threshold) in components/teleprompter/config/TabBottomSheet.tsx
+- [ ] T076 [US5] Add "Done" button to mobile config panel in components/teleprompter/config/TabBottomSheet.tsx
+- [ ] T077 [US5] Implement landscape split view in components/teleprompter/config/TabBottomSheet.tsx
+- [ ] T078 [US5] Add compact layout for < 375px devices in components/teleprompter/config/TabBottomSheet.tsx
+- [ ] T079 [US5] Integrate mobile config panel with Editor in components/teleprompter/Editor.tsx
 
-**Description**: Ensure no horizontal scroll appears regardless of textarea size
-
-**Implementation Steps**:
-1. Add `overflow-x: hidden` to content panel
-2. Update layouts to use flexbox with proper wrapping
-3. Test at each textarea size
-4. Add horizontal scroll detection and prevention
-5. Fix any overflow issues
-
-**Acceptance Criteria**:
-- [ ] No horizontal scroll at default size
-- [ ] No horizontal scroll at medium size
-- [ ] No horizontal scroll at large size
-- [ ] No horizontal scroll at fullscreen size
-- [ ] All buttons remain visible without scrolling
-
-**Files**: `components/teleprompter/editor/ContentPanel.tsx`
+**Checkpoint**: At this point, User Stories 1-5 should all work independently
 
 ---
 
-#### Task 2.1.4: Center Expand/Collapse Button on Textarea Edge
-**Priority**: P2  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 2.1.1
+## Phase 8: User Story 6 - Adaptive Footer with Textarea Scaling (Priority: P3)
 
-**Description**: Keep expand/collapse button vertically centered on textarea edge
+**Goal**: Footer actions remain accessible and properly positioned at all textarea sizes with fixed positioning and proper content padding
 
-**Implementation Steps**:
-1. Calculate textarea height dynamically
-2. Position button using absolute positioning
-3. Add transform to center vertically
-4. Recalculate on textarea resize
-5. Test at each textarea size
+**Independent Test**: Expand textarea to each size level and verify (1) footer remains visible and accessible, (2) no content hidden behind footer, (3) buttons maintain 44x44px minimum, (4) footer hidden in fullscreen mode
 
-**Acceptance Criteria**:
-- [ ] Button remains vertically centered at default size
-- [ ] Button remains vertically centered at medium size
-- [ ] Button remains vertically centered at large size
-- [ ] Button remains vertically centered at fullscreen size
-- [ ] Button position updates smoothly on resize
+### Tests for User Story 6 (OPTIONAL) ⚠️
 
-**Files**: `components/teleprompter/editor/TextareaExpandButton.tsx`
+- [ ] T080 [P] [US6] Integration test: Footer remains fixed at bottom in __tests__/integration/config/footer-fixed.test.tsx
+- [ ] T081 [P] [US6] Visual test: No content hidden behind footer in __tests__/visual/config/footer-padding.test.tsx
+- [ ] T082 [US6] Responsive test: Touch targets maintained in __tests__/responsive/config/footer-touch-targets.test.tsx
+- [ ] T083 [US6] Mobile test: Footer reflow works on small screens in __tests__/responsive/mobile/footer-reflow.test.tsx
 
----
+### Implementation for User Story 6
 
-#### Task 2.1.5: Scale and Cap Label Text
-**Priority**: P2  
-**Estimated Effort**: 0.5 days  
-**Dependencies**: Task 2.1.1
+- [ ] T084 [US6] Calculate footer scale multiplier based on textarea size in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T085 [US6] Implement fixed/sticky positioning at viewport bottom in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T086 [US6] Add bottom padding to content equal to footer height in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T087 [US6] Ensure 44x44px minimum touch targets for footer buttons in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T088 [US6] Hide footer in fullscreen mode in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T089 [US6] Add semi-transparent backdrop (bg-card/90) in components/teleprompter/editor/ContentPanel.tsx
+- [ ] T090 [US6] Implement footer reflow for mobile in components/teleprompter/editor/ContentPanel.tsx
 
-**Description**: Scale label text proportionally but cap at 16px maximum
-
-**Implementation Steps**:
-1. Apply font-size scaling to labels
-2. Use CSS `clamp()` to cap at 16px
-3. Test readability at all sizes
-4. Ensure proper spacing hierarchy
-
-**Acceptance Criteria**:
-- [ ] Label text scales proportionally
-- [ ] Label text caps at 16px maximum
-- [ ] Labels remain readable at all sizes
-- [ ] Spacing hierarchy is maintained
-
-**Files**: `components/teleprompter/editor/ContentPanel.tsx`
+**Checkpoint**: All user stories should now be independently functional
 
 ---
 
-### Story 2.2: Configuration Undo/Redo
+## Phase 9: Polish & Cross-Cutting Concerns
 
-#### Task 2.2.1: Create History Management Class
-**Priority**: P2  
-**Estimated Effort**: 1.5 days  
-**Dependencies**: None
+**Purpose**: Improvements that affect multiple user stories
 
-**Description**: Implement history stack with position tracking and FIFO removal
-
-**Implementation Steps**:
-1. Create `HistoryManager` class in `lib/config/history.ts`
-2. Implement stack with array of config states
-3. Add current position pointer
-4. Implement push, undo, redo methods
-5. Add FIFO removal when limit exceeded (50 states)
-6. Add serialization for localStorage persistence
-
-**Acceptance Criteria**:
-- [ ] HistoryManager class created with all methods
-- [ ] Stack supports up to 50 states
-- [ ] Current position pointer works correctly
-- [ ] FIFO removes oldest state when limit exceeded
-- [ ] States can be serialized to JSON
-
-**Files**: `lib/config/history.ts` (new)
+- [ ] T091 [P] Update component documentation in components/teleprompter/config/ConfigPanel.md
+- [ ] T092 [P] Update store type definitions in lib/config/types.ts
+- [ ] T093 Code cleanup and refactoring across config components
+- [ ] T094 Performance optimization across all config stories
+- [ ] T095 [P] Additional unit tests for edge cases in __tests__/unit/config/
+- [ ] T096 Security hardening (localStorage XSS protection) in stores/useUIStore.ts
+- [ ] T097 Run quickstart.md validation scenarios
+- [ ] T098 Verify WCAG 2.1 AA compliance for all new features
 
 ---
 
-#### Task 2.2.2: Implement Hybrid Change Recording
-**Priority**: P2  
-**Estimated Effort**: 2 days  
-**Dependencies**: Task 2.2.1
+## Dependencies & Execution Order
 
-**Description**: Record discrete changes immediately, batch continuous changes on release
+### Phase Dependencies
 
-**Implementation Steps**:
-1. Create middleware for config store
-2. Detect discrete controls (checkboxes, selects, dropdowns)
-3. Detect continuous controls (sliders, color pickers)
-4. Record discrete changes immediately
-5. Batch continuous changes on mouse/touch release
-6. Test recording accuracy
+- **Setup (Phase 1)**: No dependencies - can start immediately
+- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
+- **User Stories (Phase 3-8)**: All depend on Foundational phase completion
+  - US1 (P1) and US2 (P1) can proceed in parallel after Foundational
+  - US3 (P2) and US4 (P2) can proceed in parallel after Foundational
+  - US5 (P3) and US6 (P3) can proceed in parallel after Foundational
+  - Or sequentially in priority order: P1 → P2 → P3
+- **Polish (Phase 9)**: Depends on all desired user stories being complete
 
-**Acceptance Criteria**:
-- [ ] Discrete changes recorded immediately
-- [ ] Continuous changes batched on release
-- [ ] History stack populated correctly
-- [ ] No duplicate entries in history
+### User Story Dependencies
 
-**Files**: `lib/stores/useConfigStore.ts`, `lib/config/history.ts`
+- **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
+- **User Story 2 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
+- **User Story 3 (P2)**: Can start after Foundational (Phase 2) - No dependencies on other stories
+- **User Story 4 (P2)**: Can start after Foundational (Phase 2) - No dependencies on other stories
+- **User Story 5 (P3)**: Can start after Foundational (Phase 2) - No dependencies on other stories
+- **User Story 6 (P3)**: Can start after Foundational (Phase 2) - No dependencies on other stories
 
----
+### Within Each User Story
 
-#### Task 2.2.3: Add Undo/Redo Actions to Config Store
-**Priority**: P2  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 2.2.1
+- Tests (if included) can be written alongside implementation
+- Type definitions before components
+- Store extensions before components
+- Core implementation before integration
+- Story complete before moving to next priority
 
-**Description**: Add undo() and redo() actions to restore previous states
+### Parallel Opportunities
 
-**Implementation Steps**:
-1. Add `undoConfig()` action to config store
-2. Add `redoConfig()` action to config store
-3. Restore state from history manager
-4. Update current position pointer
-5. Trigger re-render with restored state
-
-**Acceptance Criteria**:
-- [ ] Undo restores previous config state
-- [ ] Redo restores undone config state
-- [ ] Current position pointer updates correctly
-- [ ] Can undo multiple times
-- [ ] Can redo after undo
-
-**Files**: `lib/stores/useConfigStore.ts`, `lib/config/history.ts`
+- All Setup tasks marked [P] (T002-T007) can run in parallel
+- All Foundational tasks marked [P] (T009-T011) can run in parallel
+- Once Foundational phase completes:
+  - US1 (Phase 3) and US2 (Phase 4) can be developed in parallel
+  - US3 (Phase 5) and US4 (Phase 6) can be developed in parallel
+  - US5 (Phase 7) and US6 (Phase 8) can be developed in parallel
+- All tests for a user story marked [P] can run in parallel
+- Different user stories can be worked on in parallel by different team members
 
 ---
 
-#### Task 2.2.4: Update Undo/Redo Button UI
-**Priority**: P2  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 2.2.3
+## Parallel Example: User Story 1 (Config Panel Toggle)
 
-**Description**: Update existing undo/redo buttons with new history system
+```bash
+# Launch all type definitions together (if starting fresh):
+Task: "Create HistoryEntry interface in lib/config/types.ts"
+Task: "Create HistoryStack interface in lib/config/types.ts"
+Task: "Create TextareaScaleState interface in lib/config/types.ts"
+Task: "Create FooterState interface in lib/config/types.ts"
+Task: "Create scale multipliers constant in lib/config/types.ts"
+Task: "Create useMediaQuery hook in hooks/useMediaQuery.ts"
 
-**Implementation Steps**:
-1. Update undo button to use new history manager
-2. Update redo button to use new history manager
-3. Enable/disable based on history state
-4. Add visual position indicator (e.g., "5/10 changes")
-5. Test button states
-
-**Acceptance Criteria**:
-- [ ] Undo button enabled when history not empty
-- [ ] Undo button disabled when at start of history
-- [ ] Redo button enabled when not at latest state
-- [ ] Redo button disabled when at latest state
-- [ ] Position indicator displays correctly
-
-**Files**: `components/teleprompter/config/ConfigPanel.tsx`, `lib/config/history.ts`
+# After Foundational, launch all tests for US1 together (if doing TDD):
+Task: "Unit test: Panel toggle button click updates state"
+Task: "Unit test: localStorage persistence across reloads"
+Task: "Unit test: Keyboard shortcut functionality"
+Task: "Integration test: Panel animation smoothness"
+Task: "Accessibility test: ARIA labels and announcements"
+```
 
 ---
 
-#### Task 2.2.5: Implement History Reset Triggers
-**Priority**: P2  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 2.2.1
+## Parallel Example: User Story 4 (Undo/Redo)
 
-**Description**: Reset history when preset/template/script is loaded
-
-**Implementation Steps**:
-1. Detect preset application
-2. Detect template loading
-3. Detect script loading
-4. Clear history stack on these events
-5. Reset position pointer
-
-**Acceptance Criteria**:
-- [ ] History clears when preset applied
-- [ ] History clears when template loaded
-- [ ] History clears when script loaded
-- [ ] Cannot undo to pre-preset state
-- [ ] Position indicator resets to 0/0
-
-**Files**: `lib/stores/useConfigStore.ts`, `lib/config/history.ts`
+```bash
+# Launch all tests for US4 together:
+Task: "Unit test: History stack maintains 50-state limit"
+Task: "Unit test: FIFO removal when limit exceeded"
+Task: "Integration test: Undo/redo restores correct states"
+Task: "Unit test: Keyboard shortcuts work correctly"
+Task: "Integration test: History resets on preset/template load"
+```
 
 ---
 
-#### Task 2.2.6: Add Clear History Confirmation Dialog
-**Priority**: P2  
-**Estimated Effort**: 0.5 days  
-**Dependencies**: Task 2.2.4
+## Implementation Strategy
 
-**Description**: Add confirmation dialog for clear history action
+### MVP First (User Stories 1 & 2 Only)
 
-**Implementation Steps**:
-1. Add "Clear History" button to config panel
-2. Create confirmation dialog component
-3. Show dialog when clear clicked
-4. Clear history if confirmed
-5. Do nothing if cancelled
+1. Complete Phase 1: Setup (T001-T007)
+2. Complete Phase 2: Foundational (T008-T013) - CRITICAL
+3. Complete Phase 3: User Story 1 (T014-T027)
+4. Complete Phase 4: User Story 2 (T028-T038)
+5. **STOP and VALIDATE**: Test US1 and US2 independently
+6. Deploy/demo MVP if ready
 
-**Acceptance Criteria**:
-- [ ] "Clear History" button displays in config panel
-- [ ] Confirmation dialog appears on click
-- [ ] History clears if user confirms
-- [ ] History preserved if user cancels
+### Incremental Delivery
 
-**Files**: `components/teleprompter/config/ConfigPanel.tsx`, `components/ui/dialog.tsx`
+1. Complete Setup + Foundational → Foundation ready
+2. Add US1 (Config Toggle) + US2 (Real-Time Preview) → Test independently → Deploy/Demo (MVP!)
+3. Add US3 (Scaling) + US4 (Undo/Redo) → Test independently → Deploy/Demo
+4. Add US5 (Mobile) + US6 (Footer) → Test independently → Deploy/Demo
+5. Each story adds value without breaking previous stories
 
----
+### Parallel Team Strategy
 
-## Phase 3: Enhancement Features
+With multiple developers:
 
-### Story 3.1: Mobile Configuration Interface
+1. Team completes Setup (Phase 1) + Foundational (Phase 2) together
+2. Once Foundational is done:
+   - Developer A: US1 (Config Toggle) + US2 (Real-Time Preview) - P1 priority
+   - Developer B: US3 (Scaling) + US4 (Undo/Redo) - P2 priority
+   - Developer C: US5 (Mobile) + US6 (Footer) - P3 priority
+3. Stories complete and integrate independently
 
-#### Task 3.1.1: Create Mobile Config Bottom Sheet Component
-**Priority**: P3  
-**Estimated Effort**: 2 days  
-**Dependencies**: Task 1.1.1
+### Minimum Viable Product (MVP) Scope
 
-**Description**: Create bottom sheet component for mobile configuration interface
+**Recommended MVP**: User Stories 1 & 2 (P1 priority)
+- Config Panel Toggle with Smooth Animation
+- Real-Time Configuration Preview
 
-**Implementation Steps**:
-1. Create `MobileConfigSheet.tsx` component
-2. Implement slide-up animation (200ms duration)
-3. Set height to 90% of viewport
-4. Add drag handle at top
-5. Configure to show on mobile (< 768px)
-
-**Acceptance Criteria**:
-- [ ] Bottom sheet slides up from bottom
-- [ ] Sheet occupies 90% of screen height
-- [ ] Animation completes in 200ms
-- [ ] Drag handle displays at top
-- [ ] Sheet only shows on mobile viewport
-
-**Files**: `components/teleprompter/config/MobileConfigSheet.tsx` (new)
+This provides:
+- Immediate workspace improvement (toggle)
+- Core configuration UX enhancement (real-time preview)
+- Foundation for P2/P3 features
 
 ---
 
-#### Task 3.1.2: Add Touch-Optimized Sliders for Mobile
-**Priority**: P3  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 3.1.1
+## Notes
 
-**Description**: Increase slider height to 48px minimum on mobile devices
-
-**Implementation Steps**:
-1. Update `SliderInput.tsx` with mobile detection
-2. Increase height to 48px on touch devices
-3. Test touch interaction on mobile
-4. Ensure proper hit testing
-
-**Acceptance Criteria**:
-- [ ] Slider height is 48px minimum on mobile
-- [ ] Touch interaction works smoothly
-- [ ] Slider value updates correctly
-- [ ] Visual feedback is clear on touch
-
-**Files**: `components/teleprompter/config/ui/SliderInput.tsx`
+- [P] tasks = different files, no dependencies
+- [Story] label maps task to specific user story for traceability
+- Each user story should be independently completable and testable
+- Tests are OPTIONAL - can be written alongside implementation rather than strict TDD
+- Commit after each task or logical group
+- Stop at any checkpoint to validate story independently
+- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
 
 ---
 
-#### Task 3.1.3: Implement Native Color Input for Mobile
-**Priority**: P3  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 3.1.1
-
-**Description**: Replace react-colorful with native color input on mobile
-
-**Implementation Steps**:
-1. Add mobile detection to `ColorPicker.tsx`
-2. Replace HexColorPicker with `<input type="color">` on mobile
-3. Style native input to match design
-4. Test on mobile devices
-
-**Acceptance Criteria**:
-- [ ] Native color input shows on mobile
-- [ ] HexColorPicker shows on desktop
-- [ ] Color selection works on mobile
-- [ ] Visual style is consistent
-
-**Files**: `components/teleprompter/config/ui/ColorPicker.tsx`
-
----
-
-#### Task 3.1.4: Implement Native Font Picker for Mobile
-**Priority**: P3  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 3.1.1
-
-**Description**: Replace font dropdown with native select on mobile
-
-**Implementation Steps**:
-1. Add mobile detection to `FontSelector.tsx`
-2. Replace dropdown with `<select>` on mobile
-3. Populate options with available fonts
-4. Style native select to match design
-5. Test on mobile devices
-
-**Acceptance Criteria**:
-- [ ] Native select shows on mobile
-- [ ] Font dropdown shows on desktop
-- [ ] Font selection works on mobile
-- [ ] All fonts available in select
-
-**Files**: `components/teleprompter/config/typography/FontSelector.tsx`
-
----
-
-#### Task 3.1.5: Add Swipe Down Gesture to Close Sheet
-**Priority**: P3  
-**Estimated Effort**: 1.5 days  
-**Dependencies**: Task 3.1.1
-
-**Description**: Implement swipe down gesture with 100px threshold to close mobile config
-
-**Implementation Steps**:
-1. Add touch event listeners to sheet
-2. Track touch start and move positions
-3. Calculate drag distance
-4. Close sheet when threshold exceeded (100px)
-5. Add visual feedback during drag
-
-**Acceptance Criteria**:
-- [ ] Swipe down gesture is detected
-- [ ] Sheet closes when drag > 100px
-- [ ] Sheet stays open when drag < 100px
-- [ ] Visual feedback shows during drag
-- [ ] Sheet springs back if threshold not met
-
-**Files**: `components/teleprompter/config/MobileConfigSheet.tsx`
-
----
-
-#### Task 3.1.6: Add Done Button to Mobile Config Sheet
-**Priority**: P3  
-**Estimated Effort**: 0.5 days  
-**Dependencies**: Task 3.1.1
-
-**Description**: Add Done button at top-right of mobile config panel
-
-**Implementation Steps**:
-1. Add Done button to sheet header
-2. Position at top-right corner
-3. Style to match other controls
-4. Wire click handler to close sheet
-
-**Acceptance Criteria**:
-- [ ] Done button displays at top-right
-- [ ] Button style is consistent
-- [ ] Clicking button closes sheet
-- [ ] Button is easily tappable (44x44px min)
-
-**Files**: `components/teleprompter/config/MobileConfigSheet.tsx`
-
----
-
-#### Task 3.1.7: Implement Landscape Split View
-**Priority**: P3  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 3.1.1
-
-**Description**: Switch to split view (half screen) when device rotates to landscape
-
-**Implementation Steps**:
-1. Detect device orientation changes
-2. Switch between bottom sheet (portrait) and split view (landscape)
-3. Update layout dynamically
-4. Test orientation transitions
-
-**Acceptance Criteria**:
-- [ ] Portrait mode shows bottom sheet
-- [ ] Landscape mode shows split view
-- [ ] Transitions are smooth
-- [ ] Layout adjusts correctly on rotation
-
-**Files**: `components/teleprompter/config/MobileConfigSheet.tsx`
-
----
-
-#### Task 3.1.8: Add Compact Layout for Small Screens
-**Priority**: P3  
-**Estimated Effort**: 0.5 days  
-**Dependencies**: Task 3.1.1
-
-**Description**: Use compact spacing with reduced padding on screens < 375px
-
-**Implementation Steps**:
-1. Detect small screens (< 375px)
-2. Reduce padding on small screens
-3. Adjust spacing between controls
-4. Test on very small devices
-
-**Acceptance Criteria**:
-- [ ] Compact layout shows on screens < 375px
-- [ ] Padding is reduced appropriately
-- [ ] All controls remain accessible
-- [ ] No layout overlap
-
-**Files**: `components/teleprompter/config/MobileConfigSheet.tsx`
-
----
-
-### Story 3.2: Adaptive Footer
-
-#### Task 3.2.1: Implement Footer Scaling with Textarea Size
-**Priority**: P3  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 2.1.1
-
-**Description**: Scale footer proportionally with textarea size changes
-
-**Implementation Steps**:
-1. Calculate scale factor based on textarea size
-2. Apply scaling to footer height and padding
-3. Cap at 120px maximum height
-4. Test at each textarea size
-
-**Acceptance Criteria**:
-- [ ] Footer scales at medium size
-- [ ] Footer scales at large size
-- [ ] Footer caps at 120px maximum
-- [ ] Scaling is proportional and smooth
-
-**Files**: `components/teleprompter/editor/ContentPanel.tsx`
-
----
-
-#### Task 3.2.2: Implement Fixed Footer Positioning
-**Priority**: P3  
-**Estimated Effort**: 1 day  
-**Dependencies**: None
-
-**Description**: Anchor footer to bottom of viewport with fixed/sticky positioning
-
-**Implementation Steps**:
-1. Add `position: fixed` with `bottom: 0` to footer
-2. Add `backdrop-filter: blur()` for semi-transparent effect
-3. Set z-index to stay on top of content
-4. Test on various viewport sizes
-
-**Acceptance Criteria**:
-- [ ] Footer is fixed at bottom of viewport
-- [ ] Semi-transparent backdrop works correctly
-- [ ] Footer stays on top of content
-- [ ] Footer doesn't interfere with scrolling
-
-**Files**: `components/teleprompter/editor/ContentPanel.tsx`
-
----
-
-#### Task 3.2.3: Add Content Padding to Prevent Overlap
-**Priority**: P3  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 3.2.2
-
-**Description**: Add bottom padding to content equal to footer height
-
-**Implementation Steps**:
-1. Calculate footer height dynamically
-2. Add bottom padding to content area
-3. Update padding on footer resize
-4. Update padding on textarea size change
-5. Test that no content is hidden
-
-**Acceptance Criteria**:
-- [ ] Content padding equals footer height
-- [ ] No content is hidden behind footer
-- [ ] Padding updates dynamically
-- [ ] Users can always access all content
-
-**Files**: `components/teleprompter/editor/ContentPanel.tsx`
-
----
-
-#### Task 3.2.4: Hide Footer in Fullscreen Mode
-**Priority**: P3  
-**Estimated Effort**: 0.5 days  
-**Dependencies**: None
-
-**Description**: Hide footer when textarea is in fullscreen mode
-
-**Implementation Steps**:
-1. Detect fullscreen mode in UI store
-2. Hide footer with CSS when fullscreen active
-3. Show footer when exiting fullscreen
-4. Test transitions
-
-**Acceptance Criteria**:
-- [ ] Footer hides in fullscreen mode
-- [ ] Footer shows when exiting fullscreen
-- [ ] Transitions are smooth
-- [ ] Editing space is maximized in fullscreen
-
-**Files**: `components/teleprompter/editor/ContentPanel.tsx`, `stores/useUIStore.ts`
-
----
-
-#### Task 3.2.5: Reflow Footer Content on Mobile
-**Priority**: P3  
-**Estimated Effort**: 0.5 days  
-**Dependencies**: Task 3.2.1
-
-**Description**: Wrap footer buttons to multiple rows on mobile if needed
-
-**Implementation Steps**:
-1. Add flex-wrap to footer button container
-2. Ensure minimum touch targets (44x44px) on mobile
-3. Test on various mobile viewport widths
-4. Adjust spacing as needed
-
-**Acceptance Criteria**:
-- [ ] Footer buttons wrap on mobile
-- [ ] All buttons maintain 44x44px minimum
-- [ ] Layout is readable on mobile
-- [ ] No overlap or crowding
-
-**Files**: `components/teleprompter/editor/ContentPanel.tsx`
-
----
-
-## Testing Tasks
-
-### Task T1: Write Unit Tests for Config Panel Toggle
-**Priority**: P1  
-**Estimated Effort**: 2 days  
-**Dependencies**: Task 1.1.5
-
-**Test Cases**:
-- [ ] Test toggle button rendering
-- [ ] Test localStorage persistence
-- [ ] Test keyboard shortcut handler
-- [ ] Test debounce mechanism
-- [ ] Test animation states
-
-**Files**: `__tests__/unit/config/ConfigPanelToggle.test.tsx`
-
----
-
-### Task T2: Write Unit Tests for Real-Time Preview
-**Priority**: P1  
-**Estimated Effort**: 2 days  
-**Dependencies**: Task 1.2.5
-
-**Test Cases**:
-- [ ] Test config store subscription
-- [ ] Test 100ms update timing
-- [ ] Test batching mechanism
-- [ ] Test loading states
-- [ ] Test error states
-
-**Files**: `__tests__/unit/config/RealTimePreview.test.tsx`
-
----
-
-### Task T3: Write Unit Tests for Proportional Scaling
-**Priority**: P2  
-**Estimated Effort**: 1.5 days  
-**Dependencies**: Task 2.1.5
-
-**Test Cases**:
-- [ ] Test scale factor calculations
-- [ ] Test button scaling at each size
-- [ ] Test horizontal scroll prevention
-- [ ] Test label capping
-
-**Files**: `__tests__/unit/config/ProportionalScaling.test.tsx`
-
----
-
-### Task T4: Write Unit Tests for Undo/Redo
-**Priority**: P2  
-**Estimated Effort**: 2 days  
-**Dependencies**: Task 2.2.6
-
-**Test Cases**:
-- [ ] Test history stack operations
-- [ ] Test FIFO removal at limit
-- [ ] Test hybrid recording strategy
-- [ ] Test reset triggers
-- [ ] Test keyboard shortcuts
-
-**Files**: `__tests__/unit/config/UndoRedo.test.tsx`
-
----
-
-### Task T5: Write Integration Tests for Panel Toggle + Preview
-**Priority**: P1  
-**Estimated Effort**: 1.5 days  
-**Dependencies**: Task 1.2.5
-
-**Test Cases**:
-- [ ] Test preview updates when panel hidden
-- [ ] Test layout adjustment
-- [ ] Test state persistence across reloads
-
-**Files**: `__tests__/integration/config/PanelTogglePreview.test.tsx`
-
----
-
-### Task T6: Write Integration Tests for Scaling + Footer
-**Priority**: P2  
-**Estimated Effort**: 1 day  
-**Dependencies**: Task 3.2.5
-
-**Test Cases**:
-- [ ] Test footer scales with textarea
-- [ ] Test content padding prevents overlap
-- [ ] Test buttons remain accessible
-
-**Files**: `__tests__/integration/config/ScalingFooter.test.tsx`
-
----
-
-### Task T7: Write E2E Tests for User Workflows
-**Priority**: P2  
-**Estimated Effort**: 2 days  
-**Dependencies**: Task T6
-
-**Test Cases**:
-- [ ] Complete configuration workflow
-- [ ] Real-time preview verification
-- [ ] Undo/redo after multiple changes
-- [ ] Mobile configuration workflow
-
-**Files**: `__tests__/e2e/config/ConfigurationWorkflow.test.tsx`
-
----
-
-### Task T8: Write Accessibility Tests
-**Priority**: P2  
-**Estimated Effort**: 1.5 days  
-**Dependencies**: Task T7
-
-**Test Cases**:
-- [ ] Test screen reader navigation
-- [ ] Test keyboard navigation
-- [ ] Test prefers-reduced-motion compliance
-- [ ] Test ARIA label verification
-
-**Files**: `__tests__/a11y/config/Accessibility.test.tsx`
-
----
-
-### Task T9: Write Performance Tests
-**Priority**: P2  
-**Estimated Effort**: 1.5 days  
-**Dependencies**: Task T8
-
-**Test Cases**:
-- [ ] Test animation frame rate (60 FPS)
-- [ ] Test config change update timing (< 100ms)
-- [ ] Test history overhead (< 5ms per change)
-- [ ] Test mobile panel open time (< 200ms)
-
-**Files**: `__tests__/performance/config/Performance.test.tsx`
-
----
-
-## Summary
-
-**Total Estimated Effort**: 42-48 days
-
-### Phase 1 (P1): 9-11 days
-- Config Panel Toggle: 4 days
-- Real-Time Preview: 5-7 days
-
-### Phase 2 (P2): 12-14 days
-- Proportional UI Scaling: 4 days
-- Configuration Undo/Redo: 6-7 days
-- Testing: 2-3 days
-
-### Phase 3 (P3): 9-11 days
-- Mobile Configuration Interface: 6-7 days
-- Adaptive Footer: 2-3 days
-- Testing: 1 day
-
-### Testing (All Phases): 12-13 days
-- Unit Tests: 8 days
-- Integration Tests: 2.5 days
-- E2E Tests: 2 days
-- Accessibility Tests: 1.5 days
-
-**Recommended Schedule**: 6-week sprint with 2-week checkpoints for each phase
+## Task Summary
+
+**Total Tasks**: 98
+- Setup: 7 tasks
+- Foundational: 6 tasks
+- US1 (P1 - Config Toggle): 14 tasks (5 optional tests + 9 implementation)
+- US2 (P1 - Real-Time Preview): 11 tasks (4 optional tests + 7 implementation)
+- US3 (P2 - Scaling): 11 tasks (4 optional tests + 7 implementation)
+- US4 (P2 - Undo/Redo): 14 tasks (5 optional tests + 9 implementation)
+- US5 (P3 - Mobile): 16 tasks (5 optional tests + 11 implementation)
+- US6 (P3 - Footer): 11 tasks (4 optional tests + 7 implementation)
+- Polish: 8 tasks
+
+**Test Tasks**: 31 (optional, marked clearly)
+**Implementation Tasks**: 67 (required)
+
+**Parallel Opportunities**: 35 tasks marked [P] can run in parallel within their phases
+
+**MVP Scope**: 25 implementation tasks (Setup + Foundational + US1 + US2)

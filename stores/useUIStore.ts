@@ -1,5 +1,11 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+import type {
+  PanelState,
+  TextareaScaleState,
+  FooterState as ConfigFooterState,
+} from '@/lib/config/types'
+import { TEXTAREA_SCALE_MULTIPLIERS } from '@/lib/config/types'
 
 // ==================== Interfaces from data-model.md ====================
 
@@ -23,12 +29,16 @@ export interface TextareaPreferences {
 }
 
 /**
- * Footer state management
+ * Footer state management (legacy - for backward compatibility)
+ * @deprecated Use ConfigFooterState from @/lib/config/types for new features
  */
 export interface FooterState {
   isCollapsed: boolean
   collapsedSince?: number
 }
+
+// Re-export for convenience
+export type { ConfigFooterState }
 
 /**
  * Preview panel state for mobile/tablet
@@ -117,6 +127,11 @@ interface UIStore {
   autoSaveStatus: AutoSaveStatus
   errorContext: ErrorContext | null
 
+  // T008: Phase 2 - Configuration Panel UI/UX state
+  panelState: PanelState
+  textareaScale: TextareaScaleState
+  configFooterState: ConfigFooterState
+
   // Textarea actions
   setTextareaPrefs: (prefs: Partial<TextareaPreferences>) => void
   toggleTextareaSize: () => void
@@ -140,6 +155,17 @@ interface UIStore {
   // Error context actions
   setErrorContext: (error: ErrorContext | null) => void
   clearError: () => void
+
+  // T009: Phase 2 - Panel visibility actions
+  setPanelVisible: (visible: boolean, isAnimating?: boolean) => void
+  togglePanel: () => void
+
+  // T010: Phase 2 - Textarea scale action
+  setTextareaSize: (size: 'compact' | 'medium' | 'large') => void
+
+  // T011: Phase 2 - Config footer actions
+  setConfigFooterVisible: (visible: boolean, height?: number) => void
+  toggleConfigFooterCollapsed: () => void
 }
 
 // ==================== Create the UI Store ====================
@@ -154,6 +180,23 @@ export const useUIStore = create<UIStore>()(
       shortcutsStats: DEFAULT_SHORTCUTS_STATS,
       autoSaveStatus: DEFAULT_AUTOSAVE_STATUS,
       errorContext: null,
+
+      // T025: Phase 2 - Configuration Panel UI/UX initial state
+      // Panel hidden by default on mobile/tablet (< 1024px), visible on desktop
+      panelState: {
+        visible: typeof window !== 'undefined' && window.innerWidth >= 1024,
+        isAnimating: false,
+        lastToggled: null,
+      },
+      textareaScale: {
+        size: 'medium',
+        scale: TEXTAREA_SCALE_MULTIPLIERS.medium,
+      },
+      configFooterState: {
+        visible: true,
+        collapsed: false,
+        height: 60, // Default footer height in pixels
+      },
 
       // ==================== Textarea Actions ====================
       setTextareaPrefs: (prefs) => {
@@ -284,6 +327,78 @@ export const useUIStore = create<UIStore>()(
       clearError: () => {
         set({ errorContext: null })
       },
+
+      // ==================== T009: Panel Visibility Actions ====================
+      setPanelVisible: (visible, isAnimating = false) => {
+        set((state) => ({
+          panelState: {
+            ...state.panelState,
+            visible,
+            isAnimating,
+            lastToggled: visible ? Date.now() : state.panelState.lastToggled,
+          },
+        }))
+      },
+
+      // T024: Debounce togglePanel to prevent animation glitches (150ms debounce)
+      togglePanel: () => {
+        set((state) => {
+          const now = Date.now()
+          const lastToggled = state.panelState.lastToggled || 0
+          const debounceMs = 150
+          
+          // Prevent rapid toggle clicks within debounce period
+          if (now - lastToggled < debounceMs) {
+            return state
+          }
+          
+          const newVisible = !state.panelState.visible
+          return {
+            panelState: {
+              visible: newVisible,
+              isAnimating: true, // Start animation
+              lastToggled: now,
+            },
+          }
+        })
+      },
+
+      // ==================== T010: Textarea Scale Action ====================
+      setTextareaSize: (size) => {
+        set((state) => {
+          const scale = TEXTAREA_SCALE_MULTIPLIERS[size]
+          return {
+            textareaScale: {
+              size,
+              scale,
+            },
+          }
+        })
+      },
+
+      // ==================== T011: Config Footer Actions ====================
+      setConfigFooterVisible: (visible, height) => {
+        set((state) => ({
+          configFooterState: {
+            ...state.configFooterState,
+            visible,
+            height: height ?? state.configFooterState.height,
+          },
+        }))
+      },
+
+      toggleConfigFooterCollapsed: () => {
+        set((state) => {
+          const newCollapsed = !state.configFooterState.collapsed
+          return {
+            configFooterState: {
+              ...state.configFooterState,
+              collapsed: newCollapsed,
+              height: newCollapsed ? 24 : 60, // Collapsed vs expanded height
+            },
+          }
+        })
+      },
     }),
     {
       name: 'teleprompter-ui-store',
@@ -293,6 +408,10 @@ export const useUIStore = create<UIStore>()(
         footerState: state.footerState,
         previewState: state.previewState,
         shortcutsStats: state.shortcutsStats,
+        // T008: Persist new state properties
+        panelState: state.panelState,
+        textareaScale: state.textareaScale,
+        configFooterState: state.configFooterState,
       }),
     }
   )

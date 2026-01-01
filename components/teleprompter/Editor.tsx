@@ -1,8 +1,9 @@
 "use client";
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useUIStore } from '@/stores/useUIStore';
 import { ContentPanel } from './editor/ContentPanel';
 import { ConfigPanel } from './config/ConfigPanel';
 import { PreviewPanel } from './editor/PreviewPanel';
@@ -22,6 +23,12 @@ import { PreviewPanel } from './editor/PreviewPanel';
  */
 export function Editor() {
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const { panelState } = useUIStore();
+
+  // T025: Sync panel visibility with screen size
+  // Panel should only be visible on desktop (1024px+)
+  const shouldShowPanel = isDesktop && panelState.visible;
 
   return (
     <motion.div
@@ -34,8 +41,11 @@ export function Editor() {
       {/* Content Panel - Text editing and quick actions */}
       <ContentPanel />
       
-      {/* Config Panel - Always-visible configuration */}
-      <ConfigPanel />
+      {/* T021: Config Panel wrapped with AnimatePresence for exit animations */}
+      {/* T025: Only show on desktop screens (1024px+) */}
+      <AnimatePresence mode="wait">
+        {shouldShowPanel && <ConfigPanel key="config-panel" />}
+      </AnimatePresence>
       
       {/* Preview Panel - Live preview (desktop only) */}
       <PreviewPanel />

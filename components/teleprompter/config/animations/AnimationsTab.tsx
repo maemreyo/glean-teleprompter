@@ -1,15 +1,21 @@
 'use client'
 
+import { useState } from 'react'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
 import { SliderInput } from '../ui/SliderInput'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
+import { Play } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { EntranceAnimation } from '@/lib/config/types'
 
 export function AnimationsTab() {
   const t = useTranslations('Config.animations')
   const { animations, setAnimations } = useConfigStore()
+  
+  // T036: [US2] Test button state for entrance animations
+  const [isTesting, setIsTesting] = useState(false)
 
   const animationTypeMap: Record<EntranceAnimation, string> = {
     'fade-in': t('fadeIn'),
@@ -55,7 +61,26 @@ export function AnimationsTab() {
 
         {/* Entrance Animation */}
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-foreground">{t('entranceAnimation')}</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium text-foreground">{t('entranceAnimation')}</h4>
+            {/* T036: [US2] Test button for entrance animations */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsTesting(true)
+                // Reset animation state after duration completes
+                setTimeout(() => {
+                  setIsTesting(false)
+                }, animations.entranceDuration)
+              }}
+              disabled={isTesting}
+              className="gap-2"
+            >
+              <Play size={14} />
+              {isTesting ? 'Testing...' : 'Test'}
+            </Button>
+          </div>
           
           <div className="space-y-2">
             <Label className="text-sm">{t('animationType')}</Label>
