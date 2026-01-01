@@ -170,6 +170,132 @@ export function dialogAnnouncement(title: string, description: string): string {
 }
 
 /**
+ * Generate ARIA label for draft list
+ * @param count - Number of drafts in the list
+ * @returns ARIA label string
+ */
+export function draftList(count: number): string {
+  return `List of saved drafts, ${count} ${count === 1 ? 'draft' : 'drafts'}`
+}
+
+/**
+ * Generate ARIA label for draft restore action
+ * @param timestamp - Draft timestamp in milliseconds
+ * @returns ARIA label string
+ */
+export function restoreDraft(timestamp: number): string {
+  const date = new Date(timestamp)
+  const relativeTime = formatRelativeTime(date)
+  return `Restore draft from ${relativeTime}`
+}
+
+/**
+ * Generate ARIA label for draft delete action
+ * @param timestamp - Draft timestamp in milliseconds
+ * @returns ARIA label string
+ */
+export function deleteDraft(timestamp: number): string {
+  const date = new Date(timestamp)
+  const relativeTime = formatRelativeTime(date)
+  return `Delete draft from ${relativeTime}`
+}
+
+/**
+ * Generate ARIA label for draft item in list
+ * @param timestamp - Draft timestamp in milliseconds
+ * @param index - Item index (0-based)
+ * @param total - Total number of drafts
+ * @param isSelected - Whether draft is selected for bulk actions
+ * @returns ARIA label string
+ */
+export function draftListItem(
+  timestamp: number,
+  index: number,
+  total: number,
+  isSelected: boolean = false
+): string {
+  const date = new Date(timestamp)
+  const relativeTime = formatRelativeTime(date)
+  const selectedText = isSelected ? ', selected' : ''
+  return `Draft from ${relativeTime}, ${index + 1} of ${total}${selectedText}`
+}
+
+/**
+ * Generate ARIA label for auto-save status
+ * @param status - Current save status
+ * @param lastSaved - Timestamp of last save (optional)
+ * @returns ARIA label string
+ */
+export function autoSaveStatus(
+  status: 'idle' | 'saving' | 'saved' | 'error',
+  lastSaved?: number
+): string {
+  const statusMap = {
+    idle: 'No changes to save',
+    saving: 'Saving draft...',
+    saved: lastSaved ? `Saved ${formatRelativeTime(new Date(lastSaved))}` : 'Draft saved',
+    error: 'Save failed, retrying...',
+  }
+  return statusMap[status]
+}
+
+/**
+ * Generate ARIA label for storage quota warning
+ * @param percentage - Storage usage percentage
+ * @returns ARIA label string
+ */
+export function storageQuotaWarning(percentage: number): string {
+  if (percentage >= 100) {
+    return `Storage full. Clear old drafts to continue saving.`
+  }
+  if (percentage >= 90) {
+    return `Storage almost full, ${percentage.toFixed(0)}% used. Consider clearing old drafts.`
+  }
+  return `Storage ${percentage.toFixed(0)}% full`
+}
+
+/**
+ * Generate ARIA label for private browsing warning
+ * @returns ARIA label string
+ */
+export function privateBrowsingWarning(): string {
+  return `Private browsing detected. Your drafts will not be saved after you close this session.`
+}
+
+/**
+ * Generate ARIA label for cleanup old drafts button
+ * @param count - Number of drafts that would be deleted
+ * @returns ARIA label string
+ */
+export function cleanupOldDrafts(count?: number): string {
+  if (count !== undefined) {
+    return `Clear ${count} old ${count === 1 ? 'draft' : 'drafts'} older than 30 days`
+  }
+  return 'Clear old drafts'
+}
+
+/**
+ * Format relative time for accessibility
+ * @param date - Date to format
+ * @returns Relative time string
+ */
+function formatRelativeTime(date: Date): string {
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMins < 1) return 'just now'
+  if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'} ago`
+  if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`
+  if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`
+  
+  // For older drafts, use absolute date
+  return date.toLocaleDateString()
+}
+
+/**
  * Combined ARIA_LABELS constant object for easy import
  */
 export const ARIA_LABELS = {
@@ -182,4 +308,12 @@ export const ARIA_LABELS = {
   statusIndicator,
   keyboardHint,
   dialogAnnouncement,
+  draftList,
+  restoreDraft,
+  deleteDraft,
+  draftListItem,
+  autoSaveStatus,
+  storageQuotaWarning,
+  privateBrowsingWarning,
+  cleanupOldDrafts,
 } as const

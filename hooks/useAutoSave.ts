@@ -1,214 +1,332 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { useUIStore } from '@/stores/useUIStore'
+/**
+ * Unified auto-save hook that consolidates dual save mechanisms
+ * Saves all 11 teleprompter properties atomically with debouncing and periodic saves
+ */
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { StoreApi } from 'zustand';
+import { saveDraft, loadDraft, saveDraftWithConflictDetection } from '@/lib/storage/draftStorage';
+import { createDraft } from '@/lib/storage/draftStorage';
+import { TeleprompterDraft, SaveStatus, ConflictData, ConflictResolution } from '@/lib/storage/types';
+import { useUIStore } from '@/stores/useUIStore';
+
+// ============================================================================
+// Type Definitions
+// ============================================================================
 
 export interface UseAutoSaveOptions {
-  /** Interval in milliseconds between auto-save attempts (default: 5000ms) */
-  interval?: number
-  /** Whether auto-save is enabled (default: true) */
-  enabled?: boolean
-  /** Custom storage key (default: 'teleprompter_draft') */
-  storageKey?: string
-  /** Debounce delay in milliseconds (default: 1000ms) */
-  debounceMs?: number
+  /**
+   * Debounce delay in milliseconds after last change
+   * @default 1000
+   */
+  debounceMs?: number;
+  
+  /**
+   * Periodic save interval in milliseconds
+   * @default 5000
+   */
+  periodicMs?: number;
+  
+  /**
+   * Callback fired when save status changes
+   */
+  onStatusChange?: (status: SaveStatus) => void;
+  
+  /**
+   * Enable beforeunload handler for page close protection
+   * @default true
+   */
+  enableBeforeUnload?: boolean;
+  
+  /**
+   * Current mode (setup, running, read-only)
+   * Only saves in 'setup' mode
+   */
+  mode: 'setup' | 'running' | 'readonly';
+  
+  /**
+   * Enable conflict detection for multi-tab scenarios
+   * @default true
+   */
+  enableConflictDetection?: boolean;
+  
+  /**
+   * Callback when conflict is detected
+   */
+  onConflict?: (conflict: ConflictData) => ConflictResolution;
 }
 
 export interface UseAutoSaveReturn {
-  /** Current auto-save status */
-  status: 'idle' | 'saving' | 'saved' | 'error'
-  /** Timestamp of last successful save */
-  lastSavedAt: number | null
-  /** Error message if save failed */
-  error: string | null
-  /** Manually trigger a save */
-  saveNow: () => Promise<void>
+  /**
+   * Current save status
+   */
+  status: SaveStatus;
+  
+  /**
+   * Last save timestamp (Unix ms)
+   */
+  lastSavedAt: number | null;
+  
+  /**
+   * Trigger an immediate save (debounce bypass)
+   */
+  saveNow: () => void;
+  
+  /**
+   * Cancel pending debounced save
+   */
+  cancelSave: () => void;
+  
+  /**
+   * Reset save status to idle
+   */
+  resetStatus: () => void;
+}
+
+// ============================================================================
+// Hook Implementation
+// ============================================================================
+
+/**
+ * Extract teleprompter state from store
+ */
+function extractTeleprompterState(store: StoreApi<any>): Partial<TeleprompterDraft> {
+  const state = store.getState();
+  
+  return {
+    text: state.text || '',
+    backgroundUrl: state.backgroundUrl || '',
+    musicUrl: state.musicUrl || '',
+    fontStyle: state.fontStyle || 'Arial',
+    colorIndex: state.colorIndex ?? 0,
+    scrollSpeed: state.scrollSpeed ?? 50,
+    fontSize: state.fontSize ?? 24,
+    textAlignment: state.textAlignment || 'center',
+    lineHeight: state.lineHeight ?? 1.5,
+    margin: state.margin ?? 20,
+    overlayOpacity: state.overlayOpacity ?? 0.5,
+  };
 }
 
 /**
- * useAutoSave - Hook for auto-saving data to localStorage
+ * Unified auto-save hook
  * 
  * Features:
- * - Debounced saves to avoid excessive writes
- * - requestIdleCallback for non-blocking saves
- * - QuotaExceededError handling
- * - Status tracking via useUIStore
+ * - Single unified save mechanism (no more dual system)
+ * - Debounced save (1s after last change)
+ * - Periodic save (every 5s)
+ * - Conflict detection for multi-tab scenarios
+ * - Mode-aware (only saves in setup mode)
+ * - Non-blocking saves using requestIdleCallback
  * 
- * @param data - Data to save (any serializable object)
+ * @param store - Zustand store containing teleprompter state
  * @param options - Configuration options
- * @returns Auto-save status and controls
+ * @returns Object containing save status and control functions
  */
-export function useAutoSave<T extends Record<string, any>>(
-  data: T,
-  options: UseAutoSaveOptions = {}
+export function useAutoSave(
+  store: StoreApi<any>,
+  options: UseAutoSaveOptions
 ): UseAutoSaveReturn {
   const {
-    interval = 5000,
-    enabled = true,
-    storageKey = 'teleprompter_draft',
     debounceMs = 1000,
-  } = options
+    periodicMs = 5000,
+    onStatusChange,
+    enableBeforeUnload = true,
+    mode,
+    enableConflictDetection = true,
+    onConflict,
+  } = options;
 
-  const setAutoSaveStatus = useUIStore((state) => state.setAutoSaveStatus)
+  const setAutoSaveStatus = useUIStore((state) => state.setAutoSaveStatus);
 
-  const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  // State
+  const [status, setStatus] = useState<SaveStatus>('idle');
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
 
-  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const saveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const lastDataRef = useRef<string>(JSON.stringify(data))
-  const isMountedRef = useRef(true)
-
-  /**
-   * Perform the actual save operation
-   */
-  const performSave = useCallback(
-    async (dataToSave: T): Promise<void> => {
-      if (!isMountedRef.current) return
-
-      setStatus('saving')
-      setError(null)
-      setAutoSaveStatus({ status: 'saving' })
-
-      try {
-        // Use requestIdleCallback for non-blocking save if available
-        const saveOperation = () => {
-          return new Promise<void>((resolve, reject) => {
-            const saveData = () => {
-              try {
-                if (typeof window !== 'undefined') {
-                  localStorage.setItem(storageKey, JSON.stringify(dataToSave))
-                }
-                resolve()
-              } catch (err) {
-                reject(err)
-              }
-            }
-
-            // Check if requestIdleCallback is available
-            if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-              ;(window as any).requestIdleCallback(
-                () => {
-                  saveData()
-                },
-                { timeout: 2000 }
-              )
-            } else {
-              // Fallback to immediate save
-              saveData()
-            }
-          })
-        }
-
-        await saveOperation()
-
-        if (!isMountedRef.current) return
-
-        const now = Date.now()
-        setStatus('saved')
-        setLastSavedAt(now)
-        setError(null)
-        setAutoSaveStatus({
-          status: 'saved',
-          lastSavedAt: now,
-          errorMessage: undefined,
-        })
-      } catch (err) {
-        if (!isMountedRef.current) return
-
-        // Handle QuotaExceededError specifically
-        const isQuotaError =
-          err instanceof DOMException && err.name === 'QuotaExceededError'
-        const errorMessage = isQuotaError
-          ? 'Storage full. Some browsers limit storage. Try saving to your account instead.'
-          : err instanceof Error
-          ? err.message
-          : 'Unknown error occurred'
-
-        setStatus('error')
-        setError(errorMessage)
-        setAutoSaveStatus({
-          status: 'error',
-          errorMessage,
-        })
-
-        console.error('[useAutoSave] Save failed:', err)
-      }
-    },
-    [storageKey, setAutoSaveStatus]
-  )
+  // Refs
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const periodicTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isMountedRef = useRef(true);
+  const lastStateRef = useRef<string>('');
 
   /**
-   * Manually trigger a save
+   * Perform save operation
    */
-  const saveNow = useCallback(async () => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-      debounceTimerRef.current = null
+  const performSave = useCallback(async (immediate = false) => {
+    // Only save in setup mode
+    if (mode !== 'setup') {
+      return;
     }
-    await performSave(data)
-  }, [data, performSave])
+
+    if (!isMountedRef.current) return;
+
+    setStatus('saving');
+    onStatusChange?.('saving');
+    setAutoSaveStatus({ status: 'saving' });
+
+    try {
+      const state = extractTeleprompterState(store);
+      const draft = createDraft(state);
+
+      // Use conflict detection if enabled
+      if (enableConflictDetection && !immediate) {
+        const result = saveDraftWithConflictDetection(draft, {
+          checkConflicts: true,
+          onConflict: onConflict || ((conflict: ConflictData) => {
+            // Default behavior: cancel on conflict
+            // Could show dialog here
+            return 'cancel';
+          }),
+        });
+
+        if (!result.success && result.conflict?.hasNewerVersion) {
+          setStatus('error');
+          onStatusChange?.('error');
+          return;
+        }
+      } else {
+        // Save without conflict detection
+        saveDraft(draft);
+      }
+
+      if (!isMountedRef.current) return;
+
+      const now = Date.now();
+      setStatus('saved');
+      setLastSavedAt(now);
+      onStatusChange?.('saved');
+      setAutoSaveStatus({
+        status: 'saved',
+        lastSavedAt: now,
+        errorMessage: undefined,
+      });
+    } catch (error) {
+      if (!isMountedRef.current) return;
+
+      setStatus('error');
+      onStatusChange?.('error');
+      setAutoSaveStatus({
+        status: 'error',
+        errorMessage: error instanceof Error ? error.message : 'Save failed',
+      });
+
+      console.error('[useAutoSave] Save failed:', error);
+    }
+  }, [store, mode, enableConflictDetection, onStatusChange, setAutoSaveStatus]);
 
   /**
    * Debounced save trigger
    */
-  const triggerSave = useCallback(() => {
-    if (!enabled) return
+  const triggerDebouncedSave = useCallback(() => {
+    if (mode !== 'setup') return;
 
-    // Clear existing debounce timer
+    // Clear existing timer
     if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
+      clearTimeout(debounceTimerRef.current);
     }
 
-    // Set new debounce timer
+    // Set new timer
     debounceTimerRef.current = setTimeout(() => {
-      performSave(data)
-    }, debounceMs)
-  }, [data, enabled, debounceMs, performSave])
+      performSave();
+    }, debounceMs);
+  }, [mode, debounceMs, performSave]);
 
-  // Watch for data changes and trigger debounced save
-  useEffect(() => {
-    const currentDataString = JSON.stringify(data)
-    if (currentDataString !== lastDataRef.current) {
-      lastDataRef.current = currentDataString
-      triggerSave()
+  /**
+   * Save immediately (bypass debounce)
+   */
+  const saveNow = useCallback(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
     }
-  }, [data, triggerSave])
+    performSave(true);
+  }, [performSave]);
 
-  // Set up periodic saves
+  /**
+   * Cancel pending save
+   */
+  const cancelSave = useCallback(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+  }, []);
+
+  /**
+   * Reset status to idle
+   */
+  const resetStatus = useCallback(() => {
+    setStatus('idle');
+    onStatusChange?.('idle');
+  }, [onStatusChange]);
+
+  // Watch for state changes
   useEffect(() => {
-    if (!enabled) return
+    if (mode !== 'setup') return;
 
-    // Set up interval save
-    saveTimerRef.current = setInterval(() => {
-      performSave(data)
-    }, interval)
+    const currentState = JSON.stringify(extractTeleprompterState(store));
+    
+    // Only trigger save if state actually changed
+    if (currentState !== lastStateRef.current) {
+      lastStateRef.current = currentState;
+      triggerDebouncedSave();
+    }
+  }, [store, mode, triggerDebouncedSave]);
+
+  // Periodic save
+  useEffect(() => {
+    if (mode !== 'setup') return;
+
+    periodicTimerRef.current = setInterval(() => {
+      performSave();
+    }, periodicMs);
 
     return () => {
-      if (saveTimerRef.current) {
-        clearInterval(saveTimerRef.current)
+      if (periodicTimerRef.current) {
+        clearInterval(periodicTimerRef.current);
       }
-    }
-  }, [data, interval, enabled, performSave])
+    };
+  }, [mode, periodicMs, performSave]);
 
-  // Cleanup on unmount
+  // beforeunload handler
   useEffect(() => {
-    isMountedRef.current = true
+    if (mode !== 'setup' || !enableBeforeUnload) return;
+
+    const handleBeforeUnload = () => {
+      // Save immediately before page close
+      const state = extractTeleprompterState(store);
+      try {
+        const draft = createDraft(state);
+        saveDraft(draft);
+      } catch (error) {
+        console.error('[useAutoSave] Failed to save on beforeunload:', error);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [store, mode, enableBeforeUnload]);
+
+  // Cleanup
+  useEffect(() => {
+    isMountedRef.current = true;
 
     return () => {
-      isMountedRef.current = false
+      isMountedRef.current = false;
       if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
+        clearTimeout(debounceTimerRef.current);
       }
-      if (saveTimerRef.current) {
-        clearInterval(saveTimerRef.current)
+      if (periodicTimerRef.current) {
+        clearInterval(periodicTimerRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   return {
     status,
     lastSavedAt,
-    error,
     saveNow,
-  }
+    cancelSave,
+    resetStatus,
+  };
 }
