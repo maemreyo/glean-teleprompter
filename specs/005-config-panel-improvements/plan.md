@@ -1,488 +1,414 @@
 # Implementation Plan: Configuration Panel UI/UX Improvements
 
-**Feature Branch**: `005-config-panel-improvements`  
-**Created**: 2026-01-01  
+**Branch**: `005-config-panel-improvements`  
+**Feature Spec**: [`spec.md`](spec.md)  
 **Status**: Draft  
-**Specification**: [spec.md](spec.md)
-
-## Overview
-
-This plan details the implementation of 6 user stories to improve the configuration panel UI/UX in the teleprompter editor. The stories are prioritized into three phases to deliver value incrementally.
-
-### Implementation Strategy
-
-- **Phase 1 (P1 - Critical)**: Core functionality that significantly impacts user workflow
-  - Config Panel Toggle with Smooth Animation
-  - Real-Time Configuration Preview
-
-- **Phase 2 (P2 - Important)**: Enhanced user experience and safety features
-  - Proportional UI Scaling with Textarea Expansion
-  - Configuration Undo/Redo
-
-- **Phase 3 (P3 - Enhancement)**: Specialized use cases and edge case refinements
-  - Mobile-Optimized Configuration Interface
-  - Adaptive Footer with Textarea Scaling
-
-## Phase 1: Critical Features (Weeks 1-2)
-
-### Story 1.1: Config Panel Toggle with Smooth Animation
-
-**User Story**: Content creators need to maximize workspace by toggling the config panel visibility
-
-**Acceptance Criteria**:
-- [ ] Toggle button in content panel header with Settings icon (44x44px min)
-- [ ] Panel slides in/out with 300ms ease-out animation
-- [ ] State persists via localStorage (key: 'configPanelVisible')
-- [ ] Keyboard shortcut: Ctrl/Cmd + ,
-- [ ] Defaults to hidden for first-time users
-- [ ] Content/preview panels expand when config hidden
-- [ ] Debounce mechanism for rapid toggles
-- [ ] ARIA labels for accessibility
-
-**Technical Implementation**:
-
-1. **State Management**:
-   - Add `configPanelVisible` to UI store (`stores/useUIStore.ts`)
-   - Initialize from localStorage on mount
-   - Persist to localStorage on state change
-
-2. **Toggle Button Component**:
-   - Create `ConfigToggleButton.tsx` in content panel header
-   - Use Settings icon from lucide-react
-   - Style: 44x44px min, positioned next to existing controls
-   - Add hover/focus states with proper contrast
-
-3. **Panel Animation**:
-   - Use Framer Motion for smooth transitions
-   - Animate width from 35% to 0 and vice versa
-   - Respect `prefers-reduced-motion` media query
-   - Implement debounce: 300ms lock after toggle start
-
-4. **Layout Adjustment**:
-   - Update `Editor.tsx` layout to handle panel visibility
-   - Content panel: 30% → 50% when config hidden
-   - Preview panel: 35% → 50% when config hidden
-   - Use flexbox with smooth width transitions
-
-5. **Keyboard Shortcut**:
-   - Add global keydown listener in `Editor.tsx`
-   - Listen for Ctrl/Cmd + ,
-   - Call toggle function from UI store
-   - Prevent default browser behavior
-
-**Files to Modify**:
-- `stores/useUIStore.ts` - Add panel visibility state
-- `components/teleprompter/Editor.tsx` - Layout adjustments, keyboard listener
-- `components/teleprompter/editor/ContentPanel.tsx` - Add toggle button
-- `components/teleprompter/config/ConfigPanel.tsx` - Add animation wrapper
-
-**Dependencies**: None (can start immediately)
-
-**Estimated Effort**: 3-4 days
+**Created**: 2026-01-01  
 
 ---
 
-### Story 1.2: Real-Time Configuration Preview
+## Technical Context
 
-**User Story**: Content creators need immediate visual feedback when making configuration changes
+### Existing Components
+- **ConfigPanel**: [`components/teleprompter/config/ConfigPanel.tsx`](../../components/teleprompter/config/ConfigPanel.tsx) - Always-visible 35% width panel with undo/redo buttons
+- **ConfigTabs**: [`components/teleprompter/config/ConfigTabs.tsx`](../../components/teleprompter/config/ConfigTabs.tsx) - Tab navigation with 7 tabs (Typography, Colors, Effects, Layout, Animations, Presets, Media)
+- **ContentPanel**: [`components/teleprompter/editor/ContentPanel.tsx`](../../components/teleprompter/editor/ContentPanel.tsx) - Left panel with textarea, auto-save, auth controls
+- **Editor**: [`components/teleprompter/Editor.tsx`](../../components/teleprompter/Editor.tsx) - Three-column layout (ContentPanel, ConfigPanel, PreviewPanel)
 
-**Acceptance Criteria**:
-- [ ] Preview updates within 100ms of config changes
-- [ ] Updates apply even when config panel hidden
-- [ ] Loading indicator for slow operations
-- [ ] Test button for entrance animations
-- [ ] Batch updates within 50ms window
-- [ ] Error state for invalid media URLs
+### State Management
+- **useConfigStore**: [`lib/stores/useConfigStore.ts`](../../lib/stores/useConfigStore.ts) - Zustand store for typography, colors, effects, layout, animations
+- **useUIStore**: `stores/useUIStore.ts` - UI preferences (needs review for panel visibility state)
+- **useTeleprompterStore**: `stores/useTeleprompterStore.ts` - Text content, mode switching
 
-**Technical Implementation**:
+### UI Framework
+- **Framer Motion**: Used for animations in existing codebase (can leverage for panel animations)
+- **Tailwind CSS**: Responsive utilities, breakpoints (sm: 640px, md: 768px, lg: 1024px)
+- **shadcn/ui**: Button, Dialog, Input components available
 
-1. **Preview Update Mechanism**:
-   - Subscribe to config store changes in `PreviewPanel.tsx`
-   - Use `useEffect` with config state dependencies
-   - Implement 100ms debounce for performance
+### Key Integrations
+- **localStorage**: Used for auto-save ([`__tests__/mocks/local-storage.mock.ts`](../../__tests__/mocks/local-storage.mock.ts))
+- **Next.js 14+**: App Router, React Server Components
+- **TypeScript 5.3+**: Strict mode enabled
+- **React 18.2+**: Component architecture
 
-2. **Loading States**:
-   - Add loading indicator component in preview
-   - Show when font files or media are loading
-   - Display "Updating..." message during long operations
-
-3. **Batch Updates**:
-   - Implement 50ms batching in config store
-   - Collect rapid changes and apply as single update
-   - Use requestAnimationFrame for smooth updates
-
-4. **Animation Testing**:
-   - Add "Test" button in AnimationsTab
-   - Trigger entrance animation on click
-   - Reset animation state after completion
-
-5. **Error Handling**:
-   - Validate media URLs before loading
-   - Show error state in preview for invalid URLs
-   - Display error message and fallback to previous state
-
-**Files to Modify**:
-- `components/teleprompter/editor/PreviewPanel.tsx` - Subscribe to config changes
-- `lib/stores/useConfigStore.ts` - Add batching mechanism
-- `components/teleprompter/config/animations/AnimationsTab.tsx` - Add Test button
-- `components/teleprompter/config/ui/LoadingIndicator.tsx` - New component
-
-**Dependencies**: None (can work in parallel with Story 1.1)
-
-**Estimated Effort**: 4-5 days
+### Technology Decisions Needed
+- **History Management**: How to integrate with Zustand store without major refactoring (NEEDS CLARIFICATION)
+- **Panel Animation**: Whether to use Framer Motion or CSS transitions for panel slide effect
+- **Real-time Preview Integration**: How to connect config changes to preview panel (store subscription pattern)
+- **Mobile Bottom Sheet**: Component choice - existing TabBottomSheet or new implementation
+- **Textarea Scaling Logic**: How to calculate and apply proportional scaling multipliers
 
 ---
 
-## Phase 2: Important Features (Weeks 3-4)
+## Constitution Check
 
-### Story 2.1: Proportional UI Scaling with Textarea Expansion
+### I. User Experience First
+✅ **PASS** - All 6 user stories focus on improving UX:
+- Config Panel Toggle gives users more workspace control
+- Real-Time Preview provides immediate visual feedback
+- Proportional UI Scaling ensures visual consistency
+- Undo/Redo enables confident exploration
+- Mobile optimization ensures accessibility
+- Adaptive Footer maintains usability at all sizes
 
-**User Story**: Content creators need UI elements to scale proportionally with textarea size
+### II. Performance & Reliability
+✅ **PASS** - Performance metrics defined:
+- 100ms update time for preview (SC-002)
+- 300ms panel animation (SC-019)
+- <5ms overhead for history management (SC-020)
+- 60 FPS maintained during rapid changes (SC-022)
+- Debouncing for batch updates (FR-013)
 
-**Acceptance Criteria**:
-- [ ] Buttons scale 1.2x (medium), 1.4x (large), 1.5x max (fullscreen)
-- [ ] No horizontal scroll at any size
-- [ ] Smooth 200ms transitions
-- [ ] Expand/collapse button remains centered
-- [ ] Label text caps at 16px
-- [ ] Proper spacing hierarchy maintained
+### III. Security & Privacy
+✅ **PASS** - No security/privacy concerns in feature scope:
+- All changes are client-side configuration
+- No new data collection
+- localStorage used for persistence (existing pattern)
 
-**Technical Implementation**:
+### IV. Code Quality & Testing
+⚠️ **NEEDS ATTENTION** - Testing strategy needs definition:
+- Unit tests for new components (Toggle button, History management)
+- Integration tests for panel state transitions
+- E2E tests for mobile bottom sheet interactions
+- Performance tests for real-time preview updates
 
-1. **Scaling System**:
-   - Define scale factors in UI store: default (1.0), medium (1.2), large (1.4), fullscreen (1.5)
-   - Create CSS custom properties for dynamic scaling
-   - Apply scaling to button components via data attributes
-
-2. **Button Component Updates**:
-   - Update all interactive buttons to use scaling
-   - Scale padding, margins, and icon sizes proportionally
-   - Ensure minimum 44x44px at all sizes
-
-3. **Layout Adjustments**:
-   - Update `ContentPanel.tsx` to use flex layouts
-   - Prevent overflow with `overflow-x: hidden`
-   - Add horizontal scroll detection and prevention
-
-4. **Expand Button Centering**:
-   - Calculate vertical position based on textarea height
-   - Use absolute positioning with transform
-   - Recalculate on textarea resize
-
-5. **Label Scaling**:
-   - Apply font-size scaling to labels
-   - Cap at 16px using CSS `clamp()`
-   - Ensure readability at all sizes
-
-**Files to Modify**:
-- `stores/useUIStore.ts` - Add scale factor state
-- `components/teleprompter/editor/ContentPanel.tsx` - Apply scaling
-- `components/teleprompter/editor/TextareaExpandButton.tsx` - Center positioning
-- `components/ui/button.tsx` - Add scaling support
-
-**Dependencies**: Story 1.1 (needs toggle button in place)
-
-**Estimated Effort**: 3-4 days
+### V. Technology Standards
+✅ **PASS** - Aligns with technology stack:
+- Next.js 14+ ✅
+- TypeScript strict mode ✅
+- Tailwind CSS ✅
+- Framer Motion (existing dependency) ✅
+- shadcn/ui components ✅
 
 ---
 
-### Story 2.2: Configuration Undo/Redo
+## Gate Evaluation
 
-**User Story**: Content creators need to undo and redo configuration changes safely
-
-**Acceptance Criteria**:
-- [ ] Hybrid recording: discrete immediate, continuous batched
-- [ ] 50-state history limit with FIFO
-- [ ] Keyboard shortcuts: Ctrl/Cmd + Z, Ctrl/Cmd + Shift + Z
-- [ ] Visual position indicator (e.g., "5/10 changes")
-- [ ] Reset on preset/template/script load
-- [ ] Clear History with confirmation
-
-**Technical Implementation**:
-
-1. **History Management**:
-   - Create `HistoryManager` class in `lib/config/history.ts`
-   - Implement stack with current position tracking
-   - Add FIFO removal when limit exceeded
-
-2. **Change Recording**:
-   - Middleware for config store to intercept changes
-   - Detect discrete vs continuous controls
-   - Batch continuous changes on mouse/touch release
-
-3. **Undo/Redo Actions**:
-   - Add `undo()` and `redo()` actions to config store
-   - Restore previous state from history
-   - Update current position pointer
-
-4. **UI Components**:
-   - Update undo/redo buttons in `ConfigPanel.tsx`
-   - Enable/disable based on history state
-   - Add position indicator display
-
-5. **Reset Triggers**:
-   - Listen for preset/template/script load events
-   - Clear history on these events
-   - Add confirmation dialog for Clear History
-
-**Files to Modify**:
-- `lib/config/history.ts` - New file for history management
-- `lib/stores/useConfigStore.ts` - Add history actions
-- `components/teleprompter/config/ConfigPanel.tsx` - Update UI
-- `components/ui/dialog.tsx` - Confirmation dialog
-
-**Dependencies**: Story 1.2 (needs real-time preview to work correctly)
-
-**Estimated Effort**: 5-6 days
+| Gate | Status | Notes |
+|------|--------|-------|
+| Technical Feasibility | ✅ PASS | All required components exist, patterns established |
+| Testing Strategy Required | ⚠️ | Define testing approach before Phase 1 |
+| No Breaking Changes | ⚠️ | Verify panel toggle doesn't disrupt existing Editor layout |
+| Performance Impact | ✅ PASS | Metrics defined; debouncing prevents performance issues |
+| Mobile Responsive | ✅ PASS | Tailwind breakpoints defined; bottom sheet approach proven |
 
 ---
 
-## Phase 3: Enhancement Features (Weeks 5-6)
+## Phase 0: Research & Design Decisions
 
-### Story 3.1: Mobile-Optimized Configuration Interface
+### Research Tasks
 
-**User Story**: Mobile users need full access to configuration options via mobile-friendly interface
+1. **Panel Animation Approach**
+   - Research: Compare Framer Motion vs CSS transitions for 300ms panel slide
+   - Decision needed: Which approach for smooth 60fps animation?
+   - Options: Framer Motion (existing dependency), CSS transitions (lighter), React Spring (not in stack)
 
-**Acceptance Criteria**:
-- [ ] Bottom sheet on mobile (< 768px)
-- [ ] 90% screen height when open
-- [ ] Horizontally scrollable tab pills
-- [ ] Touch-optimized sliders (48px min height)
-- [ ] Native color/font inputs
-- [ ] Swipe down to close (100px threshold)
-- [ ] Done button at top-right
-- [ ] Landscape split view
-- [ ] Compact layout on small screens (< 375px)
+2. **History Management Pattern**
+   - Research: Zustand history middleware patterns
+   - Decision needed: How to integrate undo/redo into useConfigStore?
+   - Options: Custom middleware, separate history store, patch middleware
 
-**Technical Implementation**:
+3. **Real-Time Preview Architecture**
+   - Research: Store subscription patterns for preview updates
+   - Decision needed: How to efficiently sync config changes to preview?
+   - Options: useConfigStore subscription, custom event emitter, React context
 
-1. **Bottom Sheet Component**:
-   - Create `MobileConfigSheet.tsx`
-   - Use existing `TabBottomSheet.tsx` as base
-   - Implement slide-up animation with 200ms duration
-   - Add drag handle at top
+4. **Mobile Bottom Sheet Component**
+   - Research: Existing TabBottomSheet capabilities vs new component
+   - Decision needed: Can existing component handle requirements?
+   - Options: Extend TabBottomSheet, create new MobileConfigPanel, use third-party library
 
-2. **Touch Optimization**:
-   - Update `SliderInput.tsx` for mobile
-   - Increase height to 48px on touch devices
-   - Add larger touch targets for all controls
+5. **Textarea Scaling Implementation**
+   - Research: CSS transform vs inline style calculations
+   - Decision needed: How to apply 1.2x/1.4x multipliers proportionally?
+   - Options: CSS custom properties (variables), Tailwind arbitrary values, style object computation
 
-3. **Native Inputs**:
-   - Detect mobile viewport
-   - Replace `ColorPicker` with `<input type="color">` on mobile
-   - Replace font dropdown with native select on mobile
+### Data Model Requirements
 
-4. **Gesture Handling**:
-   - Add touch event listeners for swipe detection
-   - Calculate drag distance
-   - Close sheet when threshold exceeded
-
-5. **Orientation Handling**:
-   - Detect device orientation changes
-   - Switch between bottom sheet (portrait) and split view (landscape)
-   - Update layout dynamically
-
-**Files to Modify**:
-- `components/teleprompter/config/TabBottomSheet.tsx` - Enhance for mobile config
-- `components/teleprompter/config/ui/SliderInput.tsx` - Touch optimization
-- `components/teleprompter/config/ui/ColorPicker.tsx` - Mobile detection
-- `components/teleprompter/config/typography/FontSelector.tsx` - Native select on mobile
-
-**Dependencies**: Story 1.1 (needs toggle button), Story 1.2 (needs real-time preview)
-
-**Estimated Effort**: 5-6 days
+From spec Key Entities, need to define:
+- **HistoryEntry structure**: How to store configuration snapshots efficiently
+- **HistoryStack interface**: FIFO queue behavior with 50-state limit
+- **PanelState interface**: Animation state management
+- **ConfigurationState type**: Extended from useConfigStore
 
 ---
 
-### Story 3.2: Adaptive Footer with Textarea Scaling
+## Phase 1: Design & Contracts
 
-**User Story**: Content creators need footer actions to remain accessible at all textarea sizes
+### Data Model Design
 
-**Acceptance Criteria**:
-- [ ] Footer scales proportionally with textarea
-- [ ] Caps at 120px maximum height
-- [ ] Fixed/sticky positioning at viewport bottom
-- [ ] Content padding equals footer height
-- [ ] Minimum 44x44px button size
-- [ ] Hidden in fullscreen mode
-- [ ] Semi-transparent backdrop
-- [ ] Reflows on mobile
+**Entities to Define**:
 
-**Technical Implementation**:
+1. **HistoryEntry**
+   ```typescript
+   interface HistoryEntry {
+     id: string
+     timestamp: number
+     config: ConfigurationState // full config snapshot
+     description?: string // optional change description
+   }
+   ```
 
-1. **Footer Scaling**:
-   - Calculate scale factor based on textarea size
-   - Apply to footer height and padding
-   - Cap at 120px using CSS `max-height`
+2. **HistoryStack**
+   ```typescript
+   interface HistoryStack {
+     entries: HistoryEntry[]
+     currentIndex: number // points to current state
+     maxSize: 50 // maximum entries
+   }
+   ```
 
-2. **Positioning**:
-   - Use `position: fixed` with `bottom: 0`
-   - Add `backdrop-filter: blur()` for semi-transparent effect
-   - Ensure footer stays on top of content with z-index
+3. **PanelState** (extend existing useUIStore)
+   ```typescript
+   interface PanelState {
+     isVisible: boolean
+     isAnimating: boolean
+     lastToggled: number
+   }
+   ```
 
-3. **Content Padding**:
-   - Calculate footer height dynamically
-   - Add bottom padding to content area
-   - Update on footer resize and textarea size change
+4. **TextareaScaleState** (extend existing useUIStore)
+   ```typescript
+   interface TextareaScaleState {
+     size: 'default' | 'medium' | 'large' | 'fullscreen'
+     scaleMultiplier: 1.0 | 1.2 | 1.4 | 1.5
+   }
+   ```
 
-4. **Fullscreen Handling**:
-   - Detect fullscreen mode in UI store
-   - Hide footer with CSS when fullscreen active
-   - Show footer when exiting fullscreen
+### Contracts (Internal APIs)
 
-5. **Mobile Reflow**:
-   - Use flexbox with `flex-wrap` for buttons
-   - Ensure minimum touch targets on mobile
-   - Test with various viewport widths
+**Config Store Extensions**:
+```typescript
+// History Management
+interface ConfigStoreHistory {
+  history: HistoryStack
+  undo(): void
+  redo(): void
+  canUndo(): boolean
+  canRedo(): boolean
+  clearHistory(): void
+  recordChange(change: Partial<ConfigurationState>): void
+}
 
-**Files to Modify**:
-- `components/teleprompter/editor/ContentPanel.tsx` - Footer implementation
-- `stores/useUIStore.ts` - Footer state management
-- `components/teleprompter/editor/TextareaExpandButton.tsx` - Fullscreen detection
+// Panel Visibility
+interface ConfigStorePanel {
+  panelVisible: boolean
+  togglePanel(): void
+}
+```
 
-**Dependencies**: Story 2.1 (needs proportional scaling to work correctly)
-
-**Estimated Effort**: 2-3 days
+**UI Store Extensions**:
+```typescript
+interface UIStoreExtensions {
+  panelState: PanelState
+  textareaScale: TextareaScaleState
+  setPanelVisible(visible: boolean): void
+  setTextareaScale(size: TextareaSize): void
+}
+```
 
 ---
 
-## Testing Strategy
+## Implementation Phases
 
-### Unit Tests
+### Phase 1A: Config Panel Toggle (P1)
+**Duration**: 2-3 days
 
-1. **Config Panel Toggle**:
-   - Test toggle button rendering and state
-   - Test localStorage persistence
-   - Test keyboard shortcut handler
-   - Test debounce mechanism
+**Tasks**:
+1. Add panel visibility state to useUIStore
+2. Create toggle button component (Settings icon) in ContentPanel header
+3. Implement panel slide animation with Framer Motion
+4. Add localStorage persistence (key: 'configPanelVisible')
+5. Add keyboard shortcut (Ctrl/Cmd + ,)
+6. Ensure responsive behavior (hidden by default on mobile/tablet)
+7. Add ARIA labels and screen reader announcements
 
-2. **Real-Time Preview**:
-   - Test config store subscription
-   - Test 100ms update timing
-   - Test batching mechanism
-   - Test loading states
+**Files to Modify**:
+- [`stores/useUIStore.ts`](stores/useUIStore.ts)
+- [`components/teleprompter/editor/ContentPanel.tsx`](components/teleprompter/editor/ContentPanel.tsx)
+- [`components/teleprompter/ConfigPanel.tsx`](components/teleprompter/config/ConfigPanel.tsx)
+- [`components/teleprompter/Editor.tsx`](components/teleprompter/Editor.tsx)
 
-3. **Proportional Scaling**:
-   - Test scale factor calculations
-   - Test button scaling at each size
-   - Test horizontal scroll prevention
-   - Test label capping at 16px
+**Testing**:
+- Unit test: toggle button click updates state
+- Unit test: localStorage persistence across reloads
+- Unit test: keyboard shortcut functionality
+- Integration test: panel animation smoothness
+- Accessibility test: ARIA labels and announcements
 
-4. **Undo/Redo**:
-   - Test history stack operations
-   - Test FIFO removal at limit
-   - Test hybrid recording strategy
-   - Test reset triggers
+### Phase 1B: Real-Time Preview (P1)
+**Duration**: 3-4 days
 
-5. **Mobile Interface**:
-   - Test bottom sheet rendering
-   - Test gesture handling
-   - Test orientation changes
-   - Test native input fallbacks
+**Tasks**:
+1. Ensure PreviewPanel subscribes to useConfigStore
+2. Add loading state indicators to PreviewPanel
+3. Implement batch update debouncing (50ms window)
+4. Add error state handling for invalid media URLs
+5. Create "Test" button for entrance animations
+6. Optimize for 100ms update target
+7. Add performance monitoring
 
-6. **Adaptive Footer**:
-   - Test footer scaling calculations
-   - Test fixed positioning
-   - Test content padding adjustments
-   - Test fullscreen hiding
+**Files to Modify**:
+- [`components/teleprompter/editor/PreviewPanel.tsx`](components/teleprompter/editor/PreviewPanel.tsx)
+- [`lib/stores/useConfigStore.ts`](lib/stores/useConfigStore.ts)
+- [`components/teleprompter/config/animations/AnimationsTab.tsx`](components/teleprompter/config/animations/AnimationsTab.tsx)
 
-### Integration Tests
+**Testing**:
+- Integration test: Preview updates within 100ms
+- Performance test: 60 FPS maintained during rapid changes
+- Unit test: Loading states display correctly
+- Unit test: Error states display for invalid URLs
 
-1. **Panel Toggle + Preview**:
-   - Test that preview updates when panel is hidden
-   - Test that layout adjusts correctly
-   - Test state persistence across page reloads
+### Phase 2A: Proportional UI Scaling (P2)
+**Duration**: 2-3 days
 
-2. **Scaling + Footer**:
-   - Test that footer scales with textarea
-   - Test that content padding prevents overlap
-   - Test that buttons remain accessible
+**Tasks**:
+1. Define scale multipliers (1.2x, 1.4x, 1.5x) in useUIStore
+2. Update TextareaExpandButton to scale with textarea
+3. Update footer action buttons to scale proportionally
+4. Ensure no horizontal scroll at any size
+5. Implement 200ms size transition
+6. Add cap for label text (16px max)
+7. Test on minimum viewport width (375px)
 
-3. **Undo/Redo + All Features**:
-   - Test that undo works for all config changes
-   - Test that history resets appropriately
-   - Test that keyboard shortcuts work globally
+**Files to Modify**:
+- [`stores/useUIStore.ts`](stores/useUIStore.ts)
+- [`components/teleprompter/editor/TextareaExpandButton.tsx`](components/teleprompter/editor/TextareaExpandButton.tsx)
+- [`components/teleprompter/editor/ContentPanel.tsx`](components/teleprompter/editor/ContentPanel.tsx)
 
-### End-to-End Tests
+**Testing**:
+- Visual regression test: Button scaling at each size level
+- Unit test: Scale multipliers calculated correctly
+- Integration test: No horizontal scroll appears
+- Responsive test: Layout intact at 375px width
 
-1. **User Workflow Tests**:
-   - Complete configuration workflow with panel toggle
-   - Real-time preview verification
-   - Undo/redo after multiple changes
-   - Mobile configuration workflow
+### Phase 2B: Configuration Undo/Redo (P2)
+**Duration**: 4-5 days
 
-2. **Accessibility Tests**:
-   - Screen reader navigation
-   - Keyboard navigation
-   - prefers-reduced-motion compliance
-   - ARIA label verification
+**Tasks**:
+1. Implement HistoryStack data structure
+2. Create history management middleware for useConfigStore
+3. Add hybrid recording logic (discrete=immediate, continuous=batched)
+4. Implement undo/redo keyboard shortcuts
+5. Add visual indicator ("5/10 changes")
+6. Create "Clear History" dialog
+7. Reset history on preset/template/script load
+8. Implement localStorage persistence for history
 
-3. **Performance Tests**:
-   - Animation frame rate (60 FPS)
-   - Config change update timing (< 100ms)
-   - History overhead (< 5ms per change)
-   - Mobile panel open time (< 200ms)
+**Files to Modify**:
+- [`lib/stores/useConfigStore.ts`](lib/stores/useConfigStore.ts)
+- [`components/teleprompter/config/ConfigPanel.tsx`](components/teleprompter/config/ConfigPanel.tsx)
+- [`components/ui/dialog.tsx`](components/ui/dialog.tsx) - for clear history confirmation
 
-## Deployment Plan
+**Testing**:
+- Unit test: History stack maintains 50-state limit
+- Unit test: FIFO removal when limit exceeded
+- Integration test: Undo/redo restores correct states
+- Unit test: Keyboard shortcuts work correctly
+- Integration test: History resets on preset/template load
 
-### Phase 1 Deployment (Week 2)
-- Deploy Config Panel Toggle
-- Deploy Real-Time Preview
-- Monitor for: layout issues, animation performance, localStorage errors
+### Phase 3A: Mobile Config Interface (P3)
+**Duration**: 5-6 days
 
-### Phase 2 Deployment (Week 4)
-- Deploy Proportional UI Scaling
-- Deploy Configuration Undo/Redo
-- Monitor for: scaling issues, history performance, keyboard conflicts
+**Tasks**:
+1. Extend/modify TabBottomSheet for mobile config
+2. Implement bottom sheet with 90% height
+3. Add tab pills as horizontally scrollable
+4. Touch-optimize all sliders (48px minimum)
+5. Create mobile-specific color picker wrapper (native input)
+6. Create mobile font picker (native select/modal)
+7. Implement swipe-to-close gesture (100px threshold)
+8. Add "Done" button
+9. Implement landscape split view
+10. Add compact layout for < 375px devices
 
-### Phase 3 Deployment (Week 6)
-- Deploy Mobile Configuration Interface
-- Deploy Adaptive Footer
-- Monitor for: mobile layout issues, gesture conflicts, footer positioning
+**Files to Modify**:
+- [`components/teleprompter/config/TabBottomSheet.tsx`](components/teleprompter/config/TabBottomSheet.tsx)
+- [`components/teleprompter/config/ui/SliderInput.tsx`](components/teleprompter/config/ui/SliderInput.tsx)
+- [`components/teleprompter/config/colors/ColorsTab.tsx`](components/teleprompter/config/colors/ColorsTab.tsx)
+- [`components/teleprompter/config/typography/FontSelector.tsx`](components/teleprompter/config/typography/FontSelector.tsx)
+- [`components/teleprompter/config/ConfigTabs.tsx`](components/teleprompter/config/ConfigTabs.tsx)
 
-## Risk Mitigation
+**Testing**:
+- Mobile integration test: Bottom sheet opens correctly
+- Touch test: Sliders meet 48px touch target
+- Gesture test: Swipe-to-close works at 100px threshold
+- Responsive test: Landscape split view activates
+- Accessibility test: "Done" button and gestures accessible
 
-### High-Risk Areas
+### Phase 3B: Adaptive Footer (P3)
+**Duration**: 2-3 days
 
-1. **Animation Performance**:
-   - Risk: Animations may stutter on low-end devices
-   - Mitigation: Implement prefers-reduced-motion detection, use CSS transforms (GPU-accelerated)
+**Tasks**:
+1. Calculate footer scale multiplier based on textarea size
+2. Implement fixed/sticky positioning at viewport bottom
+3. Add bottom padding to content equal to footer height
+4. Ensure 44x44px minimum touch targets for all buttons
+5. Hide footer in fullscreen mode
+6. Add semi-transparent backdrop (bg-card/90)
+7. Implement reflow for mobile (wrap if needed)
 
-2. **History Management**:
-   - Risk: Large config objects may cause memory issues
-   - Mitigation: Use 50-state limit, implement efficient serialization
+**Files to Modify**:
+- [`stores/useUIStore.ts`](stores/useUIStore.ts)
+- [`components/teleprompter/editor/ContentPanel.tsx`](components/teleprompter/editor/ContentPanel.tsx)
 
-3. **Mobile Gestures**:
-   - Risk: Gesture conflicts with native browser actions
-   - Mitigation: Test on multiple devices, provide fallback controls
+**Testing**:
+- Integration test: Footer remains fixed at bottom
+- Visual test: No content hidden behind footer
+- Responsive test: Touch targets maintained
+- Mobile test: Footer reflow works on small screens
 
-4. **Cross-Browser Compatibility**:
-   - Risk: CSS grid/flexbox inconsistencies
-   - Mitigation: Use Tailwind utilities, test on major browsers
+---
 
-## Success Metrics
+## Dependencies & Risks
 
-### Phase 1 Success Criteria
-- [ ] 95% of users successfully toggle panel on first attempt
-- [ ] Config changes appear in preview within 100ms (95th percentile)
-- [ ] No animation frame drops on target devices (60 FPS)
+### Dependencies
+- **Framer Motion** - Required for panel animations (existing dependency)
+- **Zustand** - Required for state management (existing dependency)
+- **Tailwind CSS** - Required for responsive utilities (existing dependency)
 
-### Phase 2 Success Criteria
-- [ ] 80% of users report increased confidence with undo/redo
-- [ ] No horizontal scrolling at any textarea size
-- [ ] History overhead < 5ms per change
+### Risks
+- **Breaking Changes**: Panel toggle could disrupt Editor layout - **Mitigation**: Test thoroughly on all viewport sizes
+- **Performance Overhead**: History management adds <5ms per change - **Mitigation**: Batch updates, limit to 50 states
+- **Mobile Complexity**: Bottom sheet implementation may require custom component - **Mitigation**: Leverage existing TabBottomSheet patterns
+- **Browser Support**: prefers-reduced-motion must be respected - **Mitigation**: Test with accessibility tools
 
-### Phase 3 Success Criteria
-- [ ] 75% of mobile users report configuration is "accessible"
-- [ ] Footer remains visible at all textarea sizes
-- [ ] Mobile config panel opens in < 200ms (90th percentile)
+---
 
-## Rollback Plan
+## Success Metrics Tracking
 
-Each phase is independently deployable and can be rolled back if critical issues are discovered:
+### Quantitative Metrics
+- Panel toggle animation: 300ms ±50ms
+- Preview update latency: <100ms for 95% of changes
+- History overhead: <5ms per change
+- Mobile panel open time: <200ms on 90% of devices
+- No horizontal scroll at any textarea size
 
-- **Phase 1 Rollback**: Remove toggle button, revert layout changes
-- **Phase 2 Rollback**: Remove scaling, disable history
-- **Phase 3 Rollback**: Remove mobile bottom sheet, revert footer positioning
+### Qualitative Metrics
+- User satisfaction: 85% improved workspace satisfaction (survey)
+- Confidence in exploration: 80% increased confidence due to undo/redo
+- Mobile usability: 75% report "accessible" or "easy to use"
+- Polished feel: 90% report "professional" with proportional scaling
 
-Feature flags will be implemented to allow quick disabling of individual features without code deployment.
+### Testing Coverage Goals
+- Unit tests: 80% coverage for new components
+- Integration tests: All user scenarios covered
+- E2E tests: Critical paths (toggle, preview, undo/redo)
+- Accessibility: WCAG 2.1 AA compliance for all new features
+- Performance: 60 FPS maintained during rapid interactions
+
+---
+
+## Next Steps
+
+1. **Phase 0**: Complete research tasks above and document in `research.md`
+2. **Phase 1A**: Begin Config Panel Toggle implementation (highest priority)
+3. **Phase 1B**: Implement Real-Time Preview alongside toggle
+4. **Phase 2**: Implement P2 features (Scaling, Undo/Redo)
+5. **Phase 3**: Implement P3 features (Mobile, Footer)
+6. **Final Testing**: Comprehensive test suite and performance validation
+7. **Documentation**: Update README and user guides
+
+**Current Phase**: Research & Design Decisions (Phase 0)
+
+**Ready for Phase 1**: After research.md is complete with all decisions documented
