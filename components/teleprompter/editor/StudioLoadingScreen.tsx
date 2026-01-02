@@ -41,7 +41,7 @@ export function StudioLoadingScreen() {
 
       {/* Three-panel layout matching Editor.tsx */}
       <div className="flex h-full">
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           {/* Content Panel Skeleton */}
           <motion.div
             key="content-skeleton"
