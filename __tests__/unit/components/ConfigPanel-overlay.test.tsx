@@ -68,7 +68,7 @@ describe('ConfigPanel - Overlay Behavior (US2)', () => {
     })
   })
 
-  describe('Dialog wrapper', () => () => {
+  describe('Dialog wrapper', () => {
     it('should render Dialog.Root with open state from panel.visible', () => {
       render(<ConfigPanel />)
       

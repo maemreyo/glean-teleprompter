@@ -201,10 +201,10 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
     </div>
   ), [errorMessage]);
   
-  // Desktop: Always visible, right-side panel (35% width)
+  // T032: [US2] Desktop: Always visible, right-side panel (50% width for two-column layout)
   if (isDesktop) {
     return (
-      <div className={`w-[35%] relative bg-black overflow-hidden ${className}`}>
+      <div className={`w-[50%] relative bg-black overflow-hidden ${className}`}>
         {/* T033: [US2] Loading overlay */}
         {isLoading && LoadingOverlay}
         

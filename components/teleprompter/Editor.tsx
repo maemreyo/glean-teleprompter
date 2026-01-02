@@ -48,46 +48,46 @@ export function Editor() {
   // T079: Tab config for mobile config panel
   const tabs = getTabConfig(t);
 
-  // T025: Sync panel visibility with screen size
-  // Panel should only be visible on desktop (1024px+)
-  const shouldShowPanel = isDesktop && panelState.visible;
-  
   // T079: Handle tab selection on mobile
   const handleTabSelect = (tabId: TabId) => {
     setActiveTab(tabId);
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={prefersReducedMotion ? { duration: 0 } : undefined}
-      className="h-screen flex flex-col lg:flex-row overflow-hidden"
-    >
-      {/* Content Panel - Text editing and quick actions */}
-      <ContentPanel onOpenMobileConfig={() => setMobileConfigOpen(true)} />
-      
-      {/* T021: Config Panel wrapped with AnimatePresence for exit animations */}
-      {/* T025: Only show on desktop screens (1024px+) */}
-      <AnimatePresence mode="wait">
-        {shouldShowPanel && <ConfigPanel key="config-panel" />}
-      </AnimatePresence>
-      
-      {/* Preview Panel - Live preview */}
-      <PreviewPanel />
-      
-      {/* T079: Mobile Config Panel - Bottom sheet on mobile only */}
-      {isMobile && (
-        <MobileConfigPanel
-          isOpen={mobileConfigOpen}
-          onClose={() => setMobileConfigOpen(false)}
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabSelect={handleTabSelect}
-          t={t}
-        />
-      )}
-    </motion.div>
+    <>
+      {/* T030: [US2] Remove AnimatePresence wrapper around ConfigPanel */}
+      {/* T031-T032: [US2] Update ContentPanel and PreviewPanel to lg:w-[50%] each */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, y: -50 }}
+        transition={prefersReducedMotion ? { duration: 0 } : undefined}
+        className="h-screen flex flex-col lg:flex-row overflow-hidden"
+      >
+        {/* Content Panel - Text editing and quick actions */}
+        {/* T031: [US2] lg:w-[50%] for two-column layout - handled in ContentPanel component */}
+        <ContentPanel onOpenMobileConfig={() => setMobileConfigOpen(true)} />
+        
+        {/* Preview Panel - Live preview */}
+        {/* T032: [US2] lg:w-[50%] for two-column layout - handled in PreviewPanel component */}
+        <PreviewPanel />
+        
+        {/* T079: Mobile Config Panel - Bottom sheet on mobile only */}
+        {isMobile && (
+          <MobileConfigPanel
+            isOpen={mobileConfigOpen}
+            onClose={() => setMobileConfigOpen(false)}
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabSelect={handleTabSelect}
+            t={t}
+          />
+        )}
+      </motion.div>
+
+      {/* T033: [US2] Remove conditional rendering - ConfigPanel always renders as Dialog */}
+      {/* T022-T033: [US2] ConfigPanel renders as Dialog overlay, not part of flex layout */}
+      <ConfigPanel />
+    </>
   );
 }

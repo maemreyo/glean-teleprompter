@@ -47,9 +47,10 @@ type ContentStore = ContentStoreState & ContentStoreActions
 const DEFAULT_TEXT = 'Chào mừng! Hãy nhập nội dung của bạn vào đây...'
 const DEFAULT_BG = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'
 
+// Create the store with proper typing
 export const useContentStore = create<ContentStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // Initial state
       text: DEFAULT_TEXT,
       bgUrl: DEFAULT_BG,
@@ -57,15 +58,15 @@ export const useContentStore = create<ContentStore>()(
       isReadOnly: false,
 
       // Actions
-      setText: (text) => set({ text }),
+      setText: (text: string) => set({ text }),
 
-      setBgUrl: (bgUrl) => set({ bgUrl }),
+      setBgUrl: (bgUrl: string) => set({ bgUrl }),
 
-      setMusicUrl: (musicUrl) => set({ musicUrl }),
+      setMusicUrl: (musicUrl: string) => set({ musicUrl }),
 
-      setIsReadOnly: (isReadOnly) => set({ isReadOnly }),
+      setIsReadOnly: (isReadOnly: boolean) => set({ isReadOnly }),
 
-      setAll: (newState) => set((state) => ({
+      setAll: (newState: Partial<ContentStoreState>) => set((state) => ({
         ...state,
         ...newState
       })),

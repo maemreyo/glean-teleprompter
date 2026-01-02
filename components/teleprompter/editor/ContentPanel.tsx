@@ -16,6 +16,7 @@ import { useDemoStore } from '@/stores/useDemoStore';
 import { useUIStore } from '@/stores/useUIStore';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import type { StoreApi } from 'zustand';
 import { AutoSaveStatus } from '@/components/teleprompter/config/ui/AutoSaveStatus';
 import { TextareaExpandButton } from '@/components/teleprompter/editor/TextareaExpandButton';
 import type { TextareaSize } from '@/components/teleprompter/editor/TextareaExpandButton';
@@ -126,17 +127,14 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
   };
 
   // Auto-save hook for local draft persistence
-  const { status: autoSaveStatus, lastSavedAt, error: autoSaveError, saveNow } = useAutoSave(
+  // Note: useAutoSave expects a Zustand StoreApi instance
+  // We pass the store instance directly, not the hook
+  const { status: autoSaveStatus = 'idle', lastSavedAt, saveNow } = useAutoSave(
+    useContentStore,
     {
-      // 007-unified-state-architecture: Use contentStore for content data
-      text: contentStore.text,
-      bgUrl: contentStore.bgUrl,
-      musicUrl: contentStore.musicUrl,
-    },
-    {
-      storageKey: 'teleprompter_draft',
-      interval: 5000,
-      enabled: true,
+      mode: mode ?? 'setup',
+      debounceMs: 1000,
+      periodicMs: 5000,
     }
   );
   
@@ -229,7 +227,7 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
   
   return (
     <div
-      className={`w-full lg:w-[30%] bg-card border-r border-border flex flex-col shadow-2xl relative transition-all duration-200 ${textareaPrefs.size === 'fullscreen' ? 'fixed inset-0 z-50 w-full h-screen' : 'z-20 h-full'}`}
+      className={`w-full lg:w-[50%] bg-card border-r border-border flex flex-col shadow-2xl relative transition-all duration-200 ${textareaPrefs.size === 'fullscreen' ? 'fixed inset-0 z-50 w-full h-screen' : 'z-20 h-full'}`}
       style={scaleStyles}
     >
       {/* T048: Ensure no horizontal scroll - overflow-x hidden on content container */}
@@ -265,7 +263,6 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
           <AutoSaveStatus
             status={autoSaveStatus}
             lastSavedAt={lastSavedAt ?? undefined}
-            errorMessage={autoSaveError ?? undefined}
             onRetry={saveNow}
           />
           

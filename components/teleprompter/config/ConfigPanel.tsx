@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { RotateCcw, RotateCw, Trash2 } from 'lucide-react'
+import { RotateCcw, RotateCw, Trash2, X } from 'lucide-react'
 import { motion, useReducedMotion, type Variants } from 'framer-motion'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
 import { useUIStore } from '@/stores/useUIStore'
@@ -9,6 +9,7 @@ import { ConfigTabs } from './ConfigTabs'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -17,17 +18,21 @@ import {
 } from '@/components/ui/dialog'
 
 /**
- * ConfigPanel - Always-visible configuration panel
- * 
+ * ConfigPanel - Floating configuration panel overlay (US2)
+ *
+ * T022-T033: [US2] Converted to Radix UI Dialog overlay
  * T058-T063: [US4] Enhanced with undo/redo functionality, visual indicator, and clear history dialog
- * 
- * Redesigned from overlay to inline panel that's always visible on desktop.
- * Contains all styling controls organized into tabs.
+ *
+ * Redesigned as a floating overlay that:
+ * - Doesn't cause layout shift (fixed positioning)
+ * - Has backdrop with blur effect
+ * - Can be dismissed via Escape, click outside, or close button
+ * - Only visible on desktop (1024px+)
  */
 export function ConfigPanel() {
   // T058, T063: Use new history methods from store
   const { canUndoHistory, canRedoHistory, performUndo, performRedo, clearHistory, historyStack, currentHistoryIndex } = useConfigStore()
-  const { panelState } = useUIStore()
+  const { panelState, setPanelVisible } = useUIStore()
   
   // T060: State for clear history dialog
   const [showClearHistoryDialog, setShowClearHistoryDialog] = useState(false)
@@ -35,34 +40,6 @@ export function ConfigPanel() {
   // T027: Respect prefers-reduced-motion
   const prefersReducedMotion = useReducedMotion()
   
-  // T020: Animation variants for slide-in/slide-out
-  const panelVariants: Variants = useMemo(() => {
-    if (prefersReducedMotion) {
-      return {
-        visible: { opacity: 1, x: 0 },
-        hidden: { opacity: 0, x: 0 },
-      }
-    }
-    return {
-      visible: {
-        opacity: 1,
-        x: 0,
-        transition: {
-          duration: 0.3,
-          ease: [0.4, 0, 0.2, 1] as const,
-        }
-      },
-      hidden: {
-        opacity: 0,
-        x: '100%',
-        transition: {
-          duration: 0.3,
-          ease: [0.4, 0, 0.2, 1] as const,
-        }
-      },
-    }
-  }, [prefersReducedMotion])
-
   // T058: Keyboard shortcuts for undo/redo (Ctrl/Cmd + Z, Ctrl/Cmd + Shift + Z)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -104,75 +81,133 @@ export function ConfigPanel() {
   const canUndo = canUndoHistory()
   const canRedo = canRedoHistory()
   
-  // T020: Apply motion wrapper with slide animation
+  // T028: Fade + scale animation variants (300ms duration)
+  const contentVariants: Variants = useMemo(() => {
+    if (prefersReducedMotion) {
+      return {
+        visible: { opacity: 1, scale: 1 },
+        hidden: { opacity: 0, scale: 1 },
+      }
+    }
+    return {
+      visible: {
+        opacity: 1,
+        scale: 1,
+        transition: {
+          duration: 0.3,
+          ease: [0.4, 0, 0.2, 1] as const,
+        }
+      },
+      hidden: {
+        opacity: 0,
+        scale: 0.95,
+        transition: {
+          duration: 0.3,
+          ease: [0.4, 0, 0.2, 1] as const,
+        }
+      },
+    }
+  }, [prefersReducedMotion])
+  
+  // T023: Wrap ConfigPanel with Dialog.Root using panel.visible state
   return (
     <>
-      <motion.div
-        className="w-full lg:w-[35%] bg-card border-r border-border flex flex-col h-full"
-        initial="visible"
-        animate={panelState.visible ? "visible" : "hidden"}
-        variants={panelVariants}
-        // T027: Disable layout shift when reduced motion is preferred
-        style={{
-          display: panelState.visible || !prefersReducedMotion ? 'flex' : 'none',
-        }}
+      {/* T022-T033: [US2] Radix UI Dialog overlay implementation */}
+      <Dialog
+        open={panelState.visible}
+        onOpenChange={(open) => setPanelVisible(open, false)}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-lg font-semibold text-foreground">
-            Configuration
-          </h2>
-          <div className="flex items-center gap-2">
-            {/* T063: Undo button - disabled when at beginning of history */}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={performUndo}
-              disabled={!canUndo}
-              className="h-8 w-8 p-0"
-              aria-label="Undo"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </Button>
-            {/* T063: Redo button - disabled when at end of history */}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={performRedo}
-              disabled={!canRedo}
-              className="h-8 w-8 p-0"
-              aria-label="Redo"
-            >
-              <RotateCw className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-        
-        {/* T059: History indicator bar */}
-        {(historyInfo.total > 0) && (
-          <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
-            <span className="text-xs text-muted-foreground">
-              {historyInfo.current}/{historyInfo.total} changes
-            </span>
-            {/* T060: Clear history button */}
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setShowClearHistoryDialog(true)}
-              className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
-              aria-label="Clear history"
-            >
-              <Trash2 className="w-3 h-3 mr-1" />
-              Clear
-            </Button>
-          </div>
-        )}
-        
-        {/* Tabs */}
-        <div className="flex-1 overflow-hidden">
-          <ConfigTabs />
-        </div>
-      </motion.div>
+        {/* T025: Fixed positioning with centered layout */}
+        {/* T026: Panel width constraints: w-[400px] max-w-[90vw] h-[80vh] */}
+        {/* T029: Close button - hide built-in to use custom one in header */}
+        <DialogContent
+          className="w-[400px] max-w-[90vw] h-[80vh] max-h-[80vh] flex flex-col p-0 gap-0"
+          aria-label="Configuration panel"
+          aria-describedby="config-panel-description"
+          showCloseButton={false}
+        >
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={contentVariants}
+            className="flex flex-col h-full"
+          >
+            {/* T029: Close button (X) to panel header */}
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-foreground">
+                  Configuration
+                </h2>
+                <span id="config-panel-description" className="sr-only">
+                  Configure teleprompter settings including typography, colors, effects, layout, and animations
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {/* T063: Undo button - disabled when at beginning of history */}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={performUndo}
+                  disabled={!canUndo}
+                  className="h-8 w-8 p-0"
+                  aria-label="Undo last change"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </Button>
+                {/* T063: Redo button - disabled when at end of history */}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={performRedo}
+                  disabled={!canRedo}
+                  className="h-8 w-8 p-0"
+                  aria-label="Redo last change"
+                >
+                  <RotateCw className="w-4 h-4" />
+                </Button>
+                {/* T037: Close button with aria-label */}
+                <DialogClose asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0"
+                    aria-label="Close configuration panel"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </DialogClose>
+              </div>
+            </div>
+            
+            {/* T059: History indicator bar */}
+            {(historyInfo.total > 0) && (
+              <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
+                <span className="text-xs text-muted-foreground">
+                  {historyInfo.current}/{historyInfo.total} changes
+                </span>
+                {/* T060: Clear history button */}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowClearHistoryDialog(true)}
+                  className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+                  aria-label="Clear history"
+                >
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Clear
+                </Button>
+              </div>
+            )}
+            
+            {/* Tabs */}
+            <div className="flex-1 overflow-hidden">
+              <ConfigTabs />
+            </div>
+          </motion.div>
+        </DialogContent>
+      </Dialog>
 
       {/* T060: Clear History Confirmation Dialog */}
       <Dialog open={showClearHistoryDialog} onOpenChange={setShowClearHistoryDialog}>
