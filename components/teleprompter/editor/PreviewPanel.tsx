@@ -217,7 +217,7 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
         {hasError && ErrorOverlay}
         
         {/* Background Image Layer */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center opacity-70 transition-opacity duration-300"
           style={backgroundStyle}
           onError={handleMediaError}

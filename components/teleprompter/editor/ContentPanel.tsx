@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect, useMemo } from 'react';
-import { Play, Save, Share2, LogOut, Crown, Eye, EyeOff, ChevronUp, ChevronDown, Settings } from 'lucide-react';
+import { Play, Save, Share2, LogOut, Crown, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 // 007-unified-state-architecture: Use useContentStore for content data
 import { useContentStore } from '@/lib/stores/useContentStore';
@@ -16,28 +16,30 @@ import { useDemoStore } from '@/stores/useDemoStore';
 import { useUIStore } from '@/stores/useUIStore';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useAutoSave } from '@/hooks/useAutoSave';
-import type { StoreApi } from 'zustand';
 import { AutoSaveStatus } from '@/components/teleprompter/config/ui/AutoSaveStatus';
-import { TextareaExpandButton } from '@/components/teleprompter/editor/TextareaExpandButton';
-import type { TextareaSize } from '@/components/teleprompter/editor/TextareaExpandButton';
+import { ContentEditorDialog, ContentEditorDialogTrigger } from '@/components/teleprompter/editor/ContentEditorDialog';
 import { ConfigPanel } from '@/components/teleprompter/config/ConfigPanel';
 
 interface ContentPanelProps {
-  /** T079: Callback to open mobile config panel */
-  onOpenMobileConfig?: () => void
+  // Props for React.memo comparison
+  className?: string;
 }
 
 /**
  * ContentPanel - The content editing section of the Editor
  *
+ * Redesigned with 20/80 vertical split:
+ * - Textarea area: 20% height (fixed, not scrollable)
+ * - Config area: 80% height (scrollable)
+ *
  * Contains:
  * - Header with title, auth, and theme switcher
- * - Text area for script content
+ * - Text area for script content (20% height)
+ * - Config panel below (80% height, scrollable)
  * - Quick action buttons (Preview, Save, Share)
- * - Mobile/Tablet preview toggle button
- * - T079: Mobile config toggle button
+ * - "View Detail" button to open ContentEditorDialog
  */
-export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
+export function ContentPanel({ className = '' }: ContentPanelProps) {
   const t = useTranslations('Editor');
   const router = useRouter();
   // 007-unified-state-architecture: Use useContentStore for content data
@@ -46,43 +48,17 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
   const { isDemoMode } = useDemoStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
   const { typography, colors, effects, layout, animations } = useConfigStore();
-  const { previewState, togglePreview, footerState, toggleFooter, textareaPrefs, setTextareaPrefs, toggleTextareaSize, mode } = useUIStore();
+  const { previewState, togglePreview, footerState, toggleFooter, mode } = useUIStore();
   const isMobileOrTablet = useMediaQuery('(max-width: 1023px)');
   const isVerySmallScreen = useMediaQuery('(max-width: 375px)');
+  
+  // Content editor dialog state
+  const [contentEditorOpen, setContentEditorOpen] = useState(false);
   
   // Ref for textarea element
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
-  // Track previous size for Esc key to exit fullscreen (T054)
-  const [previousSize, setPreviousSize] = useState<TextareaSize>('default');
-  
-  // Track the last non-fullscreen size
-  useEffect(() => {
-    if (textareaPrefs.size !== 'fullscreen') {
-      // Update previousSize whenever we're not in fullscreen
-      // This ensures we remember the size before entering fullscreen
-      setPreviousSize(textareaPrefs.size as TextareaSize);
-    }
-    // When in fullscreen, we don't update - previousSize retains the last non-fullscreen size
-  }, [textareaPrefs.size]);
-  
-  // Get height class based on current size
-  const getHeightClass = (): string => {
-    switch (textareaPrefs.size) {
-      case 'medium':
-        return 'h-80';
-      case 'large':
-        return 'h-[500px]';
-      case 'fullscreen':
-        return 'h-screen';
-      default:
-        return 'h-32';
-    }
-  };
-
   // Auto-save hook for local draft persistence
-  // Note: useAutoSave expects a Zustand StoreApi instance
-  // We pass the store instance directly, not the hook
   const { status: autoSaveStatus = 'idle', lastSavedAt, saveNow } = useAutoSave(
     useContentStore,
     {
@@ -92,24 +68,14 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
     }
   );
   
-  // Auto-scroll to bottom when Enter is pressed (T029)
-  // Exit fullscreen with Esc key (T054)
+  // Auto-scroll to bottom when Enter is pressed
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && textareaRef.current) {
-      // Small timeout to ensure content renders first
       setTimeout(() => {
         if (textareaRef.current) {
           textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
         }
       }, 10);
-    }
-    
-    // Handle Escape key to exit fullscreen
-    if (e.key === 'Escape' && textareaPrefs.size === 'fullscreen') {
-      e.preventDefault();
-      // Return to previous size (or default if not set)
-      const sizeToRestore = previousSize !== 'fullscreen' ? previousSize : 'default';
-      setTextareaPrefs({ size: sizeToRestore, isFullscreen: false });
     }
   };
 
@@ -138,7 +104,7 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
       bg_url: contentStore.bgUrl,
       music_url: contentStore.musicUrl,
       
-      // NEW: Include full config snapshot from useConfigStore
+      // Include full config snapshot from useConfigStore
       config: {
         version: '1.0.0',
         typography,
@@ -153,16 +119,12 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
         },
       },
       
-      // DEPRECATED: Legacy settings removed - no longer available in useContentStore
-      // All styling should come from useConfigStore
-      
       title: contentStore.text.substring(0, 30) || "Untitled",
       description: "Created via Web Editor"
     });
 
     if (result.success) {
       toast.success(t('saveSuccess'), { id: toastId });
-      // Update auto-save timestamp to show "Just now"
       await saveNow();
     } else {
       toast.error(t('saveFailed') + " " + result.error, { id: toastId });
@@ -170,38 +132,21 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
   };
 
   const handleShare = () => {
-    // Basic share logic: Copy current URL
     navigator.clipboard.writeText(window.location.href);
     toast.success(t('share') + " Copied!");
   };
-
-  // T056: Ensure config panel remains visible when textarea is fullscreen
-  // The ContentPanel already has z-20, and PreviewPanel (config panel) should have higher z-index
-  // This is handled by the parent component's layout
   
   return (
     <div
-      className={`w-full lg:w-[30%] bg-card border-r border-border flex flex-col shadow-2xl relative transition-all duration-200 ${textareaPrefs.size === 'fullscreen' ? 'fixed inset-0 z-50 w-full h-screen' : 'z-20 h-full'}`}
+      className={`w-full lg:w-[30%] bg-card border-r border-border flex flex-col shadow-2xl relative z-20 h-full ${className}`}
     >
-      {/* T048: Ensure no horizontal scroll - overflow-x hidden on content container */}
-      {/* Header - T056: Always visible, even in fullscreen */}
-      <div className={`p-6 border-b border-border flex justify-between items-center gap-2 ${textareaPrefs.size === 'fullscreen' ? 'z-50 bg-card' : ''}`}>
+      {/* Header */}
+      <div className="p-6 border-b border-border flex justify-between items-center gap-2">
         <h1 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
           {t('title')}
         </h1>
         
         <div className="flex items-center gap-2">
-          {/* T079: Mobile Config Panel Toggle Button - Mobile only (desktop has inline ConfigPanel) */}
-          {isMobileOrTablet && onOpenMobileConfig && (
-            <button
-              onClick={onOpenMobileConfig}
-              className="lg:hidden p-1.5 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Open configuration panel"
-            >
-              <Settings size={16} />
-            </button>
-          )}
-          
           {/* Auto-save status indicator */}
           <AutoSaveStatus
             status={autoSaveStatus}
@@ -238,53 +183,35 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
         </div>
       </div>
 
-      {/* T048: Content Controls - overflow-x hidden to prevent horizontal scroll at any size */}
-      {/* T046: 200ms size transition on all scalable elements */}
-      <div
-        className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6 custom-scrollbar transition-all duration-200 ease-in-out"
-      >
-        {/* T049: Test layout for 375px viewport - responsive spacing */}
-        {/* Text Area */}
-        <div className={`space-y-2 ${textareaPrefs.size === 'fullscreen' ? 'h-full flex flex-col' : ''}`}>
-          <div className="flex justify-between items-center">
+      {/* Content Area - 20/80 Vertical Split */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Textarea Area - 20% height, fixed, not scrollable */}
+        <div className="flex-none h-[20%] min-h-[20%] p-6 pb-4 border-b border-border">
+          <div className="flex justify-between items-center mb-2">
             <label className="text-xs font-bold text-muted-foreground uppercase">{t('contentLabel')}</label>
+            <ContentEditorDialogTrigger onClick={() => setContentEditorOpen(true)} />
           </div>
-          <div className="relative">
-            <textarea
-              ref={textareaRef}
-              // 007-unified-state-architecture: Use contentStore for text content
-              value={contentStore.text}
-              onChange={(e) => contentStore.setText(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className={`${getHeightClass()} transition-all duration-200 w-full bg-secondary rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary outline-none resize-none border border-border placeholder-muted-foreground`}
-              placeholder={t('contentPlaceholder')}
-            />
-            <TextareaExpandButton
-              currentSize={textareaPrefs.size as TextareaSize}
-              onToggle={toggleTextareaSize}
-              disabled={false}
-            />
-          </div>
+          <textarea
+            ref={textareaRef}
+            value={contentStore.text}
+            onChange={(e) => contentStore.setText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full h-[calc(100%-32px)] bg-secondary rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary outline-none resize-none border border-border placeholder-muted-foreground"
+            placeholder={t('contentPlaceholder')}
+          />
         </div>
 
-        {/* Inline ConfigPanel - displays below textarea on desktop */}
-        {isMobileOrTablet ? null : (
-          <div className="flex-1 overflow-hidden flex flex-col border-t border-border">
-            <ConfigPanel />
-          </div>
-        )}
+        {/* Config Area - 80% height, scrollable */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <ConfigPanel />
+        </div>
       </div>
 
-      {/* T085: [US6] Fixed/sticky positioning at viewport bottom */}
-      {/* T088: [US6] Hide footer in fullscreen mode */}
-      {/* T089: [US6] Semi-transparent backdrop (bg-card/90 backdrop-blur) */}
-      {textareaPrefs.size !== 'fullscreen' && (
-        <div
-          className="fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur border-t border-border space-y-2 z-30 transition-all duration-200 ease-in-out"
-        >
-        
-        {/* T030/T033: Collapse/Expand button */}
-        {/* T087: [US6] Ensure 44x44px minimum touch targets */}
+      {/* Footer */}
+      <div
+        className="fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur border-t border-border space-y-2 z-30 transition-all duration-200 ease-in-out lg:left-[30%]"
+      >
+        {/* Collapse/Expand button */}
         <div className="flex justify-center">
           <button
             onClick={toggleFooter}
@@ -302,9 +229,7 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
           </button>
         </div>
         
-        {/* T045: Footer action buttons */}
-        {/* T087: [US6] 44x44px minimum touch targets maintained */}
-        {/* T090: [US6] Footer reflow for mobile */}
+        {/* Footer action buttons */}
         {footerState.isCollapsed ? (
           <div className={isVerySmallScreen ? 'space-y-2' : 'grid grid-cols-3 gap-2'}>
             <button
@@ -328,7 +253,6 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
               <Share2 size={14} /> {t('share')}
             </button>
             <button
-              // 007-unified-state-architecture: Use useUIStore.mode instead of store.setMode
               onClick={() => mode === 'setup' ? useUIStore.getState().setMode('running') : useUIStore.getState().setMode('setup')}
               className="py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 ease-in-out flex items-center justify-center gap-2"
               style={{
@@ -341,7 +265,6 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
         ) : (
           <>
             <button
-              // 007-unified-state-architecture: Use useUIStore.mode instead of store.setMode
               onClick={() => mode === 'setup' ? useUIStore.getState().setMode('running') : useUIStore.getState().setMode('setup')}
               className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 ease-in-out flex items-center justify-center gap-2"
               style={{
@@ -350,7 +273,6 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
             >
               <Play size={16} fill="currentColor" /> {t('preview')}
             </button>
-            {/* T090: [US6] Footer reflow for mobile - stack vertically on very small screens */}
             <div className={isVerySmallScreen ? 'space-y-2' : 'grid grid-cols-2 gap-2'}>
               <button
                 onClick={handleSave}
@@ -375,8 +297,10 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
             </div>
           </>
         )}
-        </div>
-      )}
+      </div>
+      
+      {/* Content Editor Dialog */}
+      <ContentEditorDialog open={contentEditorOpen} onOpenChange={setContentEditorOpen} />
     </div>
   );
 }
