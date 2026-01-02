@@ -26,6 +26,7 @@ export function LayoutTab() {
         step={5}
         unit="px"
         label={t('horizontalMargin')}
+        tooltip={t('tooltips.horizontalMargin')}
         onChange={(value) => setLayout({ horizontalMargin: value })}
       />
       
@@ -37,12 +38,13 @@ export function LayoutTab() {
         step={5}
         unit="px"
         label={t('verticalPadding')}
+        tooltip={t('tooltips.verticalPadding')}
         onChange={(value) => setLayout({ verticalPadding: value })}
       />
       
       {/* Text Alignment */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-foreground">
+        <label className="block text-sm font-medium text-foreground" title={t('tooltips.textAlign')}>
           {t('textAlign')}
         </label>
         <div className="flex gap-2">
@@ -57,6 +59,7 @@ export function LayoutTab() {
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-background text-foreground hover:bg-secondary'
               )}
+              title={t('tooltips.textAlign')}
             >
               {align.charAt(0).toUpperCase() + align.slice(1)}
             </button>
@@ -66,7 +69,7 @@ export function LayoutTab() {
       
       {/* Column Count */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-foreground">
+        <label className="block text-sm font-medium text-foreground" title={t('tooltips.columns')}>
           {t('columns')}
         </label>
         <div className="flex gap-2">
@@ -81,6 +84,7 @@ export function LayoutTab() {
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-background text-foreground hover:bg-secondary'
               )}
+              title={t('tooltips.columns')}
             >
               {count}
             </button>
@@ -97,6 +101,7 @@ export function LayoutTab() {
           step={5}
           unit="px"
           label={t('columnGap')}
+          tooltip={t('tooltips.columnGap')}
           onChange={(value) => setLayout({ columnGap: value })}
         />
       )}
@@ -109,12 +114,13 @@ export function LayoutTab() {
         step={5}
         unit="%"
         label={t('textAreaWidth')}
+        tooltip={t('tooltips.textAreaWidth')}
         onChange={(value) => setLayout({ textAreaWidth: value })}
       />
       
       {/* Text Area Position */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-foreground">
+        <label className="block text-sm font-medium text-foreground" title={t('tooltips.textAreaPosition')}>
           {t('textAreaPosition')}
         </label>
         <div className="flex gap-2">
@@ -129,6 +135,7 @@ export function LayoutTab() {
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-background text-foreground hover:bg-secondary'
               )}
+              title={t('tooltips.textAreaPosition')}
             >
               {position.charAt(0).toUpperCase() + position.slice(1)}
             </button>

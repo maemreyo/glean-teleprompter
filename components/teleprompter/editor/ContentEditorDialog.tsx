@@ -66,14 +66,17 @@ export function ContentEditorDialog({ open, onOpenChange }: ContentEditorDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-screen h-screen max-w-screen max-h-screen p-0 gap-0 border-0 rounded-none bg-card">
+      <DialogContent
+        className="w-screen h-screen max-w-screen max-h-screen p-0 gap-0 border-0 rounded-none bg-card"
+        showCloseButton={false}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <h2 className="text-lg font-semibold">{t('contentLabel')}</h2>
           <button
             onClick={() => onOpenChange(false)}
             className="p-2 hover:bg-secondary rounded-lg transition-colors"
-            aria-label="Close content editor"
+            aria-label={t('closeEditor')}
           >
             ✕
           </button>
@@ -101,15 +104,16 @@ export function ContentEditorDialog({ open, onOpenChange }: ContentEditorDialogP
  * Can be used in the ContentPanel to open the full-size content editor dialog.
  */
 export function ContentEditorDialogTrigger({ onClick }: { onClick: () => void }) {
+  const t = useTranslations('Editor')
   return (
     <button
       onClick={onClick}
       className="px-3 py-1.5 bg-secondary hover:bg-secondary/80 rounded-lg text-xs font-medium transition-all duration-200 text-muted-foreground hover:text-foreground flex items-center gap-1.5"
-      aria-label="Open content editor (Ctrl+E)"
-      title="Open content editor (Ctrl+E)"
+      aria-label={t('openEditor')}
+      title={t('openEditor')}
     >
       <Expand size={12} />
-      <span>View Detail</span>
+      <span>{t('viewDetail')}</span>
     </button>
   )
 }

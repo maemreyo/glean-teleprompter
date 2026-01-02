@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 interface GradientPickerProps {
   enabled: boolean
@@ -25,6 +26,8 @@ export function GradientPicker({
   onAngleChange,
   className,
 }: GradientPickerProps) {
+  const t = useTranslations('Config.colors.gradientPicker')
+  
   if (!enabled) {
     return null
   }
@@ -60,7 +63,7 @@ export function GradientPicker({
               : 'bg-background text-foreground hover:bg-secondary'
           )}
         >
-          Linear
+          {t('linear')}
         </button>
         <button
           onClick={() => onTypeChange(type === 'radial' ? 'linear' : 'radial')}
@@ -72,7 +75,7 @@ export function GradientPicker({
               : 'bg-background text-foreground hover:bg-secondary'
           )}
         >
-          Radial
+          {t('radial')}
         </button>
       </div>
 
@@ -80,7 +83,7 @@ export function GradientPicker({
       {type === 'linear' && (
         <div className="space-y-2">
           <label className="block text-sm font-medium text-foreground">
-            Angle: {angle}°
+            {t('angle')}: {angle}°
           </label>
           <input
             type="range"
@@ -97,7 +100,7 @@ export function GradientPicker({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="block text-sm font-medium text-foreground">
-            Color Stops
+            {t('colorStops')}
           </label>
           <button
             onClick={handleAddColor}
@@ -107,7 +110,7 @@ export function GradientPicker({
               'bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
-            + Add Color
+            + {t('addColor')}
           </button>
         </div>
         
@@ -123,13 +126,13 @@ export function GradientPicker({
                 value={color}
                 onChange={(e) => handleColorChange(index, e.target.value)}
                 className="flex-1 px-3 py-2 text-sm border border-border rounded-lg bg-background text-foreground"
-                placeholder="#ffffff"
+                placeholder={t('colorPlaceholder')}
               />
               {colors.length > 2 && (
                 <button
                   onClick={() => handleRemoveColor(index)}
                   className="p-2 text-muted-foreground hover:text-destructive transition-colors"
-                  aria-label="Remove color"
+                  aria-label={t('removeColor')}
                 >
                   ×
                 </button>

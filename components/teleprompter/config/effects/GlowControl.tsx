@@ -4,20 +4,26 @@ import { cn } from '@/lib/utils'
 import { ColorPicker } from '../ui/ColorPicker'
 import { SliderInput } from '../ui/SliderInput'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
+import { useTranslations } from 'next-intl'
 
-export function GlowControl() {
+interface GlowControlProps {
+  tooltip?: string
+}
+
+export function GlowControl({ tooltip }: GlowControlProps) {
+  const t = useTranslations('Config.effects.glow')
   const { effects, setEffects } = useConfigStore()
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" title={tooltip}>
       {/* Enable Glow */}
       <div className="flex items-center justify-between">
         <div>
           <label className="block text-sm font-medium text-foreground">
-            Text Glow
+            {t('label')}
           </label>
           <p className="text-xs text-muted-foreground">
-            Add luminous effect around text
+            {t('description')}
           </p>
         </div>
         <button
@@ -46,7 +52,7 @@ export function GlowControl() {
             max={50}
             step={1}
             unit="px"
-            label="Blur Radius"
+            label={t('blurRadius')}
             onChange={(value) => setEffects({ glowBlurRadius: value })}
           />
 
@@ -56,13 +62,13 @@ export function GlowControl() {
             min={0}
             max={1}
             step={0.05}
-            label="Intensity"
+            label={t('intensity')}
             onChange={(value) => setEffects({ glowIntensity: value })}
           />
 
           {/* Glow Color */}
           <ColorPicker
-            label="Glow Color"
+            label={t('color')}
             value={effects.glowColor}
             onChange={(value) => setEffects({ glowColor: value })}
           />

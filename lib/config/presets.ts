@@ -45,6 +45,7 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
         backdropBlur: 0,
         backdropBrightness: 100,
         backdropSaturation: 100,
+        overlayOpacity: 0.5,
       },
       layout: {
         horizontalMargin: 0,
@@ -118,6 +119,7 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
         backdropBlur: 0,
         backdropBrightness: 100,
         backdropSaturation: 100,
+        overlayOpacity: 0.5,
       },
       layout: {
         horizontalMargin: 0,
@@ -191,6 +193,7 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
         backdropBlur: 0,
         backdropBrightness: 100,
         backdropSaturation: 100,
+        overlayOpacity: 0.5,
       },
       layout: {
         horizontalMargin: 40,
@@ -264,6 +267,7 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
         backdropBlur: 0,
         backdropBrightness: 100,
         backdropSaturation: 100,
+        overlayOpacity: 0.5,
       },
       layout: {
         horizontalMargin: 20,
@@ -337,6 +341,7 @@ export const builtInPresets: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updat
         backdropBlur: 0,
         backdropBrightness: 100,
         backdropSaturation: 100,
+        overlayOpacity: 0.5,
       },
       layout: {
         horizontalMargin: 10,

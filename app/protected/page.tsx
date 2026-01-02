@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { AppProvider } from "@/components/AppProvider";
 
 function ProtectedContent() {
-  const t = useTranslations("Protected");
+  const t = useTranslations("ProtectedPage");
   const [email, setEmail] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -30,7 +30,7 @@ function ProtectedContent() {
   }, [router]);
 
   if (loading) {
-    return <div className="flex-1 w-full flex items-center justify-center">Loading...</div>;
+    return <div className="flex-1 w-full flex items-center justify-center">{t("loading")}</div>;
   }
 
   return null;

@@ -13,6 +13,7 @@ import {
   SaveResult,
   ConflictData,
   ConflictResolution,
+  StorageError,
 } from './types';
 import { migrateDraft } from './draftMigration';
 

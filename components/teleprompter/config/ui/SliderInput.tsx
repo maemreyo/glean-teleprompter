@@ -12,6 +12,7 @@ interface SliderInputProps {
   step: number
   unit?: string
   label?: string
+  tooltip?: string
   onChange: (value: number) => void
   className?: string
 }
@@ -31,6 +32,7 @@ export function SliderInput({
   step,
   unit = '',
   label,
+  tooltip,
   onChange,
   className,
 }: SliderInputProps) {
@@ -64,7 +66,7 @@ export function SliderInput({
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <label className="text-sm font-medium text-foreground">
+        <label className="text-sm font-medium text-foreground" title={tooltip}>
           {label}
         </label>
       )}

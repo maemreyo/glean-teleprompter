@@ -5,6 +5,7 @@
 "use client";
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,7 @@ export function DraftManagementDialog({
   open,
   onOpenChange,
 }: DraftManagementDialogProps) {
+  const t = useTranslations('DraftManagementDialog')
   const {
     drafts,
     isLoading,
@@ -161,9 +163,9 @@ export function DraftManagementDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Saved Drafts</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Manage your local drafts. Restore a draft to edit it or delete old drafts to free up space.
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -172,15 +174,15 @@ export function DraftManagementDialog({
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
-                <p className="text-sm text-muted-foreground">Loading drafts...</p>
+                <p className="text-sm text-muted-foreground">{t('loading')}</p>
               </div>
             </div>
           ) : drafts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
               <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-lg font-medium">No saved drafts</p>
+              <p className="text-lg font-medium">{t('noDrafts')}</p>
               <p className="text-sm text-muted-foreground">
-                Your drafts will appear here as you work.
+                {t('noDraftsDesc')}
               </p>
             </div>
           ) : (
@@ -198,12 +200,12 @@ export function DraftManagementDialog({
                     htmlFor="select-all"
                     className="text-sm font-medium cursor-pointer flex-1"
                   >
-                    {drafts.length} draft{drafts.length > 1 ? 's' : ''}
+                    {drafts.length} {drafts.length === 1 ? t('draftCount_one', { count: drafts.length }) : t('draftCount_other', { count: drafts.length })}
                   </label>
                   {selectedIds.size > 0 && (
                     <>
                       <span className="text-sm text-muted-foreground">
-                        {selectedIds.size} selected
+                        {t('selectedCount', { count: selectedIds.size })}
                       </span>
                       <Button
                         variant="destructive"
@@ -212,7 +214,7 @@ export function DraftManagementDialog({
                         className="h-8"
                       >
                         <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
+                        {t('delete')}
                       </Button>
                     </>
                   )}
@@ -272,7 +274,7 @@ export function DraftManagementDialog({
                           </span>
                         </div>
                         <p className="text-sm font-medium truncate">
-                          {getPreviewText(draft.text) || 'Empty draft'}
+                          {getPreviewText(draft.text) || t('emptyDraft')}
                         </p>
                       </div>
 
@@ -287,7 +289,7 @@ export function DraftManagementDialog({
                         aria-label={ARIA_LABELS.restoreDraft(draft._timestamp)}
                       >
                         <RotateCcw className="h-4 w-4 mr-1" />
-                        Restore
+                        {t('restore')}
                       </Button>
                     </div>
                   );
@@ -300,7 +302,7 @@ export function DraftManagementDialog({
         {/* Footer hints */}
         {drafts.length > 0 && (
           <div className="text-xs text-muted-foreground pt-2 border-t">
-            <p>💡 Tip: Use arrow keys to navigate, Enter to restore, Delete to remove selected drafts</p>
+            <p>💡 {t('tip')}</p>
           </div>
         )}
       </DialogContent>

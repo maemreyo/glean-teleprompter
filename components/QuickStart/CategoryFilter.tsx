@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 interface CategoryFilterProps {
   selectedCategory: string;
@@ -10,12 +11,14 @@ interface CategoryFilterProps {
 }
 
 export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryFilterProps) {
+  const t = useTranslations('QuickStart.categories');
+  
   const categories = [
-    { id: 'all', name: 'All Templates' },
-    { id: 'business', name: 'Business' },
-    { id: 'creative', name: 'Creative' },
-    { id: 'education', name: 'Education' },
-    { id: 'blank', name: 'Blank' }
+    { id: 'all', name: t('all') },
+    { id: 'business', name: t('business') },
+    { id: 'creative', name: t('creative') },
+    { id: 'education', name: t('education') },
+    { id: 'blank', name: t('blank') }
   ];
 
   return (

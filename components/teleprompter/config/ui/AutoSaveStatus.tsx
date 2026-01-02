@@ -4,6 +4,7 @@ import React from 'react'
 import { Loader2, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime'
+import { useTranslations } from 'next-intl'
 
 export interface AutoSaveStatusProps {
   /** Current auto-save status */
@@ -20,7 +21,7 @@ export interface AutoSaveStatusProps {
 
 /**
  * AutoSaveStatus - Displays auto-save status with icons and timestamps
- * 
+ *
  * Shows:
  * - Spinner when saving
  * - Checkmark with relative time when saved
@@ -33,6 +34,8 @@ export function AutoSaveStatus({
   onRetry,
   className,
 }: AutoSaveStatusProps) {
+  const t = useTranslations('AutoSaveStatus')
+
   const getStatusIcon = () => {
     switch (status) {
       case 'saving':
@@ -50,11 +53,11 @@ export function AutoSaveStatus({
   const getStatusText = () => {
     switch (status) {
       case 'saving':
-        return 'Saving...'
+        return t('saving')
       case 'saved':
-        return `Saved ${formatRelativeTime(lastSavedAt ?? null)}`
+        return `${t('saved')} ${formatRelativeTime(lastSavedAt ?? null)}`
       case 'error':
-        return errorMessage || 'Failed to save'
+        return errorMessage || t('error')
       case 'idle':
       default:
         return null
@@ -100,8 +103,8 @@ export function AutoSaveStatus({
         <button
           onClick={onRetry}
           className="flex-shrink-0 p-1 hover:bg-red-500/10 rounded transition-colors"
-          aria-label="Retry save"
-          title="Retry save"
+          aria-label={t('retry')}
+          title={t('retry')}
         >
           <RefreshCw className="h-3 w-3" />
         </button>

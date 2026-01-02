@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Download, Trash2 } from 'lucide-react'
 import type { Preset } from '@/lib/config/types'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 interface PresetGridProps {
   presets: Preset[]
@@ -15,11 +16,13 @@ interface PresetGridProps {
 }
 
 export function PresetGrid({ presets, onApply, onExport, onDelete, isReadOnly = false }: PresetGridProps) {
+  const t = useTranslations('Config.presets.presetGrid')
+  
   if (presets.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-        <p>No presets found</p>
-        <p className="text-sm mt-1">Create your first preset to get started</p>
+        <p>{t('noPresets')}</p>
+        <p className="text-sm mt-1">{t('createFirst')}</p>
       </div>
     )
   }
@@ -58,7 +61,7 @@ export function PresetGrid({ presets, onApply, onExport, onDelete, isReadOnly = 
               className={cn("flex-1", isReadOnly && "w-full")}
               onClick={() => onApply(preset)}
             >
-              Apply
+              {t('apply')}
             </Button>
             <Button
               size="sm"

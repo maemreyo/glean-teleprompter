@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { Maximize2 } from 'lucide-react'
 import { useContentStore } from '@/lib/stores/useContentStore'
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText'
+import { useTranslations } from 'next-intl'
 import {
   Dialog,
   DialogContent,
@@ -69,15 +70,16 @@ export function FullPreviewDialog({ open, onOpenChange }: FullPreviewDialogProps
  * Can be used in the PreviewPanel to open the full-size preview dialog.
  */
 export function FullPreviewDialogTrigger({ onClick }: { onClick: () => void }) {
+  const t = useTranslations('FullPreviewDialog')
   return (
     <button
       onClick={onClick}
       className="p-2 bg-black/50 hover:bg-black/70 rounded-lg backdrop-blur-sm transition-all duration-200 text-white hover:text-white/80 flex items-center gap-2 text-sm font-medium"
-      aria-label="Open full preview (Ctrl+\\)"
-      title="Open full preview (Ctrl+\\)"
+      aria-label={t('openFullPreview')}
+      title={t('openFullPreview')}
     >
       <Maximize2 size={16} />
-      <span>Full Preview</span>
+      <span>{t('title')}</span>
     </button>
   )
 }

@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import {
   ContentPanelSkeleton,
   ConfigPanelSkeleton,
@@ -14,6 +15,7 @@ import {
  * Features 300ms fade-out animation via Framer Motion
  */
 export function StudioLoadingScreen() {
+  const t = useTranslations('LoadingStates')
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -32,7 +34,7 @@ export function StudioLoadingScreen() {
         >
           <div className="flex items-center gap-3">
             <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm font-medium">Loading Studio...</span>
+            <span className="text-sm font-medium">{t('loadingStudio')}</span>
           </div>
         </motion.div>
       </div>

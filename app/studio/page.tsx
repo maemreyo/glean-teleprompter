@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, Suspense, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 // 007-unified-state-architecture: Use new stores with single responsibility
 import { useContentStore } from '@/lib/stores/useContentStore';
 import { useConfigStore } from '@/lib/stores/useConfigStore';
@@ -81,11 +82,13 @@ function StudioLogic() {
   }, [setDemoMode]);
 
   // Function to load template with progress tracking
+  const t = useTranslations("StudioPage");
+  
   const loadTemplate = useCallback(async (templateId: string) => {
     setLoadingState({
       isLoading: true,
       progress: 0,
-      message: 'Loading template...',
+      message: t("loadingTemplate"),
       error: null,
       loadType: 'template'
     });
@@ -243,7 +246,7 @@ function StudioLogic() {
     setLoadingState({
       isLoading: true,
       progress: 0,
-      message: 'Loading script...',
+      message: t("loadingScript"),
       error: null,
       loadType: 'script'
     });
@@ -268,10 +271,10 @@ function StudioLogic() {
           isLoading: false,
           progress: 0,
           message: '',
-          error: 'Loading timeout - please retry',
+          error: t("loadingTimeout"),
           loadType: null
         });
-        toast.error('Loading script timed out');
+        toast.error(t("loadingScriptTimedOut"));
       }
     }, 3000);
     
@@ -578,7 +581,7 @@ function StudioLogic() {
                 onClick={handleRetry}
                 className="gap-1"
               >
-                <span>Retry</span>
+                <span>{t("retry")}</span>
               </Button>
             </div>
           </motion.div>

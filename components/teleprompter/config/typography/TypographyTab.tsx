@@ -35,6 +35,7 @@ export function TypographyTab() {
         step={0.5}
         unit="px"
         label={t('letterSpacing')}
+        tooltip={t('tooltips.letterSpacing')}
         onChange={(value) => setTypography({ letterSpacing: value })}
       />
       
@@ -45,12 +46,13 @@ export function TypographyTab() {
         max={3}
         step={0.1}
         label={t('lineHeight')}
+        tooltip={t('tooltips.lineHeight')}
         onChange={(value) => setTypography({ lineHeight: value })}
       />
       
       {/* Text Transform */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-foreground">
+        <label className="block text-sm font-medium text-foreground" title={t('tooltips.textTransform')}>
           {t('textTransform')}
         </label>
         <div className="flex gap-2" role="group" aria-label={t('textTransform')}>
@@ -67,6 +69,7 @@ export function TypographyTab() {
               )}
               aria-label={ARIA_LABELS.listItem(t(transform), typography.textTransform === transform)}
               aria-pressed={typography.textTransform === transform}
+              title={t('tooltips.textTransform')}
             >
               {t(transform)}
             </button>

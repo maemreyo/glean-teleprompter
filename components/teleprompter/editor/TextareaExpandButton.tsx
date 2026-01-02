@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Maximize2, Minimize2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 /**
  * TextareaExpandButton - Button to expand/contract textarea
@@ -19,8 +20,9 @@ interface TextareaExpandButtonProps {
 }
 
 export function TextareaExpandButton({ currentSize, onToggle, disabled = false }: TextareaExpandButtonProps) {
+  const t = useTranslations('TextareaExpandButton')
   const isFullscreen = currentSize === 'fullscreen';
-  const tooltip = isFullscreen ? 'Exit fullscreen (Esc)' : 'Expand';
+  const tooltip = isFullscreen ? t('exitFullscreen') : t('expand');
   const Icon = isFullscreen ? Minimize2 : Maximize2;
   
   return (

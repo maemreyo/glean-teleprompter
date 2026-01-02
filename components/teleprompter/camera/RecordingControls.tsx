@@ -9,6 +9,7 @@
 import { Play, Square, Pause, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export interface RecordingControlsProps {
   /** Whether recording is currently active */
@@ -45,6 +46,7 @@ export function RecordingControls({
   disabled = false,
   className,
 }: RecordingControlsProps) {
+  const t = useTranslations('RecordingControls');
   // Format duration as MM:SS
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -71,7 +73,7 @@ export function RecordingControls({
           className="bg-red-500 hover:bg-red-600 text-white"
         >
           <Play className="w-4 h-4 mr-1" />
-          Record
+          {t('record')}
         </Button>
       )}
 
@@ -100,7 +102,7 @@ export function RecordingControls({
             className="bg-gray-900 hover:bg-gray-800"
           >
             <Square className="w-4 h-4 mr-1" />
-            Stop
+            {t('stop')}
           </Button>
         </>
       )}
@@ -114,7 +116,7 @@ export function RecordingControls({
           className="border-red-500 text-red-500 hover:bg-red-50"
         >
           <RotateCcw className="w-4 h-4 mr-1" />
-          Discard
+          {t('discard')}
         </Button>
       )}
     </div>

@@ -1,4 +1,67 @@
 {
+  "Demo": {
+    "mode": "Demo Mode",
+    "signUpToSave": "Sign up to save your scripts and recordings",
+    "signUpFree": "Sign Up Free →",
+    "dismiss": "Dismiss"
+  },
+  "Landing": {
+    "hero": {
+      "badge": "Professional Teleprompter",
+      "title": "Glean Teleprompter",
+      "tagline": "Professional teleprompter for content creators",
+      "description": "Write, rehearse, and record your scripts with ease. Perfect for YouTubers, podcasters, presenters, and anyone who speaks to an audience.",
+      "startWriting": "Start Writing",
+      "tryDemo": "Try Demo",
+      "noAccountRequired": "No account required to try",
+      "signUpFree": "Sign up for free"
+    },
+    "features": {
+      "title": "Everything You Need",
+      "subtitle": "Powerful features to create professional content",
+      "smartTeleprompter": {
+        "title": "Smart Teleprompter",
+        "description": "Adjustable speed, fonts, colors, and mirror mode for reflectors"
+      },
+      "builtInRecording": {
+        "title": "Built-in Recording",
+        "description": "Record yourself while reading the script with camera overlay"
+      },
+      "cloudSync": {
+        "title": "Cloud Sync",
+        "description": "Save scripts securely and access from any device"
+      },
+      "customPresets": {
+        "title": "Custom Presets",
+        "description": "Save your favorite configurations and apply with one click"
+      }
+    },
+    "cta": {
+      "title": "Ready to Start Creating?",
+      "description": "Join thousands of content creators who use Glean Teleprompter to create professional videos and presentations.",
+      "createScript": "Create Your First Script",
+      "tryDemo": "Try Demo First"
+    }
+  },
+  "Navigation": {
+    "brand": "Glean Teleprompter",
+    "tryDemo": "Try Demo",
+    "templates": "Templates",
+    "logIn": "Log In",
+    "signUp": "Sign Up",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "demo": "Demo"
+  },
+  "QuickStart": {
+    "categories": {
+      "all": "All Templates",
+      "business": "Business",
+      "creative": "Creative",
+      "education": "Education",
+      "blank": "Blank"
+    }
+  },
   "Editor": {
     "title": "Creator Studio",
     "login": "Login",
@@ -13,7 +76,14 @@
     "preview": "Preview",
     "save": "Save Cloud",
     "share": "Share Link",
-    "logout": "Logout"
+    "logout": "Logout",
+    "closeEditor": "Close content editor",
+    "openEditor": "Open content editor (Ctrl+E)",
+    "viewDetail": "View Detail",
+    "hidePreview": "Hide preview",
+    "showPreview": "Show preview",
+    "expandFooter": "Expand footer",
+    "collapseFooter": "Collapse footer"
   },
   "Runner": {
     "create": "Create New",
@@ -184,6 +254,19 @@
     "saveRecording": "Save Recording"
   },
   "Config": {
+    "title": "Configuration",
+    "header": {
+      "undo": "Undo last change",
+      "redo": "Redo last change",
+      "clearHistory": "Clear all history",
+      "changes": "{count} changes",
+      "changesTooltip": "{current} of {total} changes",
+      "close": "Close configuration panel",
+      "clearHistoryTitle": "Clear History",
+      "clearHistoryDescription": "Are you sure you want to clear all undo/redo history? This action cannot be undone.",
+      "clearHistoryConfirm": "Clear History",
+      "description": "Configure teleprompter settings including typography, colors, effects, layout, and animations"
+    },
     "tabs": {
       "typography": "Typography",
       "colors": "Colors",
@@ -193,18 +276,52 @@
       "presets": "Presets",
       "media": "Media"
     },
+    "tabTooltips": {
+      "typography": "Configure font family, size, weight, and spacing",
+      "colors": "Set text colors, gradients, and check contrast",
+      "effects": "Add shadows, outlines, glows, and backdrop blur",
+      "layout": "Adjust margins, padding, alignment, and columns",
+      "animations": "Configure scroll, entrance animations, and highlighting",
+      "presets": "Save, load, and manage configuration presets",
+      "media": "Set background images and music"
+    },
     "allTabs": "All Tabs",
     "selectTab": "Select a tab to configure settings",
     "typography": {
       "title": "Typography Settings",
       "description": "Configure font family, size, weight, and spacing for your teleprompter text.",
+      "fontFamily": "Font Family",
+      "fontSize": "Font Size",
+      "size": "Size",
+      "weight": "Weight",
+      "searchFonts": "Search fonts...",
+      "noFontsFound": "No fonts found",
       "letterSpacing": "Letter Spacing",
       "lineHeight": "Line Height",
       "textTransform": "Text Transform",
       "none": "None",
       "uppercase": "Uppercase",
       "lowercase": "Lowercase",
-      "capitalize": "Capitalize"
+      "capitalize": "Capitalize",
+      "fontWeights": {
+        "thin": "Thin (100)",
+        "extraLight": "Extra Light (200)",
+        "light": "Light (300)",
+        "regular": "Regular (400)",
+        "medium": "Medium (500)",
+        "semiBold": "Semi Bold (600)",
+        "bold": "Bold (700)",
+        "extraBold": "Extra Bold (800)",
+        "black": "Black (900)"
+      },
+      "tooltips": {
+        "letterSpacing": "Adjust spacing between characters for readability",
+        "lineHeight": "Control the vertical space between lines of text",
+        "textTransform": "Change text case for emphasis or style",
+        "fontFamily": "Choose from Google Fonts or system fonts",
+        "fontSize": "Set the base size of your text",
+        "fontWeight": "Adjust how bold or light the text appears"
+      }
     },
     "colors": {
       "title": "Color Settings",
@@ -221,11 +338,62 @@
       "gradientDesc": "Apply gradient fill to text",
       "effectColors": "Effect Colors",
       "outlineColor": "Outline Color",
-      "glowColor": "Glow Color"
+      "glowColor": "Glow Color",
+      "gradientPicker": {
+        "linear": "Linear",
+        "radial": "Radial",
+        "angle": "Angle",
+        "colorStops": "Color Stops",
+        "addColor": "Add Color",
+        "removeColor": "Remove color",
+        "colorPlaceholder": "#ffffff"
+      },
+      "tooltips": {
+        "colorPalettes": "Quick-apply professional color schemes",
+        "primaryTextColor": "Set the main color for your text",
+        "wcagCompliance": "Check if your text meets accessibility standards",
+        "enableGradient": "Add a gradient effect to text fill",
+        "outlineColor": "Color for text outline stroke",
+        "glowColor": "Color for text glow/shadow effect"
+      }
     },
     "effects": {
       "title": "Visual Effects",
-      "description": "Configure shadows, outlines, glows, and backdrop filters for enhanced readability."
+      "description": "Configure shadows, outlines, glows, and backdrop filters for enhanced readability.",
+      "backdrop": {
+        "label": "Backdrop Filter",
+        "blur": "Blur",
+        "brightness": "Brightness",
+        "saturation": "Saturation"
+      },
+      "glow": {
+        "label": "Text Glow",
+        "description": "Add luminous effect around text",
+        "blurRadius": "Blur Radius",
+        "intensity": "Intensity",
+        "color": "Glow Color"
+      },
+      "outline": {
+        "label": "Text Outline",
+        "description": "Add border around text for better visibility",
+        "width": "Width",
+        "color": "Outline Color"
+      },
+      "shadow": {
+        "label": "Text Shadow",
+        "description": "Add depth to text with shadow",
+        "offsetX": "Offset X",
+        "offsetY": "Offset Y",
+        "blur": "Blur",
+        "opacity": "Opacity",
+        "color": "Shadow Color"
+      },
+      "tooltips": {
+        "shadow": "Add drop shadow behind text for depth",
+        "outline": "Add stroke around text edges for clarity",
+        "glow": "Add soft glow effect around text",
+        "backdropBlur": "Blur the background behind the teleprompter"
+      }
     },
     "layout": {
       "title": "Layout Settings",
@@ -236,7 +404,16 @@
       "columns": "Columns",
       "columnGap": "Column Gap",
       "textAreaWidth": "Text Area Width",
-      "textAreaPosition": "Text Area Position"
+      "textAreaPosition": "Text Area Position",
+      "tooltips": {
+        "horizontalMargin": "Space between text and screen edges (left/right)",
+        "verticalPadding": "Space between text and top/bottom of screen",
+        "textAlign": "Align text to left, center, right, or justify",
+        "columns": "Split text into multiple columns for reading",
+        "columnGap": "Spacing between text columns",
+        "textAreaWidth": "Width of the text area as percentage of screen",
+        "textAreaPosition": "Position the text area on screen"
+      }
     },
     "animations": {
       "title": "Animation Settings",
@@ -257,7 +434,20 @@
       "autoScroll": "Auto Scroll",
       "enableAutoScrolling": "Enable Auto Scrolling",
       "scrollSpeed": "Scroll Speed",
-      "acceleration": "Acceleration"
+      "acceleration": "Acceleration",
+      "test": "Test",
+      "testing": "Testing...",
+      "tooltips": {
+        "smoothScroll": "Enable smooth, damped scrolling for better control",
+        "scrollDamping": "Higher values = smoother, slower response",
+        "entranceAnimation": "Animation when text first appears",
+        "animationDuration": "Length of entrance animation",
+        "wordHighlighting": "Highlight current word as you read",
+        "highlightSpeed": "Speed of word-by-word highlight",
+        "autoScroll": "Automatically scroll text at constant speed",
+        "scrollSpeed": "Pixels per second for auto-scroll",
+        "acceleration": "Gradually increase scroll speed"
+      }
     },
     "presets": {
       "title": "Presets",
@@ -275,17 +465,61 @@
       "syncFailed": "Sync failed",
       "connected": "Connected to cloud",
       "offline": "Offline mode",
-      "sync": "Sync"
+      "sync": "Sync",
+      "importFailed": "Failed to import preset",
+      "invalidPresetFile": "Invalid preset file",
+      "presetGrid": {
+        "noPresets": "No presets found",
+        "createFirst": "Create your first preset to get started",
+        "apply": "Apply"
+      },
+      "tooltips": {
+        "savePreset": "Save current settings as a reusable preset",
+        "import": "Import a preset from a JSON file",
+        "builtinPresets": "Pre-made configurations for common use cases",
+        "sync": "Sync your presets with cloud storage"
+      }
     },
     "media": {
       "title": "Media Settings",
-      "description": "Configure background images, music, and other media assets."
+      "description": "Configure background images, music, and other media assets.",
+      "useUrl": "Use URL",
+      "upload": "Upload",
+      "backgroundImageUrl": "Background Image URL",
+      "backgroundMusicUrl": "Background Music URL",
+      "imageUrlSet": "Image URL set",
+      "musicUrlSet": "Music URL set",
+      "uploadBackgroundImage": "Upload Background Image",
+      "uploadBackgroundMusic": "Upload Background Music",
+      "clickToUploadImage": "Click to upload image",
+      "clickToUploadMusic": "Click to upload music",
+      "uploading": "Uploading...",
+      "fileFormatImage": "PNG, JPG, GIF up to 5MB",
+      "fileFormatMusic": "MP3, WAV up to 10MB",
+      "proOnly": "Pro Only",
+      "proFeature": "Pro Feature",
+      "upgradeToUpload": "Upgrade to upload music",
+      "enterBackgroundImageUrl": "Enter a URL to link to online background image",
+      "enterBackgroundMusicUrl": "Enter a URL to link to online background music",
+      "uploadFromDevice": "Upload from your device (Pro feature)",
+      "tooltips": {
+        "backgroundImage": "Set an image as the teleprompter background",
+        "backgroundMusic": "Add background music to play during recording",
+        "useUrl": "Enter a URL to link to online media",
+        "upload": "Upload media files from your device (Pro feature)"
+      }
+    },
+    "tabUI": {
+      "ariaLabel": "Configuration tabs",
+      "showAllTabs": "Show all tabs",
+      "closeTabSelector": "Close tab selector",
+      "done": "Done"
     }
   },
   "AutoSaveStatus": {
     "saving": "Saving...",
     "saved": "Saved",
-    "error": "Save failed",
+    "error": "Failed to save",
     "retry": "Retry save",
     "justNow": "Just now",
     "minutesAgo": "{count}m ago",
@@ -345,7 +579,8 @@
     "title": "Preview",
     "togglePreview": "Toggle Preview",
     "closePreview": "Close Preview",
-    "swipeToClose": "Swipe down to close"
+    "swipeToClose": "Swipe down to close",
+    "failedToLoadBg": "Failed to load background image"
   },
   "Footer": {
     "expand": "Expand footer",
@@ -385,5 +620,163 @@
   },
   "Performance": {
     "largeScriptWarning": "This script is very long ({count}+ characters). For best performance, consider splitting it into multiple scripts."
+  },
+  "DraftManagementDialog": {
+    "title": "Saved Drafts",
+    "description": "Manage your local drafts. Restore a draft to edit it or delete old drafts to free up space.",
+    "loading": "Loading drafts...",
+    "noDrafts": "No saved drafts",
+    "noDraftsDesc": "Your drafts will appear here as you work.",
+    "draftCount_one": "{count} draft",
+    "draftCount_other": "{count} drafts",
+    "selectedCount": "{count} selected",
+    "delete": "Delete",
+    "restore": "Restore",
+    "emptyDraft": "Empty draft",
+    "tip": "Tip: Use arrow keys to navigate, Enter to restore, Delete to remove selected drafts"
+  },
+  "FullPreviewDialog": {
+    "title": "Full Preview",
+    "openFullPreview": "Open full preview (Ctrl+\\)"
+  },
+  "QuickSettings": {
+    "title": "Quick Settings",
+    "modified": "Modified",
+    "close": "Close settings",
+    "scrollSpeed": "Scroll Speed",
+    "scrollSpeedUnit": "px/sec",
+    "scrollSpeedAria": "Scroll speed",
+    "fontSize": "Font Size",
+    "fontSizeUnit": "px",
+    "fontSizeAria": "Font size",
+    "textAlign": "Text Alignment",
+    "alignLeft": "Left",
+    "alignCenter": "Center",
+    "alignRight": "Right",
+    "alignLeftAria": "Align left",
+    "alignCenterAria": "Align center",
+    "alignRightAria": "Align right",
+    "backgroundUrl": "Background URL",
+    "backgroundUrlPlaceholder": "https://example.com/image.jpg",
+    "backgroundUrlAria": "Background URL",
+    "errors": {
+      "scrollSpeedFailed": "Failed to update scroll speed",
+      "fontSizeFailed": "Failed to update font size",
+      "textAlignFailed": "Failed to update text alignment",
+      "backgroundFailed": "Failed to update background",
+      "unknownError": "Unknown error occurred"
+    }
+  },
+  "Audio": {
+    "playbackFailed": "Audio playback failed"
+  },
+  "Camera": {
+    "cameraAccessDenied": "Camera access denied",
+    "enableCameraPermissions": "Please enable camera permissions",
+    "cameraOff": "Camera Off",
+    "stopCamera": "Stop Camera",
+    "startCamera": "Start Camera",
+    "cameraAccessRequired": "Camera Access Required",
+    "requestPermission": "Request Permission",
+    "muteMicrophone": "Mute Microphone",
+    "unmuteMicrophone": "Unmute Microphone",
+    "turnOffCamera": "Turn Off Camera",
+    "turnOnCamera": "Turn On Camera",
+    "closeCameraWidget": "Close Camera Widget"
+  },
+  "RecordingControls": {
+    "record": "Record",
+    "stop": "Stop",
+    "discard": "Discard"
+  },
+  "RecordingIndicator": {
+    "rec": "REC",
+    "paused": "PAUSED"
+  },
+  "App": {
+    "metadata": {
+      "title": "Glean Teleprompter - Professional Teleprompter for Content Creators",
+      "description": "Write, rehearse, and record your scripts with ease. Perfect for YouTubers, podcasters, presenters, and anyone who speaks to an audience."
+    },
+    "footer": {
+      "copyright": "© 2025 Glean Teleprompter. All rights reserved.",
+      "demo": "Demo",
+      "templates": "Templates",
+      "login": "Log In",
+      "signUp": "Sign Up"
+    }
+  },
+  "AuthError": {
+    "title": "Sorry, something went wrong.",
+    "codeError": "Code error: {code}",
+    "unspecifiedError": "An unspecified error occurred."
+  },
+  "Dashboard": {
+    "welcomeBack": "Welcome back, {email}!",
+    "welcome": "Welcome back!",
+    "subtitle": "Manage your recordings, scripts, presets, and settings",
+    "quickAction": "Quick Action",
+    "openStudio": "Open Studio",
+    "totalScripts": "Total Scripts",
+    "totalRecordings": "Total Recordings",
+    "savedPresets": "Saved Presets",
+    "quickActions": "Quick Actions",
+    "createNewScript": "Create New Script",
+    "createNewScriptDesc": "Start recording with the teleprompter",
+    "viewRecordings": "View Recordings",
+    "viewRecordingsDesc": "Manage your recorded videos",
+    "manageScripts": "Manage Scripts",
+    "manageScriptsDesc": "View and edit your saved scripts",
+    "gettingStarted": "Getting Started",
+    "gettingStartedDesc": "New to Glean Teleprompter? Here's how to get started:",
+    "step1": "Click \"Open Studio\" to create your first teleprompter script",
+    "step2": "Customize font, colors, and scroll speed to your preference",
+    "step3": "Save your scripts to the cloud and share them with others",
+    "step4": "Use camera recording to capture yourself while reading"
+  },
+  "DashboardLayout": {
+    "brand": "Glean",
+    "overview": "Overview",
+    "recordings": "Recordings",
+    "studio": "Studio",
+    "footer": "© {year} Glean Teleprompter. All rights reserved."
+  },
+  "RecordingsPage": {
+    "title": "Recordings Library",
+    "description": "Manage your video recordings"
+  },
+  "DemoPage": {
+    "loadingDemo": "Loading Demo...",
+    "saveWarning": "Demo Mode: Sign up to save your scripts and recordings",
+    "signUp": "Sign Up"
+  },
+  "QuickStartPage": {
+    "back": "Back",
+    "brand": "Glean Teleprompter",
+    "title": "Quick Start with Templates",
+    "description": "Choose a template to get started faster. Each template comes with pre-configured settings and sample content that you can customize.",
+    "dontSeeTemplate": "Don't see a template you like?",
+    "startFromScratch": "Start from scratch"
+  },
+  "StudioPage": {
+    "loadingTemplate": "Loading template...",
+    "loadingScript": "Loading script...",
+    "templateLoaded": "Template loaded!",
+    "scriptLoaded": "Script loaded!",
+    "templateNotFound": "Template \"{id}\" not found",
+    "failedToLoadTemplate": "Failed to load template",
+    "loadingTimeout": "Loading timeout - please retry",
+    "loadingScriptTimedOut": "Loading script timed out",
+    "retry": "Retry"
+  },
+  "SharedScriptPage": {
+    "loadingSharedScript": "Loading shared script...",
+    "scriptNotFound": "Script not found or not publicly shared",
+    "failedToLoad": "Failed to load script",
+    "scriptNotAvailable": "Script Not Available",
+    "goToStudio": "Go to Studio"
+  },
+  "ProtectedPage": {
+    "loading": "Loading..."
   }
 }

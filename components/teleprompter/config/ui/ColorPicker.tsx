@@ -8,6 +8,7 @@ interface ColorPickerProps {
   value: string
   onChange: (color: string) => void
   label?: string
+  tooltip?: string
   showInput?: boolean
   className?: string
 }
@@ -16,6 +17,7 @@ export function ColorPicker({
   value,
   onChange,
   label,
+  tooltip,
   showInput = true,
   className,
 }: ColorPickerProps) {
@@ -41,7 +43,7 @@ export function ColorPicker({
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <label className="text-sm font-medium text-foreground">
+        <label className="text-sm font-medium text-foreground" title={tooltip}>
           {label}
         </label>
       )}

@@ -4,20 +4,26 @@ import { cn } from '@/lib/utils'
 import { ColorPicker } from '../ui/ColorPicker'
 import { SliderInput } from '../ui/SliderInput'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
+import { useTranslations } from 'next-intl'
 
-export function OutlineControl() {
+interface OutlineControlProps {
+  tooltip?: string
+}
+
+export function OutlineControl({ tooltip }: OutlineControlProps) {
+  const t = useTranslations('Config.effects.outline')
   const { effects, setEffects } = useConfigStore()
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" title={tooltip}>
       {/* Enable Outline */}
       <div className="flex items-center justify-between">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Text Outline
+            {t('label')}
           </label>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Add border around text for better visibility
+            {t('description')}
           </p>
         </div>
         <button
@@ -46,13 +52,13 @@ export function OutlineControl() {
             max={10}
             step={0.5}
             unit="px"
-            label="Width"
+            label={t('width')}
             onChange={(value) => setEffects({ outlineWidth: value })}
           />
 
           {/* Color */}
           <ColorPicker
-            label="Outline Color"
+            label={t('color')}
             value={effects.outlineColor}
             onChange={(value) => setEffects({ outlineColor: value })}
           />

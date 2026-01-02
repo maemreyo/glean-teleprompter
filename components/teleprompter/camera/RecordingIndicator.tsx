@@ -8,6 +8,7 @@
 
 import { Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export interface RecordingIndicatorProps {
   /** Whether recording is active */
@@ -29,6 +30,7 @@ export function RecordingIndicator({
   compact = false,
   className,
 }: RecordingIndicatorProps) {
+  const t = useTranslations('RecordingIndicator');
   // Format duration as MM:SS
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -59,8 +61,8 @@ export function RecordingIndicator({
       />
 
       {/* REC Text */}
-      {!isPaused && <span className="text-red-500">REC</span>}
-      {isPaused && <span className="text-yellow-500">PAUSED</span>}
+      {!isPaused && <span className="text-red-500">{t('rec')}</span>}
+      {isPaused && <span className="text-yellow-500">{t('paused')}</span>}
 
       {/* Duration */}
       {duration > 0 && (

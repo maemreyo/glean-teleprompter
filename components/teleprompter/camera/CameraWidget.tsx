@@ -3,6 +3,7 @@ import { Camera, CameraOff, Loader2, Mic, MicOff, X, GripHorizontal } from 'luci
 import { useCamera } from '@/hooks/useCamera';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export interface CameraWidgetProps {
   /** Whether the camera widget is visible */
@@ -24,6 +25,7 @@ export function CameraWidget({
   quality = 'standard',
   className,
 }: CameraWidgetProps) {
+  const t = useTranslations('Camera');
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -140,7 +142,7 @@ export function CameraWidget({
       {!isVideoEnabled && isActive && (
          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 text-gray-500">
              <CameraOff className="w-12 h-12 mb-2 opacity-50" />
-             <p className="text-sm">Camera Off</p>
+             <p className="text-sm">{t('cameraOff')}</p>
          </div>
       )}
 
@@ -155,14 +157,14 @@ export function CameraWidget({
       {hasPermission === false && !isActive && !isLoading && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/90 text-white p-4 text-center z-10">
           <CameraOff className="w-12 h-12 mb-2 text-red-400" />
-          <p className="text-sm font-medium">Camera Access Required</p>
+          <p className="text-sm font-medium">{t('cameraAccessRequired')}</p>
           <Button
             size="sm"
             variant="outline"
             className="mt-4"
             onClick={() => requestPermissions()}
           >
-            Request Permission
+            {t('requestPermission')}
           </Button>
         </div>
       )}
@@ -182,7 +184,7 @@ export function CameraWidget({
                     ? "bg-white/20 hover:bg-white/30 text-white" 
                     : "bg-red-500/80 hover:bg-red-500 text-white"
             )}
-            title={isAudioEnabled ? "Mute Microphone" : "Unmute Microphone"}
+            title={isAudioEnabled ? t('muteMicrophone') : t('unmuteMicrophone')}
         >
             {isAudioEnabled ? <Mic size={20} /> : <MicOff size={20} />}
         </button>
@@ -196,7 +198,7 @@ export function CameraWidget({
                     ? "bg-white/20 hover:bg-white/30 text-white"
                     : "bg-red-500/80 hover:bg-red-500 text-white"
             )}
-            title={isVideoEnabled ? "Turn Off Camera" : "Turn On Camera"}
+            title={isVideoEnabled ? t('turnOffCamera') : t('turnOnCamera')}
         >
             {isVideoEnabled ? <Camera size={20} /> : <CameraOff size={20} />}
         </button>
@@ -208,7 +210,7 @@ export function CameraWidget({
                 onToggle?.();
             }}
             className="p-3 rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-md transition-all"
-            title="Close Camera Widget"
+            title={t('closeCameraWidget')}
         >
             <X size={20} />
         </button>

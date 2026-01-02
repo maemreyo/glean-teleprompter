@@ -3,14 +3,16 @@
 import { cn } from '@/lib/utils'
 import { SliderInput } from '../ui/SliderInput'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
+import { useTranslations } from 'next-intl'
 
 export function FontSizeControl() {
+  const t = useTranslations('Config.typography')
   const { typography, setTypography } = useConfigStore()
   
   return (
     <div className="space-y-4">
       <label className="block text-sm font-medium text-foreground">
-        Font Size
+        {t('fontSize')}
       </label>
       
       <div className="grid grid-cols-2 gap-4">
@@ -21,14 +23,14 @@ export function FontSizeControl() {
           max={120}
           step={1}
           unit="px"
-          label="Size"
+          label={t('size')}
           onChange={(value) => setTypography({ fontSize: value })}
         />
         
         {/* Font Weight */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-foreground">
-            Weight
+            {t('weight')}
           </label>
           <select
             value={typography.fontWeight}
@@ -39,15 +41,15 @@ export function FontSizeControl() {
               "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             )}
           >
-            <option value={100}>Thin (100)</option>
-            <option value={200}>Extra Light (200)</option>
-            <option value={300}>Light (300)</option>
-            <option value={400}>Regular (400)</option>
-            <option value={500}>Medium (500)</option>
-            <option value={600}>Semi Bold (600)</option>
-            <option value={700}>Bold (700)</option>
-            <option value={800}>Extra Bold (800)</option>
-            <option value={900}>Black (900)</option>
+            <option value={100}>{t('fontWeights.thin')}</option>
+            <option value={200}>{t('fontWeights.extraLight')}</option>
+            <option value={300}>{t('fontWeights.light')}</option>
+            <option value={400}>{t('fontWeights.regular')}</option>
+            <option value={500}>{t('fontWeights.medium')}</option>
+            <option value={600}>{t('fontWeights.semiBold')}</option>
+            <option value={700}>{t('fontWeights.bold')}</option>
+            <option value={800}>{t('fontWeights.extraBold')}</option>
+            <option value={900}>{t('fontWeights.black')}</option>
           </select>
         </div>
       </div>

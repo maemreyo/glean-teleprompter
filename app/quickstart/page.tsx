@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { CategoryFilter } from '@/components/QuickStart/CategoryFilter';
 import { TemplateGrid } from '@/components/QuickStart/TemplateGrid';
 import { templates, getTemplatesByCategory, ScriptTemplate } from '@/lib/templates/templateConfig';
@@ -13,6 +14,7 @@ import { ThemeSwitcher } from '@/components/ThemeSwitcher';
  * Users can choose pre-built script templates to get started faster
  */
 export default function QuickStartPage() {
+  const t = useTranslations("QuickStartPage");
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const filteredTemplates = useMemo(() => {
@@ -33,11 +35,11 @@ export default function QuickStartPage() {
               className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
-              <span>Back</span>
+              <span>{t("back")}</span>
             </Link>
             <ThemeSwitcher />
             <h1 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
-              Glean Teleprompter
+              {t("brand")}
             </h1>
             <div className="w-16" /> {/* Spacer for balance */}
           </div>
@@ -54,11 +56,10 @@ export default function QuickStartPage() {
             </div>
           </div>
           <h2 className="text-4xl font-bold text-white mb-4">
-            Quick Start with Templates
+            {t("title")}
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Choose a template to get started faster. Each template comes with pre-configured
-            settings and sample content that you can customize.
+            {t("description")}
           </p>
         </div>
 
@@ -76,9 +77,9 @@ export default function QuickStartPage() {
         {/* CTA Section */}
         <div className="text-center mt-16 pt-8 border-t border-gray-800">
           <p className="text-gray-400 mb-4">
-            Don&apos;t see a template you like?{' '}
+            {t("dontSeeTemplate")}{' '}
             <Link href="/studio" className="text-pink-400 hover:text-pink-300 font-medium">
-              Start from scratch
+              {t("startFromScratch")}
             </Link>
           </p>
         </div>

@@ -87,7 +87,7 @@ export function ColorsTab() {
       
       {/* Color Palettes */}
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-foreground">
+        <label className="block text-sm font-medium text-foreground" title={t('tooltips.colorPalettes')}>
           {t('colorPalettes')}
         </label>
         <div
@@ -131,7 +131,7 @@ export function ColorsTab() {
       {/* T073: Primary Color - Native picker on mobile */}
       {isMobile ? (
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-foreground">
+          <label className="block text-sm font-medium text-foreground" title={t('tooltips.primaryTextColor')}>
             {t('primaryTextColor')}
           </label>
           <div className="flex items-center gap-3">
@@ -153,13 +153,14 @@ export function ColorsTab() {
       ) : (
         <ColorPicker
           label={t('primaryTextColor')}
+          tooltip={t('tooltips.primaryTextColor')}
           value={colors.primaryColor}
           onChange={(value) => setColors({ primaryColor: value })}
         />
       )}
       
       {/* Contrast Validation */}
-      <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+      <div className="flex items-center justify-between p-3 bg-muted rounded-lg" title={t('tooltips.wcagCompliance')}>
         <div className="flex-1">
           <label className="block text-sm font-medium text-foreground mb-1">
             {t('wcagCompliance')}
@@ -172,7 +173,7 @@ export function ColorsTab() {
       </div>
       
       {/* Gradient Toggle */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" title={t('tooltips.enableGradient')}>
         <div>
           <label className="block text-sm font-medium text-foreground">
             {t('enableGradient')}
@@ -222,7 +223,7 @@ export function ColorsTab() {
         {isMobile ? (
           <>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-foreground">
+              <label className="block text-sm font-medium text-foreground" title={t('tooltips.outlineColor')}>
                 {t('outlineColor')}
               </label>
               <div className="flex items-center gap-3">
@@ -243,7 +244,7 @@ export function ColorsTab() {
             </div>
             
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-foreground">
+              <label className="block text-sm font-medium text-foreground" title={t('tooltips.glowColor')}>
                 {t('glowColor')}
               </label>
               <div className="flex items-center gap-3">
@@ -267,12 +268,14 @@ export function ColorsTab() {
           <>
             <ColorPicker
               label={t('outlineColor')}
+              tooltip={t('tooltips.outlineColor')}
               value={colors.outlineColor}
               onChange={(value) => setColors({ outlineColor: value })}
             />
             
             <ColorPicker
               label={t('glowColor')}
+              tooltip={t('tooltips.glowColor')}
               value={colors.glowColor}
               onChange={(value) => setColors({ glowColor: value })}
             />

@@ -12,7 +12,9 @@ import {
   createDraft,
 } from '@/lib/storage/draftStorage';
 import { TeleprompterDraft } from '@/lib/storage/types';
-import { useTeleprompterStore } from '@/stores/useTeleprompterStore';
+import { useConfigStore } from '@/lib/stores/useConfigStore';
+import { useContentStore } from '@/lib/stores/useContentStore';
+import { TEXT_COLORS } from '@/lib/constants';
 import { toast } from 'sonner';
 
 export interface UseDraftManagementOptions {
@@ -101,8 +103,7 @@ export function useDraftManagement(
   } = options;
 
   const router = useRouter();
-  const setAll = useTeleprompterStore((state) => state.setAll);
-
+  
   const [drafts, setDrafts] = useState<TeleprompterDraft[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -141,29 +142,51 @@ export function useDraftManagement(
     }
 
     try {
-      // Apply draft state to store (excluding metadata)
+      // Apply draft state to stores (excluding metadata)
       // Map draft properties to store property names
       const { _id, _version, _timestamp, text, backgroundUrl, musicUrl, fontStyle, colorIndex, scrollSpeed, fontSize, textAlignment, lineHeight, margin, overlayOpacity } = draft;
       
-      setAll({
+      // 1. Restore Content
+      useContentStore.getState().setAll({
         text,
         bgUrl: backgroundUrl,
         musicUrl: musicUrl,
-        font: fontStyle as any,
-        colorIndex,
-        speed: scrollSpeed,
+      });
+
+      // 2. Restore Config
+      useConfigStore.getState().setTypography({
+        fontFamily: fontStyle,
         fontSize,
-        align: textAlignment as any,
         lineHeight,
-        margin,
+      });
+
+      useConfigStore.getState().setEffects({
         overlayOpacity,
       });
+
+      useConfigStore.getState().setLayout({
+        textAlign: textAlignment as any,
+        horizontalMargin: margin,
+      });
+
+      useConfigStore.getState().setAnimations({
+        autoScrollSpeed: scrollSpeed,
+      });
+
+      // Map color index to actual color value
+      const colorValue = TEXT_COLORS[colorIndex]?.value;
+      if (colorValue) {
+        useConfigStore.getState().setColors({
+          primaryColor: colorValue,
+        });
+      }
       
       toast.success('Draft restored successfully');
     } catch (err) {
       toast.error('Failed to restore draft');
+      console.error(err);
     }
-  }, [drafts, setAll]);
+  }, [drafts]);
 
   const deleteDrafts = useCallback(async (ids: string[]) => {
     try {
@@ -187,21 +210,27 @@ export function useDraftManagement(
 
   const createDraftFromState = useCallback(() => {
     try {
-      const state = useTeleprompterStore.getState();
+      const contentState = useContentStore.getState();
+      const configState = useConfigStore.getState();
+      
+      // Map color back to index (best effort)
+      const currentColor = configState.colors.primaryColor;
+      const index = TEXT_COLORS.findIndex(c => c.value.toLowerCase() === currentColor.toLowerCase());
+      const colorIndex = index >= 0 ? index : 0;
       
       // Map store properties to draft properties
       const draftState = {
-        text: state.text,
-        backgroundUrl: state.bgUrl,
-        musicUrl: state.musicUrl,
-        fontStyle: state.font,
-        colorIndex: state.colorIndex,
-        scrollSpeed: state.speed,
-        fontSize: state.fontSize,
-        textAlignment: state.align,
-        lineHeight: state.lineHeight,
-        margin: state.margin,
-        overlayOpacity: state.overlayOpacity,
+        text: contentState.text,
+        backgroundUrl: contentState.bgUrl,
+        musicUrl: contentState.musicUrl,
+        fontStyle: configState.typography.fontFamily,
+        colorIndex,
+        scrollSpeed: configState.animations.autoScrollSpeed,
+        fontSize: configState.typography.fontSize,
+        textAlignment: configState.layout.textAlign,
+        lineHeight: configState.typography.lineHeight,
+        margin: configState.layout.horizontalMargin,
+        overlayOpacity: configState.effects.overlayOpacity,
       };
       
       const draft = createDraft(draftState);

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { NavAuth } from '@/components/auth/NavAuth'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import Link from 'next/link'
@@ -12,6 +13,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
+  const t = useTranslations("DashboardLayout")
   const router = useRouter()
   const pathname = usePathname()
   const { user, isLoading } = useAuthStore()
@@ -43,26 +45,26 @@ export default function DashboardLayout({
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/dashboard" className="text-xl font-bold text-pink-500">
-              Glean
+              {t("brand")}
             </Link>
             <div className="hidden md:flex items-center gap-6">
               <Link
                 href="/dashboard"
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                Overview
+                {t("overview")}
               </Link>
               <Link
                 href="/dashboard/recordings"
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                Recordings
+                {t("recordings")}
               </Link>
               <Link
                 href="/studio"
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                Studio
+                {t("studio")}
               </Link>
             </div>
           </div>
@@ -82,7 +84,7 @@ export default function DashboardLayout({
       {/* Footer */}
       <footer className="border-t border-gray-800 mt-auto py-8">
         <div className="container mx-auto px-4 text-center text-gray-400 text-sm">
-          <p>© {new Date().getFullYear()} Glean Teleprompter. All rights reserved.</p>
+          <p>{t("footer", { year: new Date().getFullYear() })}</p>
         </div>
       </footer>
     </div>

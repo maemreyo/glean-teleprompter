@@ -2,6 +2,7 @@
 
 import React, { useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 // 007-unified-state-architecture: Use new stores with single responsibility
 import { useContentStore } from '@/lib/stores/useContentStore';
 import { useConfigStore } from '@/lib/stores/useConfigStore';
@@ -24,6 +25,7 @@ import { toast } from 'sonner';
 
 function DemoLogic() {
   const router = useRouter();
+  const t = useTranslations("DemoPage");
   // 007-unified-state-architecture: Use new stores with single responsibility
   const { setText, setBgUrl, setMusicUrl, setIsReadOnly } = useContentStore();
   const { setAll: setConfigAll } = useConfigStore();
@@ -127,9 +129,9 @@ function DemoLogic() {
   // Override save handler to show warning
   useEffect(() => {
     const handleSaveAttempt = () => {
-      toast.error('Demo Mode: Sign up to save your scripts and recordings', {
+      toast.error(t("saveWarning"), {
         action: {
-          label: 'Sign Up',
+          label: t("signUp"),
           onClick: () => router.push('/auth/sign-up')
         }
       });
@@ -144,23 +146,28 @@ function DemoLogic() {
   }, [router]);
 
   // 007-unified-state-architecture: Use mode from useUIStore
+  const mode = useUIStore((state) => state.mode);
+
   return (
     <>
       <DemoBanner />
       <AnimatePresence mode="wait">
-        <DemoLogic />
+        {mode === 'setup' && <Editor />}
+        {mode === 'running' && <Runner />}
       </AnimatePresence>
     </>
   );
 }
 
 export default function DemoPage() {
+  const t = useTranslations("DemoPage");
+  
   return (
     <AppProvider>
       <Toaster position="top-center" richColors />
       <Suspense fallback={
         <div className="min-h-screen bg-black text-white flex items-center justify-center">
-          Loading Demo...
+          {t("loadingDemo")}
         </div>
       }>
         <DemoLogic />

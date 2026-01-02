@@ -1,4 +1,67 @@
 {
+  "Demo": {
+    "mode": "Chế độ Demo",
+    "signUpToSave": "Đăng ký để lưu các kịch bản và bản ghi của bạn",
+    "signUpFree": "Đăng ký miễn phí →",
+    "dismiss": "Đóng"
+  },
+  "Landing": {
+    "hero": {
+      "badge": "Teleprompter Chuyên nghiệp",
+      "title": "Glean Teleprompter",
+      "tagline": "Teleprompter chuyên nghiệp cho người tạo nội dung",
+      "description": "Viết, tập dượt và ghi lại các kịch bản của bạn một cách dễ dàng. Hoàn hảo cho YouTuber, podcasters, người thuyết trình và bất kỳ ai nói chuyện với khán giả.",
+      "startWriting": "Bắt đầu viết",
+      "tryDemo": "Thử Demo",
+      "noAccountRequired": "Không cần tài khoản để thử",
+      "signUpFree": "Đăng ký miễn phí"
+    },
+    "features": {
+      "title": "Mọi thứ bạn cần",
+      "subtitle": "Tính năng mạnh mẽ để tạo nội dung chuyên nghiệp",
+      "smartTeleprompter": {
+        "title": "Teleprompter thông minh",
+        "description": "Tốc độ điều chỉnh, phông chữ, màu sắc và chế độ gương cho bộ phản chiếu"
+      },
+      "builtInRecording": {
+        "title": "Ghi hình tích hợp",
+        "description": "Ghi lại chính mình trong khi đọc kịch bản với lớp phủ camera"
+      },
+      "cloudSync": {
+        "title": "Đồng bộ đám mây",
+        "description": "Lưu kịch bản một cách an toàn và truy cập từ bất kỳ thiết bị nào"
+      },
+      "customPresets": {
+        "title": "Mẫu tùy chỉnh",
+        "description": "Lưu cấu hình yêu thích của bạn và áp dụng bằng một cú nhấp chuột"
+      }
+    },
+    "cta": {
+      "title": "Sẵn sàng bắt đầu tạo?",
+      "description": "Tham gia cùng hàng nghìn người tạo nội dung sử dụng Glean Teleprompter để tạo video và bài thuyết trình chuyên nghiệp.",
+      "createScript": "Tạo kịch bản đầu tiên của bạn",
+      "tryDemo": "Thử Demo trước"
+    }
+  },
+  "Navigation": {
+    "brand": "Glean Teleprompter",
+    "tryDemo": "Thử Demo",
+    "templates": "Mẫu",
+    "logIn": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "dashboard": "Bảng điều khiển",
+    "logout": "Đăng xuất",
+    "demo": "Demo"
+  },
+  "QuickStart": {
+    "categories": {
+      "all": "Tất cả mẫu",
+      "business": "Kinh doanh",
+      "creative": "Sáng tạo",
+      "education": "Giáo dục",
+      "blank": "Trống"
+    }
+  },
   "Editor": {
     "title": "Creator Studio",
     "login": "Đăng nhập",
@@ -13,7 +76,14 @@
     "preview": "Preview",
     "save": "Lưu Cloud",
     "share": "Share Link",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "closeEditor": "Đóng trình soạn thảo nội dung",
+    "openEditor": "Mở trình soạn thảo nội dung (Ctrl+E)",
+    "viewDetail": "Xem chi tiết",
+    "hidePreview": "Ẩn xem trước",
+    "showPreview": "Hiện xem trước",
+    "expandFooter": "Mở rộng footer",
+    "collapseFooter": "Thu gọn footer"
   },
   "Runner": {
     "create": "Tạo bản mới",
@@ -102,7 +172,60 @@
     "next": "Tiếp",
     "deleteConfirm": "Bạn có chắc chắn muốn xóa bản ghi này không? Hành động này không thể hoàn tác.",
     "playRecording": "Phát bản ghi",
+    "deleteRecording": "Xóa bản ghi",
+    "searchPlaceholder": "Tìm kiếm bản ghi...",
+    "toggleFilters": "Bật tắt bộ lọc",
+    "newestFirst": "Mới nhất trước",
+    "oldestFirst": "Cũ nhất trước",
+    "shortestFirst": "Ngắn nhất trước",
+    "longestFirst": "Dài nhất trước",
+    "smallestFirst": "Nhỏ nhất trước",
+    "largestFirst": "Lớn nhất trước",
+    "listView": "Chế độ danh sách",
+    "gridView": "Chế độ lưới",
+    "toggleBulkMode": "Bật chế độ chọn hàng loạt",
+    "showingResults": "Đang hiển thị {count} của {total} bản ghi",
+    "clearFilters": "Xóa bộ lọc",
+    "bulkDeleteConfirm": "Bạn có chắc chắn muốn xóa {count} bản ghi không? Hành động này không thể hoàn tác."
+  },
+  "RecordingFilters": {
+    "title": "Bộ lọc",
+    "dateRange": "Phạm vi ngày",
+    "quality": "Chất lượng",
+    "duration": "Thời lượng",
+    "applyDateRange": "Áp dụng phạm vi ngày",
+    "allQuality": "Tất cả chất lượng",
+    "standardQuality": "Tiêu chuẩn",
+    "reducedQuality": "Giảm",
+    "allDuration": "Tất cả thời lượng",
+    "shortDuration": "Dưới 1 phút",
+    "mediumDuration": "1-5 phút",
+    "longDuration": "Trên 5 phút",
+    "clearAllFilters": "Xóa tất cả bộ lọc"
+  },
+  "RecordingCard": {
+    "quality": "chất lượng",
+    "play": "Phát",
+    "delete": "Xóa"
+  },
+  "RecordingListView": {
+    "quality": "chất lượng",
+    "playRecording": "Phát bản ghi",
     "deleteRecording": "Xóa bản ghi"
+  },
+  "BulkActionsBar": {
+    "selected": "đã chọn",
+    "deselectAll": "Bỏ chọn tất cả",
+    "selectAll": "Chọn tất cả",
+    "download": "Tải xuống",
+    "organize": "Sắp xếp",
+    "share": "Chia sẻ",
+    "delete": "Xóa",
+    "clearSelection": "Xóa lựa chọn",
+    "downloadSelected": "Tải xuống các bản ghi đã chọn",
+    "organizeSelected": "Sắp xếp các bản ghi đã chọn",
+    "shareSelected": "Chia sẻ các bản ghi đã chọn",
+    "deleteSelected": "Xóa các bản ghi đã chọn"
   },
   "PermissionDialog": {
     "cameraTitle": "Cần quyền truy cập Camera",
@@ -131,6 +254,19 @@
     "saveRecording": "Lưu bản ghi"
   },
   "Config": {
+    "title": "Cấu hình",
+    "header": {
+      "undo": "Hoàn tác thay đổi gần nhất",
+      "redo": "Làm lại thay đổi gần nhất",
+      "clearHistory": "Xóa tất cả lịch sử",
+      "changes": "{count} thay đổi",
+      "changesTooltip": "{current} của {total} thay đổi",
+      "close": "Đóng bảng cấu hình",
+      "clearHistoryTitle": "Xóa lịch sử",
+      "clearHistoryDescription": "Bạn có chắc chắn muốn xóa toàn bộ lịch sử hoàn tác/làm lại không? Hành động này không thể hoàn tác.",
+      "clearHistoryConfirm": "Xóa lịch sử",
+      "description": "Cấu hình cài đặt teleprompter bao gồm typography, màu sắc, hiệu ứng, bố cục và hoạt ảnh"
+    },
     "tabs": {
       "typography": "Typography",
       "colors": "Màu sắc",
@@ -140,18 +276,52 @@
       "presets": "Mẫu",
       "media": "Phương tiện"
     },
+    "tabTooltips": {
+      "typography": "Cấu hình font, kích thước, độ đậm và khoảng cách",
+      "colors": "Đặt màu văn bản, gradient và kiểm tra độ tương phản",
+      "effects": "Thêm bóng, viền, phát sáng và làm mờ nền",
+      "layout": "Điều chỉnh lề, khoảng cách, căn chỉnh và cột",
+      "animations": "Cấu hình cuộn, hoạt ảnh vào và làm nổi bật",
+      "presets": "Lưu, tải và quản lý các mẫu cấu hình",
+      "media": "Đặt hình ảnh nền và nhạc"
+    },
     "allTabs": "Tất cả Tab",
     "selectTab": "Chọn một tab để cài đặt",
     "typography": {
       "title": "Cài đặt Typography",
       "description": "Cấu hình font, kích thước, độ đậm và khoảng cách cho văn bản teleprompter của bạn.",
+      "fontFamily": "Phông chữ",
+      "fontSize": "Cỡ chữ",
+      "size": "Kích thước",
+      "weight": "Độ đậm",
+      "searchFonts": "Tìm kiếm phông chữ...",
+      "noFontsFound": "Không tìm thấy phông chữ",
       "letterSpacing": "Khoảng cách chữ",
       "lineHeight": "Chiều cao dòng",
       "textTransform": "Chuyển đổi văn bản",
       "none": "Không",
       "uppercase": "In hoa",
       "lowercase": "In thường",
-      "capitalize": "Viết hoa đầu câu"
+      "capitalize": "Viết hoa đầu câu",
+      "fontWeights": {
+        "thin": "Mảnh (100)",
+        "extraLight": "Siêu nhạt (200)",
+        "light": "Nhạt (300)",
+        "regular": "Thường (400)",
+        "medium": "Vừa (500)",
+        "semiBold": "Bán đậm (600)",
+        "bold": "Đậm (700)",
+        "extraBold": "Siêu đậm (800)",
+        "black": "Đen (900)"
+      },
+      "tooltips": {
+        "letterSpacing": "Điều chỉnh khoảng cách giữa các ký tự để dễ đọc",
+        "lineHeight": "Kiểm soát khoảng cách dọc giữa các dòng văn bản",
+        "textTransform": "Thay đổi chữ hoa/chữ thường để nhấn mạnh hoặc tạo phong cách",
+        "fontFamily": "Chọn font từ Google Fonts hoặc font hệ thống",
+        "fontSize": "Đặt kích thước cơ bản của văn bản",
+        "fontWeight": "Điều chỉnh độ đậm/nhạt của văn bản"
+      }
     },
     "colors": {
       "title": "Cài đặt màu sắc",
@@ -168,11 +338,62 @@
       "gradientDesc": "Áp dụng gradient cho văn bản",
       "effectColors": "Màu hiệu ứng",
       "outlineColor": "Màu viền",
-      "glowColor": "Màu phát sáng"
+      "glowColor": "Màu phát sáng",
+      "gradientPicker": {
+        "linear": "Tuyến tính",
+        "radial": "Xuyên tâm",
+        "angle": "Góc",
+        "colorStops": "Điểm màu",
+        "addColor": "Thêm màu",
+        "removeColor": "Xóa màu",
+        "colorPlaceholder": "#ffffff"
+      },
+      "tooltips": {
+        "colorPalettes": "Áp dụng nhanh các bảng màu chuyên nghiệp",
+        "primaryTextColor": "Đặt màu chính cho văn bản của bạn",
+        "wcagCompliance": "Kiểm tra xem văn bản có đáp ứng tiêu chuẩn khả năng truy cập không",
+        "enableGradient": "Thêm hiệu ứng gradient vào văn bản",
+        "outlineColor": "Màu cho viền văn bản",
+        "glowColor": "Màu cho hiệu ứng phát sáng văn bản"
+      }
     },
     "effects": {
       "title": "Hiệu ứng hình ảnh",
-      "description": "Cấu hình bóng, viền, phát sáng và bộ lọc nền để cải thiện khả năng đọc."
+      "description": "Cấu hình bóng, viền, phát sáng và bộ lọc nền để cải thiện khả năng đọc.",
+      "backdrop": {
+        "label": "Bộ lọc nền",
+        "blur": "Làm mờ",
+        "brightness": "Độ sáng",
+        "saturation": "Độ bão hòa"
+      },
+      "glow": {
+        "label": "Phát sáng văn bản",
+        "description": "Thêm hiệu ứng phát sáng xung quanh văn bản",
+        "blurRadius": "Bán kính làm mờ",
+        "intensity": "Cường độ",
+        "color": "Màu phát sáng"
+      },
+      "outline": {
+        "label": "Viền văn bản",
+        "description": "Thêm viền xung quanh văn bản để dễ nhìn hơn",
+        "width": "Chiều rộng",
+        "color": "Màu viền"
+      },
+      "shadow": {
+        "label": "Bóng văn bản",
+        "description": "Thêm chiều sâu cho văn bản với bóng",
+        "offsetX": "Dịch X",
+        "offsetY": "Dịch Y",
+        "blur": "Làm mờ",
+        "opacity": "Độ mờ",
+        "color": "Màu bóng"
+      },
+      "tooltips": {
+        "shadow": "Thêm bóng đổ phía sau văn bản để tạo chiều sâu",
+        "outline": "Thêm viền xung quanh văn bản để tăng độ rõ",
+        "glow": "Thêm hiệu ứng phát sáng mềm xung quanh văn bản",
+        "backdropBlur": "Làm mờ nền phía sau teleprompter"
+      }
     },
     "layout": {
       "title": "Cài đặt bố cục",
@@ -183,7 +404,16 @@
       "columns": "Số cột",
       "columnGap": "Khoảng cách cột",
       "textAreaWidth": "Chiều rộng vùng văn bản",
-      "textAreaPosition": "Vị trí vùng văn bản"
+      "textAreaPosition": "Vị trí vùng văn bản",
+      "tooltips": {
+        "horizontalMargin": "Khoảng cách giữa văn bản và cạnh màn hình (trái/phải)",
+        "verticalPadding": "Khoảng cách giữa văn bản và đầu/cuối màn hình",
+        "textAlign": "Căn chỉnh văn bản sang trái, giữa, phải hoặc đều hai bên",
+        "columns": "Chia văn bản thành nhiều cột để dễ đọc",
+        "columnGap": "Khoảng cách giữa các cột văn bản",
+        "textAreaWidth": "Chiều rộng vùng văn bản theo tỷ lệ phần trăm màn hình",
+        "textAreaPosition": "Đặt vị trí vùng văn bản trên màn hình"
+      }
     },
     "animations": {
       "title": "Cài đặt hoạt ảnh",
@@ -204,7 +434,20 @@
       "autoScroll": "Tự động cuộn",
       "enableAutoScrolling": "Bật tự động cuộn",
       "scrollSpeed": "Tốc độ cuộn",
-      "acceleration": "Gia tốc"
+      "acceleration": "Gia tốc",
+      "test": "Thử",
+      "testing": "Đang thử...",
+      "tooltips": {
+        "smoothScroll": "Bật cuộn mượt mà để kiểm soát tốt hơn",
+        "scrollDamping": "Giá trị cao hơn = cuộn mượt hơn, phản hồi chậm hơn",
+        "entranceAnimation": "Hoạt ảnh khi văn bản lần đầu xuất hiện",
+        "animationDuration": "Độ dài của hoạt ảnh vào",
+        "wordHighlighting": "Làm nổi bật từ hiện tại khi bạn đọc",
+        "highlightSpeed": "Tốc độ làm nổi bật từng từ",
+        "autoScroll": "Tự động cuộn văn bản với tốc độ không đổi",
+        "scrollSpeed": "Pixel mỗi giây cho tự động cuộn",
+        "acceleration": "Tăng dần tốc độ cuộn"
+      }
     },
     "presets": {
       "title": "Mẫu",
@@ -222,7 +465,318 @@
       "syncFailed": "Đồng bộ thất bại",
       "connected": "Đã kết nối với đám mây",
       "offline": "Chế độ ngoại tuyến",
-      "sync": "Đồng bộ"
+      "sync": "Đồng bộ",
+      "importFailed": "Nhập mẫu thất bại",
+      "invalidPresetFile": "Tệp mẫu không hợp lệ",
+      "presetGrid": {
+        "noPresets": "Không tìm thấy mẫu nào",
+        "createFirst": "Tạo mẫu đầu tiên của bạn để bắt đầu",
+        "apply": "Áp dụng"
+      },
+      "tooltips": {
+        "savePreset": "Lưu cài đặt hiện tại làm mẫu có thể tái sử dụng",
+        "import": "Nhập mẫu từ tệp JSON",
+        "builtinPresets": "Cấu hình có sẵn cho các trường hợp sử dụng phổ biến",
+        "sync": "Đồng bộ mẫu của bạn với bộ nhớ đám mây"
+      }
+    },
+    "media": {
+      "title": "Cài đặt phương tiện",
+      "description": "Cấu hình hình ảnh nền, nhạc và các tài sản phương tiện khác.",
+      "useUrl": "Dùng URL",
+      "upload": "Tải lên",
+      "backgroundImageUrl": "URL ảnh nền",
+      "backgroundMusicUrl": "URL nhạc nền",
+      "imageUrlSet": "Đã đặt URL ảnh",
+      "musicUrlSet": "Đã đặt URL nhạc",
+      "uploadBackgroundImage": "Tải lên ảnh nền",
+      "uploadBackgroundMusic": "Tải lên nhạc nền",
+      "clickToUploadImage": "Nhấp để tải lên ảnh",
+      "clickToUploadMusic": "Nhấp để tải lên nhạc",
+      "uploading": "Đang tải lên...",
+      "fileFormatImage": "PNG, JPG, GIF tối đa 5MB",
+      "fileFormatMusic": "MP3, WAV tối đa 10MB",
+      "proOnly": "Chỉ Pro",
+      "proFeature": "Tính năng Pro",
+      "upgradeToUpload": "Nâng cấp để tải lên nhạc",
+      "enterBackgroundImageUrl": "Nhập URL để liên kết đến ảnh nền trực tuyến",
+      "enterBackgroundMusicUrl": "Nhập URL để liên kết đến nhạc nền trực tuyến",
+      "uploadFromDevice": "Tải lên từ thiết bị của bạn (tính năng Pro)",
+      "tooltips": {
+        "backgroundImage": "Đặt ảnh làm nền teleprompter",
+        "backgroundMusic": "Thêm nhạc nền để phát trong khi ghi hình",
+        "useUrl": "Nhập URL để liên kết đến phương tiện trực tuyến",
+        "upload": "Tải lên tệp phương tiện từ thiết bị của bạn (tính năng Pro)"
+      }
+    },
+    "tabUI": {
+      "ariaLabel": "Tab cấu hình",
+      "showAllTabs": "Hiện tất cả tab",
+      "closeTabSelector": "Đóng bộ chọn tab",
+      "done": "Xong"
     }
+  },
+  "AutoSaveStatus": {
+    "saving": "Đang lưu...",
+    "saved": "Đã lưu",
+    "error": "Lưu thất bại",
+    "retry": "Thử lại",
+    "justNow": "Vừa xong",
+    "minutesAgo": "{count} phút trước",
+    "hoursAgo": "{count} giờ trước"
+  },
+  "ErrorDialog": {
+    "title": "Lỗi",
+    "close": "Đóng",
+    "copyError": "Sao chép lỗi",
+    "copied": "Đã sao chép!",
+    "network": {
+      "title": "Lỗi mạng",
+      "message": "Lỗi mạng. Kiểm tra kết nối và thử lại",
+      "details": "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối internet của bạn.",
+      "action": "Thử lại"
+    },
+    "notFound": {
+      "title": "Không tìm thấy Script",
+      "message": "Không tìm thấy script. Có thể nó đã bị xóa hoặc liên kết không chính xác",
+      "details": "Script được yêu cầu không tồn tại hoặc đã bị xóa.",
+      "action": "Duyệt Mẫu"
+    },
+    "permission": {
+      "title": "Từ chối Quyền",
+      "message": "Bạn không có quyền xem script này",
+      "details": "Script này là riêng tư hoặc bạn cần đăng nhập để truy cập.",
+      "action": "Tạo của riêng bạn"
+    },
+    "quota": {
+      "title": "Bộ nhớ đầy",
+      "message": "Bộ nhớ đầy. Một số trình duyệt giới hạn bộ nhớ cục bộ.",
+      "details": "Đã vượt quá hạn ngạch bộ nhớ trình duyệt của bạn. Hãy cân nhắc lưu vào tài khoản hoặc xóa dữ liệu cũ.",
+      "action": "Đăng ký"
+    },
+    "unknown": {
+      "title": "Lỗi không mong đợi",
+      "message": "Đã xảy ra lỗi không mong đợi",
+      "details": "Đã xảy ra lỗi. Vui lòng thử lại.",
+      "action": "Thử lại"
+    }
+  },
+  "TextareaExpandButton": {
+    "expand": "Mở rộng",
+    "collapse": "Thu gọn",
+    "exitFullscreen": "Thoát toàn màn hình (Esc)",
+    "enterFullscreen": "Vào toàn màn hình"
+  },
+  "LoadingStates": {
+    "loadingStudio": "Đang tải Studio...",
+    "loadingScript": "Đang tải script...",
+    "loadingTemplate": "Đang tải mẫu...",
+    "pleaseWait": "Vui lòng đợi...",
+    "templateLoaded": "Đã tải mẫu!",
+    "loadingFailed": "Tải thất bại"
+  },
+  "PreviewPanel": {
+    "title": "Xem trước",
+    "togglePreview": "Bật tắt xem trước",
+    "closePreview": "Đóng xem trước",
+    "swipeToClose": "Vuốt xuống để đóng",
+    "failedToLoadBg": "Không thể tải hình nền"
+  },
+  "Footer": {
+    "expand": "Mở rộng footer",
+    "collapse": "Thu gọn footer"
+  },
+  "TabBottomSheet": {
+    "title": "Tất cả Tab",
+    "selectTab": "Chọn một tab",
+    "close": "Đóng"
+  },
+  "KeyboardShortcuts": {
+    "title": "Phím tắt",
+    "description": "Làm việc hiệu quả hơn với phím tắt",
+    "searchPlaceholder": "Tìm kiếm phím tắt...",
+    "noResults": "Không tìm thấy phím tắt",
+    "categories": {
+      "editing": "Chỉnh sửa",
+      "navigation": "Điều hướng",
+      "config": "Cấu hình",
+      "media": "Phương tiện",
+      "general": "Tổng quát"
+    },
+    "shortcuts": {
+      "undo": "Hoàn tác",
+      "redo": "Làm lại",
+      "save": "Lưu",
+      "togglePreview": "Bật tắt xem trước",
+      "expandTextarea": "Mở rộng vùng văn bản",
+      "fullscreen": "Bật tắt toàn màn hình",
+      "closeModal": "Đóng hộp thoại",
+      "nextTab": "Tab tiếp theo",
+      "previousTab": "Tab trước",
+      "openShortcuts": "Mở phím tắt"
+    },
+    "proTip": "Mẹo",
+    "proTipMessage": "Nhấn {shortcut} để nhanh chóng {action}"
+  },
+  "Performance": {
+    "largeScriptWarning": "Script này rất dài ({count}+ ký tự). Để có hiệu suất tốt nhất, hãy cân nhắc chia nó thành nhiều script."
+  },
+  "DraftManagementDialog": {
+    "title": "Bản nháp đã lưu",
+    "description": "Quản lý các bản nháp cục bộ của bạn. Khôi phục bản nháp để chỉnh sửa hoặc xóa các bản nháp cũ để giải phóng dung lượng.",
+    "loading": "Đang tải bản nháp...",
+    "noDrafts": "Chưa có bản nháp nào",
+    "noDraftsDesc": "Các bản nháp của bạn sẽ xuất hiện ở đây khi bạn làm việc.",
+    "draftCount_one": "{count} bản nháp",
+    "draftCount_other": "{count} bản nháp",
+    "selectedCount": "{count} đã chọn",
+    "delete": "Xóa",
+    "restore": "Khôi phục",
+    "emptyDraft": "Bản nháp trống",
+    "tip": "Mẹo: Sử dụng phím mũi tên để điều hướng, Enter để khôi phục, Delete để xóa các bản nháp đã chọn"
+  },
+  "FullPreviewDialog": {
+    "title": "Xem trước đầy đủ",
+    "openFullPreview": "Mở xem trước đầy đủ (Ctrl+\\)"
+  },
+  "QuickSettings": {
+    "title": "Cài đặt nhanh",
+    "modified": "Đã sửa",
+    "close": "Đóng cài đặt",
+    "scrollSpeed": "Tốc độ cuộn",
+    "scrollSpeedUnit": "px/giây",
+    "scrollSpeedAria": "Tốc độ cuộn",
+    "fontSize": "Cỡ chữ",
+    "fontSizeUnit": "px",
+    "fontSizeAria": "Cỡ chữ",
+    "textAlign": "Căn chỉnh văn bản",
+    "alignLeft": "Trái",
+    "alignCenter": "Giữa",
+    "alignRight": "Phải",
+    "alignLeftAria": "Căn trái",
+    "alignCenterAria": "Căn giữa",
+    "alignRightAria": "Căn phải",
+    "backgroundUrl": "URL ảnh nền",
+    "backgroundUrlPlaceholder": "https://example.com/image.jpg",
+    "backgroundUrlAria": "URL ảnh nền",
+    "errors": {
+      "scrollSpeedFailed": "Không thể cập nhật tốc độ cuộn",
+      "fontSizeFailed": "Không thể cập nhật cỡ chữ",
+      "textAlignFailed": "Không thể cập nhật căn chỉnh văn bản",
+      "backgroundFailed": "Không thể cập nhật nền",
+      "unknownError": "Có lỗi không xác định xảy ra"
+    }
+  },
+  "Audio": {
+    "playbackFailed": "Phát âm thanh thất bại"
+  },
+  "Camera": {
+    "cameraAccessDenied": "Quyền truy cập Camera bị từ chối",
+    "enableCameraPermissions": "Vui lòng bật quyền truy cập camera",
+    "cameraOff": "Camera Tắt",
+    "stopCamera": "Dừng Camera",
+    "startCamera": "Bật Camera",
+    "cameraAccessRequired": "Cần quyền truy cập Camera",
+    "requestPermission": "Yêu cầu quyền",
+    "muteMicrophone": "Tắt tiếng Microphone",
+    "unmuteMicrophone": "Bật tiếng Microphone",
+    "turnOffCamera": "Tắt Camera",
+    "turnOnCamera": "Bật Camera",
+    "closeCameraWidget": "Đóng Widget Camera"
+  },
+  "RecordingControls": {
+    "record": "Ghi hình",
+    "stop": "Dừng",
+    "discard": "Hủy bỏ"
+  },
+  "RecordingIndicator": {
+    "rec": "GHI",
+    "paused": "TẠM DỪNG"
+  },
+  "App": {
+    "metadata": {
+      "title": "Glean Teleprompter - Teleprompter Chuyên nghiệp cho Người tạo Nội dung",
+      "description": "Viết, tập dượt và ghi lại các kịch bản của bạn một cách dễ dàng. Hoàn hảo cho YouTuber, podcasters, người thuyết trình và bất kỳ ai nói chuyện với khán giả."
+    },
+    "footer": {
+      "copyright": "© 2025 Glean Teleprompter. Đã đăng ký bản quyền.",
+      "demo": "Demo",
+      "templates": "Mẫu",
+      "login": "Đăng nhập",
+      "signUp": "Đăng ký"
+    }
+  },
+  "AuthError": {
+    "title": "Xin lỗi, có lỗi đã xảy ra.",
+    "codeError": "Mã lỗi: {code}",
+    "unspecifiedError": "Đã xảy ra lỗi không xác định."
+  },
+  "Dashboard": {
+    "welcomeBack": "Chào mừng trở lại, {email}!",
+    "welcome": "Chào mừng trở lại!",
+    "subtitle": "Quản lý các bản ghi, kịch bản, mẫu và cài đặt của bạn",
+    "quickAction": "Hành động nhanh",
+    "openStudio": "Mở Studio",
+    "totalScripts": "Tổng số Kịch bản",
+    "totalRecordings": "Tổng số Bản ghi",
+    "savedPresets": "Mẫu đã lưu",
+    "quickActions": "Hành động nhanh",
+    "createNewScript": "Tạo kịch bản mới",
+    "createNewScriptDesc": "Bắt đầu ghi hình với teleprompter",
+    "viewRecordings": "Xem bản ghi",
+    "viewRecordingsDesc": "Quản lý các video đã ghi của bạn",
+    "manageScripts": "Quản lý Kịch bản",
+    "manageScriptsDesc": "Xem và chỉnh sửa các kịch bản đã lưu của bạn",
+    "gettingStarted": "Bắt đầu",
+    "gettingStartedDesc": "Mới dùng Glean Teleprompter? Dưới đây là cách bắt đầu:",
+    "step1": "Nhấp \"Mở Studio\" để tạo kịch bản teleprompter đầu tiên của bạn",
+    "step2": "Tùy chỉnh phông, màu sắc và tốc độ cuộn theo ý thích của bạn",
+    "step3": "Lưu kịch bản của bạn vào đám mây và chia sẻ với người khác",
+    "step4": "Sử dụng ghi hình camera để quay chính mình trong khi đọc"
+  },
+  "DashboardLayout": {
+    "brand": "Glean",
+    "overview": "Tổng quan",
+    "recordings": "Bản ghi",
+    "studio": "Studio",
+    "footer": "© {year} Glean Teleprompter. Đã đăng ký bản quyền."
+  },
+  "RecordingsPage": {
+    "title": "Thư viện Bản ghi",
+    "description": "Quản lý các bản ghi video của bạn"
+  },
+  "DemoPage": {
+    "loadingDemo": "Đang tải Demo...",
+    "saveWarning": "Chế độ Demo: Đăng ký để lưu các kịch bản và bản ghi của bạn",
+    "signUp": "Đăng ký"
+  },
+  "QuickStartPage": {
+    "back": "Quay lại",
+    "brand": "Glean Teleprompter",
+    "title": "Bắt đầu nhanh với Mẫu",
+    "description": "Chọn một mẫu để bắt đầu nhanh hơn. Mỗi mẫu đi kèm với cài đặt được cấu hình trước và nội dung mẫu mà bạn có thể tùy chỉnh.",
+    "dontSeeTemplate": "Không thấy mẫu bạn thích?",
+    "startFromScratch": "Bắt đầu từ đầu"
+  },
+  "StudioPage": {
+    "loadingTemplate": "Đang tải mẫu...",
+    "loadingScript": "Đang tải kịch bản...",
+    "templateLoaded": "Đã tải mẫu!",
+    "scriptLoaded": "Đã tải kịch bản!",
+    "templateNotFound": "Không tìm thấy mẫu \"{id}\"",
+    "failedToLoadTemplate": "Không thể tải mẫu",
+    "loadingTimeout": "Hết thời gian tải - vui lòng thử lại",
+    "loadingScriptTimedOut": "Hết thời gian tải kịch bản",
+    "retry": "Thử lại"
+  },
+  "SharedScriptPage": {
+    "loadingSharedScript": "Đang tải kịch bản được chia sẻ...",
+    "scriptNotFound": "Không tìm thấy kịch bản hoặc không được chia sẻ công khai",
+    "failedToLoad": "Không thể tải kịch bản",
+    "scriptNotAvailable": "Kịch bản không khả dụng",
+    "goToStudio": "Đi đến Studio"
+  },
+  "ProtectedPage": {
+    "loading": "Đang tải..."
   }
 }

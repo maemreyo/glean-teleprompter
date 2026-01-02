@@ -132,7 +132,7 @@ export function MobileConfigPanel({
                 "font-semibold text-foreground",
                 isSmallScreen ? "text-base" : "text-lg"
               )}>
-                {t('title') || 'Configuration'}
+                {t('title')}
               </h2>
               {/* T076: Done button with 48px minimum touch target */}
               <button
@@ -144,9 +144,9 @@ export function MobileConfigPanel({
                   'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
                   'min-h-[48px] min-w-[48px]'
                 )}
-                aria-label="Done"
+                aria-label={t('tabUI.done')}
               >
-                {t('done') || 'Done'}
+                {t('tabUI.done')}
               </button>
             </div>
 
@@ -247,7 +247,7 @@ export function TabBottomSheet({
                   'hover:bg-muted',
                   'focus:outline-none focus:ring-2 focus:ring-primary'
                 )}
-                aria-label="Close tab selector"
+                aria-label={t('tabUI.closeTabSelector')}
               >
                 <X className="w-5 h-5" />
               </button>

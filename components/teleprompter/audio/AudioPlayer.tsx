@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
 
@@ -30,13 +31,14 @@ export const UniversalAudioPlayer: React.FC<AudioPlayerProps> = ({ url, playing,
 // --- Strategies ---
 
 const NativeAudioStrategy: React.FC<AudioPlayerProps> = ({ url, playing, volume, loop }) => {
+    const t = useTranslations('Audio');
     const audioRef = useRef<HTMLAudioElement>(null);
 
     useEffect(() => {
         if (audioRef.current) {
             audioRef.current.volume = volume ?? 1;
-            if (playing) { 
-                audioRef.current.play().catch(e => console.error("Audio play failed", e)); 
+            if (playing) {
+                audioRef.current.play().catch(e => console.error(t('playbackFailed'), e));
             } else {
                 audioRef.current.pause();
             }

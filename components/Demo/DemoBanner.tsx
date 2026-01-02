@@ -6,9 +6,11 @@ import { useDemoStore } from '@/stores/useDemoStore';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
+import { useTranslations } from 'next-intl';
 
 export function DemoBanner() {
   const { showWarning, setShowWarning } = useDemoStore();
+  const t = useTranslations('Demo');
 
   if (!showWarning) return null;
 
@@ -24,9 +26,9 @@ export function DemoBanner() {
           <div className="flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-pink-400" />
             <div>
-              <span className="font-bold text-pink-400">Demo Mode</span>
+              <span className="font-bold text-pink-400">{t('mode')}</span>
               <span className="text-gray-300 ml-2">
-                Sign up to save your scripts and recordings
+                {t('signUpToSave')}
               </span>
             </div>
           </div>
@@ -36,12 +38,12 @@ export function DemoBanner() {
               href="/auth/sign-up"
               className="px-4 py-1.5 bg-pink-500 text-white text-sm font-bold rounded-full hover:bg-pink-600 transition-colors"
             >
-              Sign Up Free →
+              {t('signUpFree')}
             </Link>
             <button
               onClick={() => setShowWarning(false)}
               className="p-1 hover:bg-white/10 rounded transition-colors"
-              aria-label="Dismiss"
+              aria-label={t('dismiss')}
             >
               <X className="w-4 h-4 text-gray-400" />
             </button>

@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ScrollText, Video, Cloud, Palette } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface Feature {
   icon: React.ReactNode;
@@ -10,30 +11,31 @@ interface Feature {
   description: string;
 }
 
-const features: Feature[] = [
-  {
-    icon: <ScrollText className="w-6 h-6" />,
-    title: 'Smart Teleprompter',
-    description: 'Adjustable speed, fonts, colors, and mirror mode for reflectors'
-  },
-  {
-    icon: <Video className="w-6 h-6" />,
-    title: 'Built-in Recording',
-    description: 'Record yourself while reading the script with camera overlay'
-  },
-  {
-    icon: <Cloud className="w-6 h-6" />,
-    title: 'Cloud Sync',
-    description: 'Save scripts securely and access from any device'
-  },
-  {
-    icon: <Palette className="w-6 h-6" />,
-    title: 'Custom Presets',
-    description: 'Save your favorite configurations and apply with one click'
-  }
-];
-
 export function FeatureCards() {
+  const t = useTranslations('Landing.features');
+  
+  const features: Feature[] = [
+    {
+      icon: <ScrollText className="w-6 h-6" />,
+      title: t('smartTeleprompter.title'),
+      description: t('smartTeleprompter.description')
+    },
+    {
+      icon: <Video className="w-6 h-6" />,
+      title: t('builtInRecording.title'),
+      description: t('builtInRecording.description')
+    },
+    {
+      icon: <Cloud className="w-6 h-6" />,
+      title: t('cloudSync.title'),
+      description: t('cloudSync.description')
+    },
+    {
+      icon: <Palette className="w-6 h-6" />,
+      title: t('customPresets.title'),
+      description: t('customPresets.description')
+    }
+  ];
   return (
     <section className="py-20 px-4">
       <div className="container mx-auto">
@@ -43,8 +45,8 @@ export function FeatureCards() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything You Need</h2>
-          <p className="text-gray-400">Powerful features to create professional content</p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('title')}</h2>
+          <p className="text-gray-400">{t('subtitle')}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

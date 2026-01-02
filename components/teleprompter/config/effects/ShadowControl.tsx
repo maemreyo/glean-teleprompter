@@ -4,20 +4,26 @@ import { cn } from '@/lib/utils'
 import { ColorPicker } from '../ui/ColorPicker'
 import { SliderInput } from '../ui/SliderInput'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
+import { useTranslations } from 'next-intl'
 
-export function ShadowControl() {
+interface ShadowControlProps {
+  tooltip?: string
+}
+
+export function ShadowControl({ tooltip }: ShadowControlProps) {
+  const t = useTranslations('Config.effects.shadow')
   const { effects, setEffects } = useConfigStore()
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" title={tooltip}>
       {/* Enable Shadow */}
       <div className="flex items-center justify-between">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Text Shadow
+            {t('label')}
           </label>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Add depth to text with shadow
+            {t('description')}
           </p>
         </div>
         <button
@@ -46,7 +52,7 @@ export function ShadowControl() {
             max={20}
             step={1}
             unit="px"
-            label="Offset X"
+            label={t('offsetX')}
             onChange={(value) => setEffects({ shadowOffsetX: value })}
           />
 
@@ -57,7 +63,7 @@ export function ShadowControl() {
             max={20}
             step={1}
             unit="px"
-            label="Offset Y"
+            label={t('offsetY')}
             onChange={(value) => setEffects({ shadowOffsetY: value })}
           />
 
@@ -68,7 +74,7 @@ export function ShadowControl() {
             max={30}
             step={1}
             unit="px"
-            label="Blur"
+            label={t('blur')}
             onChange={(value) => setEffects({ shadowBlur: value })}
           />
 
@@ -78,13 +84,13 @@ export function ShadowControl() {
             min={0}
             max={1}
             step={0.05}
-            label="Opacity"
+            label={t('opacity')}
             onChange={(value) => setEffects({ shadowOpacity: value })}
           />
 
           {/* Shadow Color */}
           <ColorPicker
-            label="Shadow Color"
+            label={t('color')}
             value={effects.shadowColor}
             onChange={(value) => setEffects({ shadowColor: value })}
           />

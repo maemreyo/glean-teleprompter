@@ -4,8 +4,10 @@ import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Sparkles, Play } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export function Hero() {
+  const t = useTranslations('Landing.hero');
   return (
     <section className="relative py-20 px-4 overflow-hidden">
       {/* Background effects */}
@@ -21,23 +23,22 @@ export function Hero() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-pink-500/10 border border-pink-500/20 rounded-full mb-6">
             <Sparkles className="w-4 h-4 text-pink-400" />
-            <span className="text-sm text-pink-300 font-medium">Professional Teleprompter</span>
+            <span className="text-sm text-pink-300 font-medium">{t('badge')}</span>
           </div>
 
           {/* Main heading */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
             <span className="bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent">
-              Glean Teleprompter
+              {t('title')}
             </span>
           </h1>
 
           {/* Tagline */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-4">
-            Professional teleprompter for content creators
+            {t('tagline')}
           </p>
           <p className="text-muted-foreground/80 mb-8 max-w-2xl mx-auto">
-            Write, rehearse, and record your scripts with ease. Perfect for YouTubers,
-            podcasters, presenters, and anyone who speaks to an audience.
+            {t('description')}
           </p>
 
           {/* CTA Buttons */}
@@ -47,19 +48,19 @@ export function Hero() {
               className="group px-8 py-4 bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold rounded-full hover:shadow-lg hover:shadow-pink-500/25 transition-all flex items-center gap-2"
             >
               <Play className="w-5 h-5 fill-current" />
-              Start Writing
+              {t('startWriting')}
             </Link>
             <Link
               href="/demo"
               className="px-8 py-4 bg-secondary text-secondary-foreground font-bold rounded-full hover:bg-secondary/80 transition-colors"
             >
-              Try Demo
+              {t('tryDemo')}
             </Link>
           </div>
 
           {/* Secondary link */}
           <p className="mt-6 text-sm text-muted-foreground">
-            No account required to try • <Link href="/auth/sign-up" className="text-primary hover:text-primary/80">Sign up for free</Link>
+            {t('noAccountRequired')} • <Link href="/auth/sign-up" className="text-primary hover:text-primary/80">{t('signUpFree')}</Link>
           </p>
         </motion.div>
       </div>

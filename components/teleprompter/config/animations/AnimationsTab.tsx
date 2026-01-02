@@ -36,10 +36,10 @@ export function AnimationsTab() {
       <div className="space-y-6 pt-4">
         {/* Smooth Scroll */}
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-foreground">{t('smoothScroll')}</h4>
+          <h4 className="text-sm font-medium text-foreground" title={t('tooltips.smoothScroll')}>{t('smoothScroll')}</h4>
           
           <div className="flex items-center justify-between">
-            <Label htmlFor="smooth-scroll" className="text-sm">{t('enableSmoothScrolling')}</Label>
+            <Label htmlFor="smooth-scroll" className="text-sm" title={t('tooltips.smoothScroll')}>{t('enableSmoothScrolling')}</Label>
             <Checkbox
               id="smooth-scroll"
               checked={animations.smoothScrollEnabled}
@@ -50,6 +50,7 @@ export function AnimationsTab() {
           {animations.smoothScrollEnabled && (
             <SliderInput
               label={t('scrollDamping')}
+              tooltip={t('tooltips.scrollDamping')}
               value={animations.scrollDamping}
               min={0.1}
               max={1.0}
@@ -62,7 +63,7 @@ export function AnimationsTab() {
         {/* Entrance Animation */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium text-foreground">{t('entranceAnimation')}</h4>
+            <h4 className="text-sm font-medium text-foreground" title={t('tooltips.entranceAnimation')}>{t('entranceAnimation')}</h4>
             {/* T036: [US2] Test button for entrance animations */}
             <Button
               variant="outline"
@@ -78,12 +79,12 @@ export function AnimationsTab() {
               className="gap-2"
             >
               <Play size={14} />
-              {isTesting ? 'Testing...' : 'Test'}
+              {isTesting ? t('testing') : t('test')}
             </Button>
           </div>
           
           <div className="space-y-2">
-            <Label className="text-sm">{t('animationType')}</Label>
+            <Label className="text-sm" title={t('tooltips.entranceAnimation')}>{t('animationType')}</Label>
             <div className="grid grid-cols-2 gap-2">
               {(['fade-in', 'slide-up', 'scale-in', 'none'] as EntranceAnimation[]).map((type) => (
                 <button
@@ -94,6 +95,7 @@ export function AnimationsTab() {
                       ? 'border-primary bg-primary/10 text-primary'
                       : 'border-border hover:bg-secondary'
                   }`}
+                  title={t('tooltips.entranceAnimation')}
                 >
                   {animationTypeMap[type]}
                 </button>
@@ -103,6 +105,7 @@ export function AnimationsTab() {
 
           <SliderInput
             label={t('animationDuration')}
+            tooltip={t('tooltips.animationDuration')}
             value={animations.entranceDuration}
             min={200}
             max={2000}
@@ -114,10 +117,10 @@ export function AnimationsTab() {
 
         {/* Word Highlighting */}
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-foreground">{t('wordHighlighting')}</h4>
+          <h4 className="text-sm font-medium text-foreground" title={t('tooltips.wordHighlighting')}>{t('wordHighlighting')}</h4>
           
           <div className="flex items-center justify-between">
-            <Label htmlFor="word-highlight" className="text-sm">{t('enableWordHighlight')}</Label>
+            <Label htmlFor="word-highlight" className="text-sm" title={t('tooltips.wordHighlighting')}>{t('enableWordHighlight')}</Label>
             <Checkbox
               id="word-highlight"
               checked={animations.wordHighlightEnabled}
@@ -129,6 +132,7 @@ export function AnimationsTab() {
             <>
               <SliderInput
                 label={t('highlightSpeed')}
+                tooltip={t('tooltips.highlightSpeed')}
                 value={animations.highlightSpeed}
                 min={100}
                 max={500}
@@ -142,10 +146,10 @@ export function AnimationsTab() {
 
         {/* Auto Scroll */}
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-foreground">{t('autoScroll')}</h4>
+          <h4 className="text-sm font-medium text-foreground" title={t('tooltips.autoScroll')}>{t('autoScroll')}</h4>
           
           <div className="flex items-center justify-between">
-            <Label htmlFor="auto-scroll" className="text-sm">{t('enableAutoScrolling')}</Label>
+            <Label htmlFor="auto-scroll" className="text-sm" title={t('tooltips.autoScroll')}>{t('enableAutoScrolling')}</Label>
             <Checkbox
               id="auto-scroll"
               checked={animations.autoScrollEnabled}
@@ -157,6 +161,7 @@ export function AnimationsTab() {
             <>
               <SliderInput
                 label={t('scrollSpeed')}
+                tooltip={t('tooltips.scrollSpeed')}
                 value={animations.autoScrollSpeed}
                 min={10}
                 max={100}
@@ -167,6 +172,7 @@ export function AnimationsTab() {
 
               <SliderInput
                 label={t('acceleration')}
+                tooltip={t('tooltips.acceleration')}
                 value={animations.autoScrollAcceleration}
                 min={0}
                 max={10}

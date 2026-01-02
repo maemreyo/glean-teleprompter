@@ -19,10 +19,10 @@ export function EffectsTab() {
       </div>
       
       <div className="space-y-6 pt-4">
-        <ShadowControl />
-        <OutlineControl />
-        <GlowControl />
-        <BackdropControl />
+        <ShadowControl tooltip={t('tooltips.shadow')} />
+        <OutlineControl tooltip={t('tooltips.outline')} />
+        <GlowControl tooltip={t('tooltips.glow')} />
+        <BackdropControl tooltip={t('tooltips.backdropBlur')} />
       </div>
     </div>
   )

@@ -159,7 +159,7 @@ export function ContentPanel({ className = '' }: ContentPanelProps) {
             <button
               onClick={togglePreview}
               className="p-1.5 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-colors"
-              aria-label={previewState.isOpen ? 'Hide preview' : 'Show preview'}
+              aria-label={previewState.isOpen ? t('hidePreview') : t('showPreview')}
             >
               {previewState.isOpen ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -223,7 +223,7 @@ export function ContentPanel({ className = '' }: ContentPanelProps) {
               alignItems: 'center',
               justifyContent: 'center',
             }}
-            aria-label={footerState.isCollapsed ? 'Expand footer' : 'Collapse footer'}
+            aria-label={footerState.isCollapsed ? t('expandFooter') : t('collapseFooter')}
           >
             {footerState.isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </button>

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 // 007-unified-state-architecture: Use new stores with single responsibility
 import { useContentStore } from '@/lib/stores/useContentStore'
 import { useConfigStore } from '@/lib/stores/useConfigStore'
@@ -41,6 +42,7 @@ interface SharedScript {
 }
 
 export default function SharedScriptPage({ params }: { params: { id: string } }) {
+  const t = useTranslations("SharedScriptPage")
   const [script, setScript] = useState<SharedScript | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -56,9 +58,9 @@ export default function SharedScriptPage({ params }: { params: { id: string } })
         const response = await fetch(`/api/share/${params.id}`)
         if (!response.ok) {
           if (response.status === 404) {
-            setError('Script not found or not publicly shared')
+            setError(t("scriptNotFound"))
           } else {
-            setError('Failed to load script')
+            setError(t("failedToLoad"))
           }
           return
         }
@@ -157,7 +159,7 @@ export default function SharedScriptPage({ params }: { params: { id: string } })
         setMode('running')
       } catch (err) {
         console.error('Error loading shared script:', err)
-        setError('Failed to load script')
+        setError(t("failedToLoad"))
       } finally {
         setLoading(false)
       }
@@ -172,7 +174,7 @@ export default function SharedScriptPage({ params }: { params: { id: string } })
         <div className="min-h-screen bg-black text-white flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
-            <p>Loading shared script...</p>
+            <p>{t("loadingSharedScript")}</p>
           </div>
         </div>
       </AppProvider>
@@ -184,13 +186,13 @@ export default function SharedScriptPage({ params }: { params: { id: string } })
       <AppProvider>
         <div className="min-h-screen bg-black text-white flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Script Not Available</h1>
+            <h1 className="text-2xl font-bold mb-4">{t("scriptNotAvailable")}</h1>
             <p className="text-gray-400 mb-6">{error}</p>
             <button
               onClick={() => router.push('/')}
               className="px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600"
             >
-              Go to Studio
+              {t("goToStudio")}
             </button>
           </div>
         </div>

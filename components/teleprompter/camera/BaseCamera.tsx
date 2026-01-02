@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Camera, CameraOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export interface BaseCameraProps {
   /** Whether the camera is currently active */
@@ -31,6 +32,7 @@ export function BaseCamera({
   mirrored = true,
   error,
 }: BaseCameraProps) {
+  const t = useTranslations('Camera');
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -126,8 +128,8 @@ export function BaseCamera({
       {hasPermission === false && !isActive && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/90 text-white p-4 text-center">
           <CameraOff className="w-12 h-12 mb-2 text-red-400" />
-          <p className="text-sm">Camera access denied</p>
-          <p className="text-xs text-gray-400 mt-1">Please enable camera permissions</p>
+          <p className="text-sm">{t('cameraAccessDenied')}</p>
+          <p className="text-xs text-gray-400 mt-1">{t('enableCameraPermissions')}</p>
         </div>
       )}
 
@@ -135,7 +137,7 @@ export function BaseCamera({
       {!isActive && !isLoading && hasPermission !== false && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800">
           <Camera className="w-12 h-12 text-gray-400 mb-2" />
-          <p className="text-sm text-gray-600 dark:text-gray-300">Camera Off</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t('cameraOff')}</p>
         </div>
       )}
 
@@ -162,7 +164,7 @@ export function BaseCamera({
           ) : (
             <Camera className="w-4 h-4 mr-2" />
           )}
-          {isActive ? 'Stop Camera' : 'Start Camera'}
+          {isActive ? t('stopCamera') : t('startCamera')}
         </Button>
       </div>
     </div>

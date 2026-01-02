@@ -1,9 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const t = await getTranslations("Dashboard")
 
   // Fetch user's recordings count
   const { count: recordingsCount } = await supabase
@@ -28,10 +30,10 @@ export default async function DashboardPage() {
       {/* Welcome Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">
-          Welcome back{user?.email ? `, ${user.email}` : ''}!
+          {t("welcomeBack", { email: user?.email || "" })}
         </h1>
         <p className="text-muted-foreground mt-2">
-          Manage your recordings, scripts, presets, and settings
+          {t("subtitle")}
         </p>
       </div>
 
@@ -43,9 +45,9 @@ export default async function DashboardPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">Quick Action</p>
+              <p className="text-muted-foreground text-sm">{t("quickAction")}</p>
               <p className="text-card-foreground text-lg font-semibold mt-1 group-hover:text-pink-500">
-                Open Studio
+                {t("openStudio")}
               </p>
             </div>
             <div className="h-12 w-12 bg-pink-500/20 rounded-lg flex items-center justify-center group-hover:bg-pink-500/30 transition-colors">
@@ -59,7 +61,7 @@ export default async function DashboardPage() {
         <div className="bg-card border border-border rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">Total Scripts</p>
+              <p className="text-muted-foreground text-sm">{t("totalScripts")}</p>
               <p className="text-card-foreground text-2xl font-bold mt-1">{scriptsCount || 0}</p>
             </div>
             <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
@@ -73,7 +75,7 @@ export default async function DashboardPage() {
         <div className="bg-card border border-border rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">Total Recordings</p>
+              <p className="text-muted-foreground text-sm">{t("totalRecordings")}</p>
               <p className="text-card-foreground text-2xl font-bold mt-1">{recordingsCount || 0}</p>
             </div>
             <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
@@ -87,7 +89,7 @@ export default async function DashboardPage() {
         <div className="bg-card border border-border rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">Saved Presets</p>
+              <p className="text-muted-foreground text-sm">{t("savedPresets")}</p>
               <p className="text-card-foreground text-2xl font-bold mt-1">{presetsCount || 0}</p>
             </div>
             <div className="h-12 w-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
@@ -101,7 +103,7 @@ export default async function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="bg-card border border-border rounded-lg p-6">
-        <h2 className="text-card-foreground text-lg font-semibold mb-4">Quick Actions</h2>
+        <h2 className="text-card-foreground text-lg font-semibold mb-4">{t("quickActions")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             href="/studio"
@@ -113,8 +115,8 @@ export default async function DashboardPage() {
               </svg>
             </div>
             <div>
-              <p className="text-card-foreground font-medium">Create New Script</p>
-              <p className="text-muted-foreground text-sm">Start recording with the teleprompter</p>
+              <p className="text-card-foreground font-medium">{t("createNewScript")}</p>
+              <p className="text-muted-foreground text-sm">{t("createNewScriptDesc")}</p>
             </div>
           </Link>
 
@@ -128,8 +130,8 @@ export default async function DashboardPage() {
               </svg>
             </div>
             <div>
-              <p className="text-card-foreground font-medium">View Recordings</p>
-              <p className="text-muted-foreground text-sm">Manage your recorded videos</p>
+              <p className="text-card-foreground font-medium">{t("viewRecordings")}</p>
+              <p className="text-muted-foreground text-sm">{t("viewRecordingsDesc")}</p>
             </div>
           </Link>
 
@@ -143,8 +145,8 @@ export default async function DashboardPage() {
               </svg>
             </div>
             <div>
-              <p className="text-card-foreground font-medium">Manage Scripts</p>
-              <p className="text-muted-foreground text-sm">View and edit your saved scripts</p>
+              <p className="text-card-foreground font-medium">{t("manageScripts")}</p>
+              <p className="text-muted-foreground text-sm">{t("manageScriptsDesc")}</p>
             </div>
           </Link>
         </div>
@@ -152,26 +154,26 @@ export default async function DashboardPage() {
 
       {/* Getting Started */}
       <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 rounded-lg p-6">
-        <h2 className="text-card-foreground text-lg font-semibold mb-2">Getting Started</h2>
+        <h2 className="text-card-foreground text-lg font-semibold mb-2">{t("gettingStarted")}</h2>
         <p className="text-muted-foreground text-sm mb-4">
-          New to Glean Teleprompter? Here&apos;s how to get started:
+          {t("gettingStartedDesc")}
         </p>
         <ol className="space-y-2 text-gray-300 text-sm">
           <li className="flex items-start gap-2">
             <span className="text-pink-500 font-bold">1.</span>
-            <span className="text-foreground">Click &quot;Open Studio&quot; to create your first teleprompter script</span>
+            <span className="text-foreground">{t("step1")}</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-pink-500 font-bold">2.</span>
-            <span className="text-foreground">Customize font, colors, and scroll speed to your preference</span>
+            <span className="text-foreground">{t("step2")}</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-pink-500 font-bold">3.</span>
-            <span className="text-foreground">Save your scripts to the cloud and share them with others</span>
+            <span className="text-foreground">{t("step3")}</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-pink-500 font-bold">4.</span>
-            <span className="text-foreground">Use camera recording to capture yourself while reading</span>
+            <span className="text-foreground">{t("step4")}</span>
           </li>
         </ol>
       </div>

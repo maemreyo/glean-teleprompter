@@ -11,6 +11,7 @@ import {
   type FontCategory,
 } from '@/lib/fonts/google-fonts'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { useTranslations } from 'next-intl'
 
 interface FontSelectorProps {
   className?: string
@@ -33,6 +34,7 @@ const categoryIconComponents: Record<FontCategory, React.ComponentType<{ classNa
  * - Keeps custom dropdown on desktop
  */
 export function FontSelector({ className }: FontSelectorProps) {
+  const t = useTranslations('Config.typography')
   const { typography, setTypography } = useConfigStore()
   const [isOpen, setIsOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<FontCategory>('sans')
@@ -67,7 +69,7 @@ export function FontSelector({ className }: FontSelectorProps) {
   return (
     <div className={cn('relative', className)}>
       <label className="block text-sm font-medium text-foreground mb-2">
-        Font Family
+        {t('fontFamily')}
       </label>
       
       {/* T074: Native select on mobile, custom dropdown on desktop */}
@@ -156,7 +158,7 @@ export function FontSelector({ className }: FontSelectorProps) {
                 <div className="p-3 border-b border-border">
                   <input
                     type="text"
-                    placeholder="Search fonts..."
+                    placeholder={t('searchFonts')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className={cn(
@@ -172,7 +174,7 @@ export function FontSelector({ className }: FontSelectorProps) {
                 <div className="flex-1 overflow-y-auto p-2">
                   {filteredFonts.length === 0 ? (
                     <div className="text-center text-muted-foreground py-8">
-                      No fonts found
+                      {t('noFontsFound')}
                     </div>
                   ) : (
                     <div className="space-y-1">

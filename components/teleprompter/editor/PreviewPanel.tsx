@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { X, Maximize2, AlertCircle, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 // 007-unified-state-architecture: Use useContentStore for content data
 import { useContentStore } from '@/lib/stores/useContentStore';
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
@@ -46,6 +47,7 @@ const areEqual = (prevProps: PreviewPanelProps, nextProps: PreviewPanelProps) =>
 };
 
 export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel({ className = '' }) {
+  const t = useTranslations('PreviewPanel')
   // Full preview dialog state
   const [fullPreviewOpen, setFullPreviewOpen] = useState(false);
   // 007-unified-state-architecture: Use useContentStore for content data
@@ -129,7 +131,7 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
   // T034: [US2] Handle media load errors
   const handleMediaError = useCallback(() => {
     setHasError(true);
-    setErrorMessage('Failed to load background image');
+    setErrorMessage(t('failedToLoadBg'));
     // 007-unified-state-architecture: Use bgUrl from useContentStore
     console.error('[PreviewPanel] Media load error:', bgUrl);
   }, [bgUrl]);
@@ -274,7 +276,7 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 z-20 p-2 bg-black/50 hover:bg-black/70 rounded-full backdrop-blur-sm transition-colors"
-          aria-label="Close preview"
+          aria-label={t('closePreview')}
         >
           <X size={20} className="text-white" />
         </button>
@@ -326,12 +328,12 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
           <div className="flex justify-between items-center px-4 py-2 border-b border-white/10">
             <div className="flex items-center gap-2 text-white/80 text-sm">
               <Maximize2 size={16} />
-              <span className="font-medium">Preview</span>
+              <span className="font-medium">{t('title')}</span>
             </div>
             <button
               onClick={handleClose}
               className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-              aria-label="Close preview"
+              aria-label={t('closePreview')}
             >
               <X size={18} className="text-white/80" />
             </button>

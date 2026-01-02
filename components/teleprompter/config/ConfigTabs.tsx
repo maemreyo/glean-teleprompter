@@ -32,6 +32,7 @@ import { TabBottomSheet } from './TabBottomSheet'
 interface TabConfig {
   id: TabId
   labelKey: string
+  tooltipKey: string
   icon: React.ComponentType<{ className?: string }>
   component: React.ComponentType
 }
@@ -40,42 +41,49 @@ export const getTabConfig = (t: (key: string) => string): TabConfig[] => [
   {
     id: 'typography',
     labelKey: 'tabs.typography',
+    tooltipKey: 'tabTooltips.typography',
     icon: Type,
     component: TypographyTab,
   },
   {
     id: 'colors',
     labelKey: 'tabs.colors',
+    tooltipKey: 'tabTooltips.colors',
     icon: Palette,
     component: ColorsTab,
   },
   {
     id: 'effects',
     labelKey: 'tabs.effects',
+    tooltipKey: 'tabTooltips.effects',
     icon: Sparkles,
     component: EffectsTab,
   },
   {
     id: 'layout',
     labelKey: 'tabs.layout',
+    tooltipKey: 'tabTooltips.layout',
     icon: LayoutGrid,
     component: LayoutTab,
   },
   {
     id: 'animations',
     labelKey: 'tabs.animations',
+    tooltipKey: 'tabTooltips.animations',
     icon: Wand2,
     component: AnimationsTab,
   },
   {
     id: 'presets',
     labelKey: 'tabs.presets',
+    tooltipKey: 'tabTooltips.presets',
     icon: FolderOpen,
     component: PresetsTab,
   },
   {
     id: 'media',
     labelKey: 'tabs.media',
+    tooltipKey: 'tabTooltips.media',
     icon: Film,
     component: MediaTab,
   },
@@ -197,7 +205,7 @@ export function ConfigTabs() {
       <div
         ref={tabScrollContainerRef}
         role="tablist"
-        aria-label="Configuration tabs"
+        aria-label={t('tabUI.ariaLabel')}
         className={cn(
           'relative flex border-b border-border overflow-x-auto',
           // T065: Wrap tabs on tablet viewport
@@ -220,6 +228,7 @@ export function ConfigTabs() {
           const isActive = activeTab === tab.id
           const isHovered = hoveredTab === tab.id
           const label = t(tab.labelKey)
+          const tooltip = t(tab.tooltipKey)
 
           return (
             <button
@@ -240,6 +249,7 @@ export function ConfigTabs() {
               aria-selected={isActive}
               tabIndex={isActive ? 0 : -1}
               role="tab"
+              title={tooltip}
             >
               <Icon
                 className={cn(
@@ -261,7 +271,7 @@ export function ConfigTabs() {
               'border-b-2 -mb-px border-transparent text-muted-foreground hover:text-foreground',
               'md:hidden'
             )}
-            aria-label="Show all tabs"
+            aria-label={t('tabUI.showAllTabs')}
           >
             <MoreHorizontal className="w-4 h-4" />
           </button>

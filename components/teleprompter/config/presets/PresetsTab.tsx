@@ -48,7 +48,7 @@ export function PresetsTab() {
         const imported = importPresetFromJSON(json)
         
         if ('error' in imported) {
-          setImportError(imported.error || 'Failed to import preset')
+          setImportError(imported.error || t('importFailed'))
           return
         }
 
@@ -64,7 +64,7 @@ export function PresetsTab() {
           setImportError(null)
         }
       } catch {
-        setImportError('Invalid preset file')
+        setImportError(t('invalidPresetFile'))
       }
     }
     reader.readAsText(file)
@@ -84,12 +84,12 @@ export function PresetsTab() {
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-2 pt-4">
-        <Button onClick={() => setShowSaveDialog(true)} size="sm">
+        <Button onClick={() => setShowSaveDialog(true)} size="sm" title={t('tooltips.savePreset')}>
           <Plus className="w-4 h-4 mr-2" />
           {t('savePreset')}
         </Button>
         
-        <Button onClick={() => document.getElementById('preset-import')?.click()} size="sm" variant="outline">
+        <Button onClick={() => document.getElementById('preset-import')?.click()} size="sm" variant="outline" title={t('tooltips.import')}>
           <Upload className="w-4 h-4 mr-2" />
           {t('import')}
         </Button>
@@ -113,7 +113,7 @@ export function PresetsTab() {
 
       {/* Presets Grid */}
       <div className="space-y-4">
-        <h4 className="text-sm font-medium text-foreground">{t('builtinPresets')}</h4>
+        <h4 className="text-sm font-medium text-foreground" title={t('tooltips.builtinPresets')}>{t('builtinPresets')}</h4>
         <PresetGrid
           presets={builtInPresets.map((p, i) => ({ 
             ...p, 

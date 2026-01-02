@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 // Default values from stores for comparison
 const DEFAULT_SCROLL_SPEED = 50
@@ -41,6 +42,7 @@ interface QuickSettingsPanelProps {
  * QuickSettingsPanel - Floating settings panel for Runner mode
  */
 export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelProps) {
+  const t = useTranslations('QuickSettings')
   // Get state from stores
   const { animations, typography, layout, setAnimations, setTypography, setLayout } = useConfigStore()
   const { bgUrl, setBgUrl } = useContentStore()
@@ -65,48 +67,48 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
     } catch (error) {
       // T030: Error handling with toast notifications
       // T047 [Phase 6]: Ensure 5-second visibility requirement
-      toast.error('Failed to update scroll speed', {
-        description: error instanceof Error ? error.message : 'Unknown error occurred',
+      toast.error(t('errors.scrollSpeedFailed'), {
+        description: error instanceof Error ? error.message : t('errors.unknownError'),
         duration: 5000,
       })
     }
-  }, [setAnimations])
+  }, [setAnimations, t])
 
   // T027: Font size control
   const handleFontSizeChange = useCallback((value: number) => {
     try {
       setTypography({ fontSize: value })
     } catch (error) {
-      toast.error('Failed to update font size', {
-        description: error instanceof Error ? error.message : 'Unknown error occurred',
+      toast.error(t('errors.fontSizeFailed'), {
+        description: error instanceof Error ? error.message : t('errors.unknownError'),
         duration: 5000,
       })
     }
-  }, [setTypography])
+  }, [setTypography, t])
 
   // T028: Text alignment control
   const handleTextAlignChange = useCallback((align: 'left' | 'center' | 'right') => {
     try {
       setLayout({ textAlign: align })
     } catch (error) {
-      toast.error('Failed to update text alignment', {
-        description: error instanceof Error ? error.message : 'Unknown error occurred',
+      toast.error(t('errors.textAlignFailed'), {
+        description: error instanceof Error ? error.message : t('errors.unknownError'),
         duration: 5000,
       })
     }
-  }, [setLayout])
+  }, [setLayout, t])
 
   // T029: Background URL input
   const handleBgUrlChange = useCallback((url: string) => {
     try {
       setBgUrl(url)
     } catch (error) {
-      toast.error('Failed to update background', {
-        description: error instanceof Error ? error.message : 'Unknown error occurred',
+      toast.error(t('errors.backgroundFailed'), {
+        description: error instanceof Error ? error.message : t('errors.unknownError'),
         duration: 5000,
       })
     }
-  }, [setBgUrl])
+  }, [setBgUrl, t])
 
   // Handle Escape key for closing dialog
   const handleEscapeKey = useCallback((e: KeyboardEvent) => {
@@ -124,24 +126,25 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
+      <DialogContent
         className={cn(
-          "sm:max-w-md w-full",
+          "sm:max-w-md",
           "bg-background/95 backdrop-blur-xl",
           "border-border/50 shadow-2xl"
         )}
         onEscapeKeyDown={() => onOpenChange(false)}
+        showCloseButton={false}
       >
         <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div className="flex items-center gap-2">
             <DialogTitle className="flex items-center gap-2">
               <Settings className="w-5 h-5" />
-              Quick Settings
+              {t('title')}
             </DialogTitle>
             {/* T031: Visual indication for modified settings */}
             {hasModifications && (
               <Badge variant="secondary" className="ml-2" data-testid="modified-badge">
-                Modified
+                {t('modified')}
               </Badge>
             )}
           </div>
@@ -150,7 +153,7 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
             size="icon"
             onClick={() => onOpenChange(false)}
             className="h-8 w-8"
-            aria-label="Close settings"
+            aria-label={t('close')}
             data-testid="close-button"
           >
             <X className="h-4 w-4" />
@@ -161,9 +164,9 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
           {/* T026: Scroll speed control */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Scroll Speed</label>
+              <label className="text-sm font-medium">{t('scrollSpeed')}</label>
               <span className="text-sm text-muted-foreground">
-                {animations.autoScrollSpeed} px/sec
+                {animations.autoScrollSpeed} {t('scrollSpeedUnit')}
               </span>
             </div>
             <input
@@ -174,7 +177,7 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
               value={animations.autoScrollSpeed}
               onChange={(e) => handleScrollSpeedChange(Number(e.target.value))}
               className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary hover:accent-primary/80 transition-colors"
-              aria-label="Scroll speed"
+              aria-label={t('scrollSpeedAria')}
               role="slider"
               aria-valuemin={10}
               aria-valuemax={200}
@@ -186,9 +189,9 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
           {/* T027: Font size control */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Font Size</label>
+              <label className="text-sm font-medium">{t('fontSize')}</label>
               <span className="text-sm text-muted-foreground">
-                {typography.fontSize} px
+                {typography.fontSize} {t('fontSizeUnit')}
               </span>
             </div>
             <input
@@ -199,7 +202,7 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
               value={typography.fontSize}
               onChange={(e) => handleFontSizeChange(Number(e.target.value))}
               className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary hover:accent-primary/80 transition-colors"
-              aria-label="Font size"
+              aria-label={t('fontSizeAria')}
               role="slider"
               aria-valuemin={20}
               aria-valuemax={80}
@@ -210,43 +213,43 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
 
           {/* T028: Text alignment control */}
           <div className="space-y-3">
-            <label className="text-sm font-medium">Text Alignment</label>
+            <label className="text-sm font-medium">{t('textAlign')}</label>
             <div className="flex gap-2">
               <Button
                 variant={layout.textAlign === 'left' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => handleTextAlignChange('left')}
-                aria-label="Align left"
+                aria-label={t('alignLeftAria')}
                 aria-pressed={layout.textAlign === 'left'}
                 className="flex-1"
                 data-testid="align-left"
               >
                 <AlignLeft className="w-4 h-4" />
-                Left
+                {t('alignLeft')}
               </Button>
               <Button
                 variant={layout.textAlign === 'center' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => handleTextAlignChange('center')}
-                aria-label="Align center"
+                aria-label={t('alignCenterAria')}
                 aria-pressed={layout.textAlign === 'center'}
                 className="flex-1"
                 data-testid="align-center"
               >
                 <AlignCenter className="w-4 h-4" />
-                Center
+                {t('alignCenter')}
               </Button>
               <Button
                 variant={layout.textAlign === 'right' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => handleTextAlignChange('right')}
-                aria-label="Align right"
+                aria-label={t('alignRightAria')}
                 aria-pressed={layout.textAlign === 'right'}
                 className="flex-1"
                 data-testid="align-right"
               >
                 <AlignRight className="w-4 h-4" />
-                Right
+                {t('alignRight')}
               </Button>
             </div>
           </div>
@@ -254,15 +257,15 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
           {/* T029: Background URL input */}
           <div className="space-y-3">
             <label htmlFor="bg-url" className="text-sm font-medium">
-              Background URL
+              {t('backgroundUrl')}
             </label>
             <Input
               id="bg-url"
               type="text"
-              placeholder="https://example.com/image.jpg"
+              placeholder={t('backgroundUrlPlaceholder')}
               value={bgUrl}
               onChange={(e) => handleBgUrlChange(e.target.value)}
-              aria-label="Background URL"
+              aria-label={t('backgroundUrlAria')}
               className="w-full"
               data-testid="bg-url-input"
             />

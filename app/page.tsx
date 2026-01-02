@@ -3,6 +3,7 @@
 import React from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { PublicNavbar } from '@/components/Navigation/PublicNavbar';
 import { Hero } from '@/components/Landing/Hero';
 import { FeatureCards } from '@/components/Landing/FeatureCards';
@@ -16,6 +17,7 @@ import { AuthInitializer } from '@/components/auth/AuthInitializer';
 export default function LandingPage() {
   const router = useRouter();
   const { user, isLoading } = useAuthStore();
+  const t = useTranslations("App");
 
   // Redirect authenticated users to dashboard
   React.useEffect(() => {
@@ -49,12 +51,12 @@ export default function LandingPage() {
         {/* Footer */}
         <footer className="border-t border-border py-8 px-4">
           <div className="container mx-auto text-center text-sm text-muted-foreground">
-            <p>© 2025 Glean Teleprompter. All rights reserved.</p>
+            <p>{t("footer.copyright")}</p>
             <div className="flex justify-center gap-6 mt-4">
-              <a href="/demo" className="hover:text-primary transition-colors">Demo</a>
-              <a href="/quickstart" className="hover:text-primary transition-colors">Templates</a>
-              <a href="/auth/login" className="hover:text-primary transition-colors">Log In</a>
-              <a href="/auth/sign-up" className="hover:text-primary transition-colors">Sign Up</a>
+              <a href="/demo" className="hover:text-primary transition-colors">{t("footer.demo")}</a>
+              <a href="/quickstart" className="hover:text-primary transition-colors">{t("footer.templates")}</a>
+              <a href="/auth/login" className="hover:text-primary transition-colors">{t("footer.login")}</a>
+              <a href="/auth/sign-up" className="hover:text-primary transition-colors">{t("footer.signUp")}</a>
             </div>
           </div>
         </footer>
