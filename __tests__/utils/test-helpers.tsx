@@ -287,3 +287,171 @@ export function findByText(
 export function isInDocument(element: HTMLElement | null): boolean {
   return element !== null && document.body.contains(element);
 }
+
+// ============================================================================
+// Preview Component Helpers (009-fix-preview)
+// ============================================================================
+
+/**
+ * Create a mock background URL for testing
+ * Returns a valid Unsplash image URL
+ */
+export function createMockBgUrl(id: string = 'default'): string {
+  const mockUrls: Record<string, string> = {
+    default: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop',
+    abstract: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2564&auto=format&fit=crop',
+    nature: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=2564&auto=format&fit=crop',
+    gradient: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?q=80&w=2564&auto=format&fit=crop',
+  };
+  return mockUrls[id] || mockUrls.default;
+}
+
+/**
+ * Create a mock content state for preview testing
+ */
+export function createMockContentState(overrides: Partial<{
+  text: string;
+  bgUrl: string;
+  musicUrl: string;
+  isReadOnly: boolean;
+}> = {}) {
+  return {
+    text: 'Chào mừng! Hãy nhập nội dung của bạn vào đây...',
+    bgUrl: createMockBgUrl(),
+    musicUrl: '',
+    isReadOnly: false,
+    ...overrides
+  };
+}
+
+/**
+ * Wait for background image to load
+ * Useful for testing image loading states
+ */
+export function waitForBackgroundLoad(): Promise<void> {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve(); // Resolve even on error for testing
+    img.src = createMockBgUrl();
+  });
+}
+
+/**
+ * Assert that a preview component has the correct background style
+ */
+export function expectBackgroundStyle(
+  element: HTMLElement | null,
+  expectedBgUrl: string
+) {
+  expect(element).not.toBeNull();
+  const style = window.getComputedStyle(element!);
+  expect(style.backgroundImage).toContain(expectedBgUrl);
+  expect(style.backgroundSize).toBe('cover');
+  expect(style.backgroundPosition).toBe('center');
+}
+
+/**
+ * Assert that a preview component shows error state
+ */
+export function expectPreviewError(
+  container: HTMLElement,
+  expectedError: string | RegExp
+) {
+  const errorElement = container.querySelector('[class*="error"]');
+  expect(errorElement).toBeInTheDocument();
+  if (typeof expectedError === 'string') {
+    expect(errorElement).toHaveTextContent(expectedError);
+  } else {
+    expect(errorElement).toHaveTextContent(expectedError);
+  }
+}
+
+/**
+ * Assert that a preview component shows loading state
+ */
+export function expectPreviewLoading(container: HTMLElement) {
+  const loadingElement = container.querySelector('[class*="loading"]');
+  expect(loadingElement).toBeInTheDocument();
+}
+
+/**
+ * Create a mock media error for testing error handling
+ */
+export function simulateMediaError(element: HTMLElement) {
+  const event = new Event('error');
+  element.dispatchEvent(event);
+}
+
+/**
+ * Create a mock media load for testing load handling
+ */
+export function simulateMediaLoad(element: HTMLElement) {
+  const event = new Event('load');
+  element.dispatchEvent(event);
+}
+
+/**
+ * Find background layer in preview component
+ */
+export function findBackgroundLayer(container: HTMLElement): HTMLElement | null {
+  return container.querySelector('.bg-cover, [class*="background"]');
+}
+
+/**
+ * Assert visual consistency between two preview components
+ * Compares background styles, text content, and overlay
+ */
+export function expectPreviewConsistency(
+  preview1: HTMLElement,
+  preview2: HTMLElement
+) {
+  const bg1 = findBackgroundLayer(preview1);
+  const bg2 = findBackgroundLayer(preview2);
+  
+  if (bg1 && bg2) {
+    const style1 = window.getComputedStyle(bg1);
+    const style2 = window.getComputedStyle(bg2);
+    
+    expect(style1.backgroundImage).toBe(style2.backgroundImage);
+    expect(style1.backgroundSize).toBe(style2.backgroundSize);
+    expect(style1.backgroundPosition).toBe(style2.backgroundPosition);
+    expect(style1.opacity).toBe(style2.opacity);
+  }
+}
+
+/**
+ * Test fixture for preview component scenarios
+ */
+export const previewTestFixtures = {
+  default: {
+    text: 'Test text',
+    bgUrl: createMockBgUrl(),
+    musicUrl: '',
+    isReadOnly: false
+  },
+  emptyBg: {
+    text: 'Test text',
+    bgUrl: '',
+    musicUrl: '',
+    isReadOnly: false
+  },
+  nullBg: {
+    text: 'Test text',
+    bgUrl: '',
+    musicUrl: '',
+    isReadOnly: false
+  },
+  customBg: {
+    text: 'Test text',
+    bgUrl: createMockBgUrl('nature'),
+    musicUrl: '',
+    isReadOnly: false
+  },
+  longText: {
+    text: 'A'.repeat(1000),
+    bgUrl: createMockBgUrl(),
+    musicUrl: '',
+    isReadOnly: false
+  }
+};

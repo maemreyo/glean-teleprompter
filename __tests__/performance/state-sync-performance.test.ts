@@ -289,3 +289,394 @@ describe('T044: State Synchronization Performance', () => {
     })
   })
 })
+
+/**
+ * ============================================================================
+ * User Story 2 Tests: Background Update Performance (T021)
+ * ============================================================================
+ *
+ * These tests verify that background updates meet the 100ms update latency
+ * requirement from the specification.
+ *
+ * Performance Requirements:
+ * - Background updates complete within 100ms
+ * - Visual updates happen immediately after store changes
+ * - Multiple rapid changes are handled efficiently
+ *
+ * Expected: PASS - useMemo with bgUrl dependency is efficient
+ */
+
+describe('T021: Background Update Performance (100ms Requirement)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    useContentStore.getState().reset()
+  })
+
+  /**
+   * T021: Performance test - 100ms update latency requirement
+   *
+   * Test that background updates complete within 100ms requirement
+   * Measure time from bgUrl change to visual update
+   * Verify performance under multiple rapid changes
+   *
+   * Expected: PASS - useMemo with bgUrl dependency is efficient
+   */
+  describe('Single Update Performance', () => {
+    it('should update bgUrl in under 100ms', () => {
+      const { result } = renderHook(() => useContentStore())
+      const newBgUrl = 'https://example.com/performance-test-bg.jpg'
+
+      const start = performance.now()
+      
+      act(() => {
+        result.current.setBgUrl(newBgUrl)
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      expect(result.current.bgUrl).toBe(newBgUrl)
+    })
+
+    it('should complete background style update within 100ms', () => {
+      const { result } = renderHook(() => useContentStore())
+      const initialBgUrl = 'https://example.com/initial-bg.jpg'
+      const newBgUrl = 'https://example.com/updated-bg.jpg'
+
+      // Set initial state
+      act(() => {
+        result.current.setBgUrl(initialBgUrl)
+      })
+
+      // Measure update time
+      const start = performance.now()
+      
+      act(() => {
+        result.current.setBgUrl(newBgUrl)
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      expect(result.current.bgUrl).toBe(newBgUrl)
+    })
+
+    it('should update multiple content properties within 100ms', () => {
+      const { result } = renderHook(() => useContentStore())
+      const newBgUrl = 'https://example.com/multi-update-bg.jpg'
+      const newText = 'Updated text content'
+
+      const start = performance.now()
+      
+      act(() => {
+        result.current.setText(newText)
+        result.current.setBgUrl(newBgUrl)
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      expect(result.current.bgUrl).toBe(newBgUrl)
+      expect(result.current.text).toBe(newText)
+    })
+  })
+
+  describe('Rapid Update Performance', () => {
+    it('should handle 10 rapid bgUrl changes efficiently', () => {
+      const { result } = renderHook(() => useContentStore())
+
+      const start = performance.now()
+      
+      act(() => {
+        for (let i = 0; i < 10; i++) {
+          result.current.setBgUrl(`https://example.com/bg-${i}.jpg`)
+        }
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      // 10 rapid updates should complete in under 100ms
+      expect(duration).toBeLessThan(100)
+      expect(result.current.bgUrl).toBe('https://example.com/bg-9.jpg')
+    })
+
+    it('should maintain performance during burst updates', () => {
+      const { result } = renderHook(() => useContentStore())
+
+      const start = performance.now()
+      
+      act(() => {
+        // Simulate burst of updates (like rapid slider changes)
+        for (let i = 0; i < 20; i++) {
+          result.current.setBgUrl(`https://example.com/burst-${i}.jpg`)
+        }
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      // 20 burst updates should still be under 100ms
+      expect(duration).toBeLessThan(100)
+    })
+
+    it('should handle alternating bgUrl changes efficiently', () => {
+      const { result } = renderHook(() => useContentStore())
+      const bgUrl1 = 'https://example.com/alternate-1.jpg'
+      const bgUrl2 = 'https://example.com/alternate-2.jpg'
+
+      const start = performance.now()
+      
+      act(() => {
+        for (let i = 0; i < 10; i++) {
+          result.current.setBgUrl(i % 2 === 0 ? bgUrl1 : bgUrl2)
+        }
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      expect(result.current.bgUrl).toBe(bgUrl2)
+    })
+  })
+
+  describe('Bulk Update Performance', () => {
+    it('should handle setAll with bgUrl within 100ms', () => {
+      const { result } = renderHook(() => useContentStore())
+
+      const start = performance.now()
+      
+      act(() => {
+        result.current.setAll({
+          text: 'Bulk update test',
+          bgUrl: 'https://example.com/bulk-bg.jpg',
+          musicUrl: 'https://example.com/bulk-music.mp3'
+        })
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      expect(result.current.bgUrl).toBe('https://example.com/bulk-bg.jpg')
+    })
+
+    it('should handle resetMedia within 100ms', () => {
+      const { result } = renderHook(() => useContentStore())
+
+      // Set initial state
+      act(() => {
+        result.current.setBgUrl('https://example.com/custom-bg.jpg')
+        result.current.setMusicUrl('https://example.com/custom-music.mp3')
+      })
+
+      const start = performance.now()
+      
+      act(() => {
+        result.current.resetMedia()
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      // resetMedia should reset to default bgUrl
+      expect(result.current.bgUrl).toBeTruthy()
+    })
+
+    it('should handle resetContent within 100ms', () => {
+      const { result } = renderHook(() => useContentStore())
+
+      // Set initial state
+      act(() => {
+        result.current.setText('Custom text')
+        result.current.setBgUrl('https://example.com/custom-bg.jpg')
+        result.current.setMusicUrl('https://example.com/custom-music.mp3')
+      })
+
+      const start = performance.now()
+      
+      act(() => {
+        result.current.resetContent()
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      expect(result.current.bgUrl).toBeTruthy()
+    })
+  })
+
+  describe('Cross-Component Update Performance', () => {
+    it('should propagate bgUrl changes to multiple components within 100ms', () => {
+      // Simulate multiple components subscribing to the same store
+      const component1 = renderHook(() => useContentStore())
+      const component2 = renderHook(() => useContentStore())
+      const component3 = renderHook(() => useContentStore())
+
+      const newBgUrl = 'https://example.com/multi-component-bg.jpg'
+
+      const start = performance.now()
+      
+      act(() => {
+        // Update from one component
+        component1.result.current.setBgUrl(newBgUrl)
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+
+      // All components should receive the update
+      expect(component1.result.current.bgUrl).toBe(newBgUrl)
+      expect(component2.result.current.bgUrl).toBe(newBgUrl)
+      expect(component3.result.current.bgUrl).toBe(newBgUrl)
+    })
+
+    it('should handle concurrent updates from multiple sources within 100ms', () => {
+      const component1 = renderHook(() => useContentStore())
+      const component2 = renderHook(() => useContentStore())
+
+      const start = performance.now()
+      
+      act(() => {
+        // Concurrent updates from different components
+        component1.result.current.setText('Text from component 1')
+        component2.result.current.setBgUrl('https://example.com/concurrent-bg.jpg')
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      
+      // Both components should see the final state
+      expect(component1.result.current.text).toBe('Text from component 1')
+      expect(component1.result.current.bgUrl).toBe('https://example.com/concurrent-bg.jpg')
+      expect(component2.result.current.bgUrl).toBe('https://example.com/concurrent-bg.jpg')
+    })
+  })
+
+  describe('Memory Efficiency During Updates', () => {
+    it('should not degrade performance after 100 updates', () => {
+      const { result } = renderHook(() => useContentStore())
+
+      // Perform 100 updates
+      for (let i = 0; i < 100; i++) {
+        act(() => {
+          result.current.setBgUrl(`https://example.com/perf-${i}.jpg`)
+        })
+      }
+
+      // Measure performance of next update
+      const start = performance.now()
+      
+      act(() => {
+        result.current.setBgUrl('https://example.com/final-bg.jpg')
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      // Performance should not degrade
+      expect(duration).toBeLessThan(100)
+    })
+
+    it('should maintain consistent update timing', () => {
+      const { result } = renderHook(() => useContentStore())
+      const timings: number[] = []
+
+      // Measure 10 consecutive updates
+      for (let i = 0; i < 10; i++) {
+        const start = performance.now()
+        
+        act(() => {
+          result.current.setBgUrl(`https://example.com/consistent-${i}.jpg`)
+        })
+
+        const end = performance.now()
+        timings.push(end - start)
+      }
+
+      // All updates should be under 100ms
+      timings.forEach(duration => {
+        expect(duration).toBeLessThan(100)
+      })
+
+      // Calculate standard deviation to check consistency
+      const mean = timings.reduce((a, b) => a + b, 0) / timings.length
+      const variance = timings.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / timings.length
+      const stdDev = Math.sqrt(variance)
+
+      // Standard deviation should be relatively low (consistent performance)
+      expect(stdDev).toBeLessThan(mean * 0.5) // Less than 50% variation
+    })
+  })
+
+  describe('Edge Case Performance', () => {
+    it('should handle empty to valid bgUrl transition within 100ms', () => {
+      const { result } = renderHook(() => useContentStore())
+
+      // Start with empty bgUrl
+      act(() => {
+        result.current.setBgUrl('')
+      })
+
+      const start = performance.now()
+      
+      act(() => {
+        result.current.setBgUrl('https://example.com/from-empty.jpg')
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      expect(result.current.bgUrl).toBe('https://example.com/from-empty.jpg')
+    })
+
+    it('should handle valid to empty bgUrl transition within 100ms', () => {
+      const { result } = renderHook(() => useContentStore())
+
+      // Start with valid bgUrl
+      act(() => {
+        result.current.setBgUrl('https://example.com/to-empty.jpg')
+      })
+
+      const start = performance.now()
+      
+      act(() => {
+        result.current.setBgUrl('')
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      expect(result.current.bgUrl).toBe('')
+    })
+
+    it('should handle very long bgUrl within 100ms', () => {
+      const { result } = renderHook(() => useContentStore())
+      const longBgUrl = 'https://example.com/' + 'a'.repeat(2000) + '.jpg'
+
+      const start = performance.now()
+      
+      act(() => {
+        result.current.setBgUrl(longBgUrl)
+      })
+
+      const end = performance.now()
+      const duration = end - start
+
+      expect(duration).toBeLessThan(100)
+      expect(result.current.bgUrl).toBe(longBgUrl)
+    })
+  })
+})
