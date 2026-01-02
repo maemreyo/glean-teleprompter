@@ -1,11 +1,12 @@
 /**
- * T020: [US2] Integration test for overlay panel behavior
+ * T020: [US2] Integration test for inline and overlay panel behavior
  *
  * Tests that:
- * - ConfigPanel renders as overlay when visible on desktop
- * - ContentPanel and PreviewPanel maintain proper width regardless of overlay state
- * - ConfigPanel is removed from document flow when hidden
+ * - ConfigPanel renders inline within ContentPanel on desktop (isOverlay: false)
+ * - ConfigPanel renders as overlay on mobile/tablet (< 1024px)
+ * - ContentPanel and PreviewPanel maintain 30/70 split on desktop
  * - Panel visibility can be toggled
+ * - FullPreviewDialog can be opened with keyboard shortcut
  */
 
 import React from 'react'
@@ -51,7 +52,7 @@ jest.mock('@/components/teleprompter/config/TabBottomSheet', () => ({
   },
 }))
 
-describe('Studio - Overlay Panel Integration (US2)', () => {
+describe('Studio - Inline and Overlay Panel Integration (US2)', () => {
   beforeEach(() => {
     // Reset stores
     useUIStore.setState({
@@ -59,7 +60,7 @@ describe('Studio - Overlay Panel Integration (US2)', () => {
         visible: false,
         isAnimating: false,
         lastToggled: null,
-        isOverlay: true,
+        isOverlay: false, // Desktop default: inline mode
       },
     })
     
@@ -139,7 +140,7 @@ describe('Studio - Overlay Panel Integration (US2)', () => {
     })
   })
 
-  describe('Layout structure', () => {
+  describe('Desktop layout structure (30/70 split)', () => {
     it('should render ContentPanel and PreviewPanel', () => {
       render(<Editor />)
       
@@ -148,64 +149,63 @@ describe('Studio - Overlay Panel Integration (US2)', () => {
       expect(editorElement).toBeInTheDocument()
     })
 
-    it('should render ConfigPanel when panel.visible is true on desktop', async () => {
+    it('should render ConfigPanel inline within ContentPanel on desktop', async () => {
       await act(async () => {
         useUIStore.setState({
           panelState: {
             visible: true,
             isAnimating: false,
             lastToggled: Date.now(),
-            isOverlay: true,
+            isOverlay: false, // Desktop: inline mode
           },
         })
       })
       
       render(<Editor />)
       
-      // ConfigPanel should be visible on desktop
+      // ConfigPanel should be visible inline on desktop
       expect(screen.getByText(/Configuration/i)).toBeInTheDocument()
     })
   })
 
-  describe('Panel visibility', () => {
-    it('should show ConfigPanel when panel.visible is true on desktop', async () => {
+  describe('Panel visibility - Desktop inline mode', () => {
+    it('should show ConfigPanel inline when panel.visible is true on desktop', async () => {
       await act(async () => {
         useUIStore.setState({
           panelState: {
             visible: true,
             isAnimating: false,
             lastToggled: Date.now(),
-            isOverlay: true,
+            isOverlay: false, // Desktop: inline mode
           },
         })
       })
       
       render(<Editor />)
       
-      // ConfigPanel should be visible
+      // ConfigPanel should be visible inline (not in Dialog)
       expect(screen.getByText(/Configuration/i)).toBeInTheDocument()
     })
 
-    it('should hide ConfigPanel when panel.visible is false', () => {
+    it('should hide inline ConfigPanel when panel.visible is false', () => {
       // Panel is hidden by default in beforeEach
       render(<Editor />)
       
       // ConfigPanel should not render when visible is false
-      // The motion.div handles this via animate prop
       const configPanel = screen.queryByText(/Configuration/i)
       expect(configPanel).not.toBeInTheDocument()
     })
   })
 
   describe('Panel toggle', () => {
-    it('should toggle panel visibility when togglePanel is called', async () => {
+    it('should toggle inline panel visibility on desktop', async () => {
       // Start with panel hidden
       useUIStore.setState({
         panelState: {
           visible: false,
           isAnimating: false,
           lastToggled: null,
-          isOverlay: true,
+          isOverlay: false, // Desktop: inline mode
         },
       })
       
@@ -225,23 +225,35 @@ describe('Studio - Overlay Panel Integration (US2)', () => {
     })
   })
 
-  describe('Responsive behavior', () => {
-    it('should only show ConfigPanel on desktop when visible', async () => {
+  describe('Responsive behavior - Mobile overlay mode', () => {
+    it('should use overlay mode on mobile (< 1024px)', async () => {
+      // Mock mobile viewport
+      jest.clearAllMocks()
+      jest.mock('@/hooks/useMediaQuery', () => ({
+        useMediaQuery: (query: string) => {
+          // Mobile viewport
+          if (query.includes('1024px')) return false
+          if (query.includes('767px')) return false
+          return false
+        },
+      }))
+      
       await act(async () => {
         useUIStore.setState({
           panelState: {
             visible: true,
             isAnimating: false,
             lastToggled: Date.now(),
-            isOverlay: true,
+            isOverlay: true, // Mobile: overlay mode
           },
         })
       })
       
       render(<Editor />)
       
-      // ConfigPanel should be visible on desktop (mocked to true)
-      expect(screen.getByText(/Configuration/i)).toBeInTheDocument()
+      // Mobile config panel should be visible
+      const mobilePanel = screen.queryByTestId('mobile-config-panel')
+      expect(mobilePanel).toBeInTheDocument()
     })
   })
 })

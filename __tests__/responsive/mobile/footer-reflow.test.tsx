@@ -7,7 +7,6 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { useUIStore } from '@/stores/useUIStore';
 import { ContentPanel } from '@/components/teleprompter/editor/ContentPanel';
-import { TEXTAREA_SCALE_MULTIPLIERS } from '@/lib/config/types';
 
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
@@ -52,8 +51,7 @@ describe('ContentPanel - Footer Mobile Reflow (T083)', () => {
     });
 
     useUIStore.setState({
-      panelState: { visible: true, isAnimating: false, lastToggled: null },
-      textareaScale: { size: 'medium', scale: TEXTAREA_SCALE_MULTIPLIERS.medium },
+      panelState: { visible: true, isAnimating: false, lastToggled: null, isOverlay: true },
       configFooterState: { visible: true, collapsed: false, height: 60 },
       textareaPrefs: { size: 'medium', isFullscreen: false },
       footerState: { isCollapsed: false },

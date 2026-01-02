@@ -1,11 +1,13 @@
 /**
- * T012: [US1] Accessibility test for column layout screen reader support
- * 
+ * T012: [US1] Accessibility test for column layout and new UI features
+ *
  * Tests that the two-column layout is accessible:
  * - Has proper ARIA attributes
  * - Screen readers can navigate the content
  * - Content is readable with column layout
  * - Meets WCAG 2.1 AA standards
+ * - FullPreviewDialog is accessible
+ * - Inline ConfigPanel is accessible
  */
 
 import React from 'react'

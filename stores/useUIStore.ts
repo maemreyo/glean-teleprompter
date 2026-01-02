@@ -2,10 +2,8 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type {
   PanelState,
-  TextareaScaleState,
   FooterState as ConfigFooterState,
 } from '@/lib/config/types'
-import { TEXTAREA_SCALE_MULTIPLIERS } from '@/lib/config/types'
 import {
   secureLoadFromStorage,
   secureSaveToStorage,
@@ -133,7 +131,6 @@ interface UIStore {
 
   // T008: Phase 2 - Configuration Panel UI/UX state
   panelState: PanelState
-  textareaScale: TextareaScaleState
   configFooterState: ConfigFooterState
 
   // Textarea actions
@@ -164,9 +161,6 @@ interface UIStore {
   setPanelVisible: (visible: boolean, isAnimating?: boolean) => void
   togglePanel: () => void
 
-  // T010: Phase 2 - Textarea scale action
-  setTextareaSize: (size: 'compact' | 'medium' | 'large') => void
-
   // T011: Phase 2 - Config footer actions
   setConfigFooterVisible: (visible: boolean, height?: number) => void
   toggleConfigFooterCollapsed: () => void
@@ -190,16 +184,12 @@ export const useUIStore = create<UIStore>()(
       errorContext: null,
 
       // T025: Phase 2 - Configuration Panel UI/UX initial state
-      // T008: [008] Panel is overlay by default, hidden by default on all screen sizes
+      // T008: [008] Panel is inline by default (not overlay), hidden by default on all screen sizes
       panelState: {
         visible: false,
         isAnimating: false,
         lastToggled: null,
-        isOverlay: true,
-      },
-      textareaScale: {
-        size: 'medium',
-        scale: TEXTAREA_SCALE_MULTIPLIERS.medium,
+        isOverlay: false,
       },
       configFooterState: {
         visible: true,
@@ -374,19 +364,6 @@ export const useUIStore = create<UIStore>()(
         })
       },
 
-      // ==================== T010: Textarea Scale Action ====================
-      setTextareaSize: (size) => {
-        set((state) => {
-          const scale = TEXTAREA_SCALE_MULTIPLIERS[size]
-          return {
-            textareaScale: {
-              size,
-              scale,
-            },
-          }
-        })
-      },
-
       // ==================== T011: Config Footer Actions ====================
       setConfigFooterVisible: (visible, height) => {
         set((state) => ({
@@ -427,7 +404,6 @@ export const useUIStore = create<UIStore>()(
         shortcutsStats: state.shortcutsStats,
         // T008: Persist new state properties
         panelState: state.panelState,
-        textareaScale: state.textareaScale,
         configFooterState: state.configFooterState,
       }),
     }

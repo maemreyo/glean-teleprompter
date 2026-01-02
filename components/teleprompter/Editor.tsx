@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useUIStore } from '@/stores/useUIStore';
 import { ContentPanel } from './editor/ContentPanel';
-import { ConfigPanel } from './config/ConfigPanel';
 import { PreviewPanel } from './editor/PreviewPanel';
 import { MobileConfigPanel } from './config/TabBottomSheet';
 import { useConfigStore } from '@/lib/stores/useConfigStore';
@@ -56,7 +55,7 @@ export function Editor() {
   return (
     <>
       {/* T030: [US2] Remove AnimatePresence wrapper around ConfigPanel */}
-      {/* T031-T032: [US2] Update ContentPanel and PreviewPanel to lg:w-[50%] each */}
+      {/* T031-T032: [US2] Update ContentPanel and PreviewPanel to lg:w-[30%] and lg:w-[70%] each */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -65,11 +64,11 @@ export function Editor() {
         className="h-screen flex flex-col lg:flex-row overflow-hidden"
       >
         {/* Content Panel - Text editing and quick actions */}
-        {/* T031: [US2] lg:w-[50%] for two-column layout - handled in ContentPanel component */}
+        {/* T031: [US2] lg:w-[30%] for two-column layout - handled in ContentPanel component */}
         <ContentPanel onOpenMobileConfig={() => setMobileConfigOpen(true)} />
         
         {/* Preview Panel - Live preview */}
-        {/* T032: [US2] lg:w-[50%] for two-column layout - handled in PreviewPanel component */}
+        {/* T032: [US2] lg:w-[70%] for two-column layout - handled in PreviewPanel component */}
         <PreviewPanel />
         
         {/* T079: Mobile Config Panel - Bottom sheet on mobile only */}
@@ -85,9 +84,7 @@ export function Editor() {
         )}
       </motion.div>
 
-      {/* T033: [US2] Remove conditional rendering - ConfigPanel always renders as Dialog */}
-      {/* T022-T033: [US2] ConfigPanel renders as Dialog overlay, not part of flex layout */}
-      <ConfigPanel />
+      {/* T033: [US2] ConfigPanel moved to ContentPanel as inline component */}
     </>
   );
 }

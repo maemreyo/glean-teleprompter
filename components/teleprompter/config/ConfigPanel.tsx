@@ -109,7 +109,73 @@ export function ConfigPanel() {
     }
   }, [prefersReducedMotion])
   
-  // T023: Wrap ConfigPanel with Dialog.Root using panel.visible state
+  // T022-T033: [US2] Render inline when isOverlay is false, otherwise as Dialog overlay
+  if (!panelState.isOverlay) {
+    // Inline mode - render ConfigPanel directly without Dialog wrapper
+    return (
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">
+              Configuration
+            </h2>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Undo button */}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={performUndo}
+              disabled={!canUndo}
+              className="h-8 w-8 p-0"
+              aria-label="Undo last change"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </Button>
+            {/* Redo button */}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={performRedo}
+              disabled={!canRedo}
+              className="h-8 w-8 p-0"
+              aria-label="Redo last change"
+            >
+              <RotateCw className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+        
+        {/* History indicator bar */}
+        {(historyInfo.total > 0) && (
+          <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
+            <span className="text-xs text-muted-foreground">
+              {historyInfo.current}/{historyInfo.total} changes
+            </span>
+            {/* Clear history button */}
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowClearHistoryDialog(true)}
+              className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+              aria-label="Clear history"
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              Clear
+            </Button>
+          </div>
+        )}
+        
+        {/* Tabs */}
+        <div className="flex-1 overflow-hidden">
+          <ConfigTabs />
+        </div>
+      </div>
+    )
+  }
+  
+  // Overlay mode - render as Dialog
   return (
     <>
       {/* T022-T033: [US2] Radix UI Dialog overlay implementation */}

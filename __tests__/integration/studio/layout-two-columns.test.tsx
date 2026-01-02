@@ -1,16 +1,18 @@
 /**
- * T011: [US1] Integration test for two-column layout behavior
- * 
+ * T011: [US1] Integration test for Studio layout behavior
+ *
  * Tests the integration between:
  * - ConfigStore (layout.columnCount, layout.columnGap)
  * - TeleprompterText component
  * - PreviewPanel component
- * 
+ * - ContentPanel component
+ *
  * Verifies that:
  * - Text displays in 2 columns by default
  * - Text flows correctly between columns
  * - Layout responds to config changes
  * - Mobile fallback to single column works
+ * - New 30/70 split layout (Editor: 30%, Preview: 70%)
  */
 
 import React from 'react'

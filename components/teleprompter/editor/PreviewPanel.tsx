@@ -9,6 +9,7 @@ import { TeleprompterText } from '@/components/teleprompter/display/Teleprompter
 import { useConfigStore } from '@/lib/stores/useConfigStore';
 import { useUIStore } from '@/stores/useUIStore';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { FullPreviewDialog, FullPreviewDialogTrigger } from './FullPreviewDialog';
 
 /**
  * PreviewPanel - The live preview section of the Editor
@@ -45,6 +46,8 @@ const areEqual = (prevProps: PreviewPanelProps, nextProps: PreviewPanelProps) =>
 };
 
 export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel({ className = '' }) {
+  // Full preview dialog state
+  const [fullPreviewOpen, setFullPreviewOpen] = useState(false);
   // 007-unified-state-architecture: Use useContentStore for content data
   const { text, bgUrl } = useContentStore();
   
@@ -201,10 +204,12 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
     </div>
   ), [errorMessage]);
   
-  // T032: [US2] Desktop: Always visible, right-side panel (50% width for two-column layout)
+  // T032: [US2] Desktop: Always visible, right-side panel (70% width for two-column layout)
   if (isDesktop) {
     return (
-      <div className={`w-[50%] relative bg-black overflow-hidden ${className}`}>
+      <>
+        <FullPreviewDialog open={fullPreviewOpen} onOpenChange={setFullPreviewOpen} />
+        <div className={`w-[70%] relative bg-black overflow-hidden ${className}`}>
         {/* T033: [US2] Loading overlay */}
         {isLoading && LoadingOverlay}
         
@@ -229,7 +234,13 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
             className="max-h-full overflow-hidden"
           />
         </div>
+        
+        {/* Full Preview Trigger Button */}
+        <div className="absolute top-4 left-4 z-20">
+          <FullPreviewDialogTrigger onClick={() => setFullPreviewOpen(true)} />
+        </div>
       </div>
+      </>
     );
   }
   

@@ -20,7 +20,7 @@ import type { StoreApi } from 'zustand';
 import { AutoSaveStatus } from '@/components/teleprompter/config/ui/AutoSaveStatus';
 import { TextareaExpandButton } from '@/components/teleprompter/editor/TextareaExpandButton';
 import type { TextareaSize } from '@/components/teleprompter/editor/TextareaExpandButton';
-import { TEXTAREA_SCALE_MULTIPLIERS } from '@/lib/config/types';
+import { ConfigPanel } from '@/components/teleprompter/config/ConfigPanel';
 
 interface ContentPanelProps {
   /** T079: Callback to open mobile config panel */
@@ -46,55 +46,9 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
   const { isDemoMode } = useDemoStore();
   const { loginWithGoogle, logout } = useSupabaseAuth();
   const { typography, colors, effects, layout, animations } = useConfigStore();
-  const { previewState, togglePreview, footerState, toggleFooter, textareaPrefs, setTextareaPrefs, toggleTextareaSize, panelState, togglePanel, textareaScale, setConfigFooterVisible, configFooterState, mode } = useUIStore();
+  const { previewState, togglePreview, footerState, toggleFooter, textareaPrefs, setTextareaPrefs, toggleTextareaSize, mode } = useUIStore();
   const isMobileOrTablet = useMediaQuery('(max-width: 1023px)');
   const isVerySmallScreen = useMediaQuery('(max-width: 375px)');
-  
-  // T043: Define scale multipliers CSS variables
-  // T045: Calculate scale multipliers for footer buttons
-  // T084: [US6] Calculate footer scale multiplier based on textarea size
-  const scaleStyles = useMemo(() => {
-    const scale = textareaScale.scale;
-    const fontScale = Math.min(scale, 1.33); // Cap at 16px max (12px * 1.33 ≈ 16px)
-    return {
-      '--scale-multiplier': scale.toString(),
-      '--font-scale': fontScale.toString(),
-      '--button-scale': scale.toString(),
-    } as React.CSSProperties;
-  }, [textareaScale.scale]);
-  
-  // T084: [US6] Calculate footer height based on textarea scale
-  // Base footer height is 60px, scaled proportionally with textarea size
-  const footerHeight = useMemo(() => {
-    const baseHeight = 60; // Base footer height in pixels
-    const scaledHeight = Math.round(baseHeight * textareaScale.scale);
-    return scaledHeight;
-  }, [textareaScale.scale]);
-  
-  // Update configFooterState when scale changes (T084)
-  useEffect(() => {
-    setConfigFooterVisible(true, footerHeight);
-  }, [footerHeight, setConfigFooterVisible]);
-  
-  // T086: [US6] Calculate content padding based on footer height
-  // Add extra buffer (8px) for visual comfort
-  const contentPaddingBottom = useMemo(() => {
-    return footerHeight + 32; // footerHeight + existing pb-32 (128px base + scaled footer)
-  }, [footerHeight]);
-  
-  // T023: Keyboard shortcut for toggling config panel (Ctrl/Cmd + ,)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl/Cmd + , to toggle config panel
-      if ((e.ctrlKey || e.metaKey) && e.key === ',') {
-        e.preventDefault();
-        togglePanel();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [togglePanel]);
   
   // Ref for textarea element
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -227,8 +181,7 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
   
   return (
     <div
-      className={`w-full lg:w-[50%] bg-card border-r border-border flex flex-col shadow-2xl relative transition-all duration-200 ${textareaPrefs.size === 'fullscreen' ? 'fixed inset-0 z-50 w-full h-screen' : 'z-20 h-full'}`}
-      style={scaleStyles}
+      className={`w-full lg:w-[30%] bg-card border-r border-border flex flex-col shadow-2xl relative transition-all duration-200 ${textareaPrefs.size === 'fullscreen' ? 'fixed inset-0 z-50 w-full h-screen' : 'z-20 h-full'}`}
     >
       {/* T048: Ensure no horizontal scroll - overflow-x hidden on content container */}
       {/* Header - T056: Always visible, even in fullscreen */}
@@ -238,17 +191,7 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
         </h1>
         
         <div className="flex items-center gap-2">
-          {/* T019/T025/T026: Config Panel Toggle Button with ARIA labels - Desktop only */}
-          <button
-            onClick={togglePanel}
-            className="hidden lg:block p-1.5 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Toggle configuration panel"
-            aria-pressed={panelState.visible}
-          >
-            <Settings size={16} />
-          </button>
-          
-          {/* T079: Mobile Config Panel Toggle Button - Mobile only */}
+          {/* T079: Mobile Config Panel Toggle Button - Mobile only (desktop has inline ConfigPanel) */}
           {isMobileOrTablet && onOpenMobileConfig && (
             <button
               onClick={onOpenMobileConfig}
@@ -297,18 +240,14 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
 
       {/* T048: Content Controls - overflow-x hidden to prevent horizontal scroll at any size */}
       {/* T046: 200ms size transition on all scalable elements */}
-      {/* T086: [US6] Dynamic bottom padding based on footer height to prevent content obstruction */}
       <div
         className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6 custom-scrollbar transition-all duration-200 ease-in-out"
-        style={{
-          paddingBottom: textareaPrefs.size === 'fullscreen' ? '1.5rem' : `${contentPaddingBottom}px`,
-        }}
       >
         {/* T049: Test layout for 375px viewport - responsive spacing */}
         {/* Text Area */}
         <div className={`space-y-2 ${textareaPrefs.size === 'fullscreen' ? 'h-full flex flex-col' : ''}`}>
           <div className="flex justify-between items-center">
-            <label className="text-xs font-bold text-muted-foreground uppercase transition-transform duration-200 ease-in-out" style={{ transform: `scale(var(--font-scale))`, transformOrigin: 'left center' }}>{t('contentLabel')}</label>
+            <label className="text-xs font-bold text-muted-foreground uppercase">{t('contentLabel')}</label>
           </div>
           <div className="relative">
             <textarea
@@ -327,6 +266,13 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
             />
           </div>
         </div>
+
+        {/* Inline ConfigPanel - displays below textarea on desktop */}
+        {isMobileOrTablet ? null : (
+          <div className="flex-1 overflow-hidden flex flex-col border-t border-border">
+            <ConfigPanel />
+          </div>
+        )}
       </div>
 
       {/* T085: [US6] Fixed/sticky positioning at viewport bottom */}
@@ -335,19 +281,15 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
       {textareaPrefs.size !== 'fullscreen' && (
         <div
           className="fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur border-t border-border space-y-2 z-30 transition-all duration-200 ease-in-out"
-          style={{
-            height: footerState.isCollapsed ? 'auto' : `${footerHeight}px`,
-          }}
         >
         
-        {/* T030/T033: Collapse/Expand button with scaling */}
+        {/* T030/T033: Collapse/Expand button */}
         {/* T087: [US6] Ensure 44x44px minimum touch targets */}
         <div className="flex justify-center">
           <button
             onClick={toggleFooter}
             className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground transition-all duration-200 ease-in-out"
             style={{
-              transform: `scale(var(--scale-multiplier))`,
               minWidth: '44px',
               minHeight: '44px',
               display: 'flex',
@@ -360,8 +302,7 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
           </button>
         </div>
         
-        {/* T045: Footer action buttons with proportional scaling */}
-        {/* T047: Labels capped at 16px max using min() function */}
+        {/* T045: Footer action buttons */}
         {/* T087: [US6] 44x44px minimum touch targets maintained */}
         {/* T090: [US6] Footer reflow for mobile */}
         {footerState.isCollapsed ? (
@@ -370,7 +311,6 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
               onClick={handleSave}
               className="py-2 bg-green-900/40 text-green-400 border border-green-900 hover:bg-green-900/60 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 ease-in-out"
               style={{
-                fontSize: 'clamp(11px, min(16px, 11px * var(--font-scale)), 16px)',
                 minHeight: '44px',
                 minWidth: isVerySmallScreen ? '0' : '44px',
               }}
@@ -381,7 +321,6 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
               onClick={handleShare}
               className="py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 ease-in-out"
               style={{
-                fontSize: 'clamp(11px, min(16px, 11px * var(--font-scale)), 16px)',
                 minHeight: '44px',
                 minWidth: isVerySmallScreen ? '0' : '44px',
               }}
@@ -393,7 +332,6 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
               onClick={() => mode === 'setup' ? useUIStore.getState().setMode('running') : useUIStore.getState().setMode('setup')}
               className="py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 ease-in-out flex items-center justify-center gap-2"
               style={{
-                fontSize: 'clamp(12px, min(16px, 12px * var(--font-scale)), 16px)',
                 minHeight: '44px',
               }}
             >
@@ -407,7 +345,6 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
               onClick={() => mode === 'setup' ? useUIStore.getState().setMode('running') : useUIStore.getState().setMode('setup')}
               className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 ease-in-out flex items-center justify-center gap-2"
               style={{
-                fontSize: 'clamp(12px, min(16px, 12px * var(--font-scale)), 16px)',
                 minHeight: '44px',
               }}
             >
@@ -419,7 +356,6 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
                 onClick={handleSave}
                 className="py-2 bg-green-900/40 text-green-400 border border-green-900 hover:bg-green-900/60 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 ease-in-out"
                 style={{
-                  fontSize: 'clamp(11px, min(16px, 11px * var(--font-scale)), 16px)',
                   minHeight: '44px',
                   minWidth: isVerySmallScreen ? '0' : '44px',
                 }}
@@ -430,7 +366,6 @@ export function ContentPanel({ onOpenMobileConfig }: ContentPanelProps) {
                 onClick={handleShare}
                 className="py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 ease-in-out"
                 style={{
-                  fontSize: 'clamp(11px, min(16px, 11px * var(--font-scale)), 16px)',
                   minHeight: '44px',
                   minWidth: isVerySmallScreen ? '0' : '44px',
                 }}

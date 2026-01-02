@@ -386,17 +386,6 @@ export interface HistoryStack {
 }
 
 /**
- * T004: TextareaScaleState interface
- * Manages the scale level and multiplier for the editor textarea
- */
-export interface TextareaScaleState {
-  /** Current size level of the textarea */
-  size: 'compact' | 'medium' | 'large'
-  /** Scale multiplier applied to the textarea base size */
-  scale: number
-}
-
-/**
  * T005: FooterState interface
  * Manages the visibility and layout state of the configuration panel footer
  */
@@ -409,12 +398,3 @@ export interface FooterState {
   height: number
 }
 
-/**
- * T006: Scale multipliers constant
- * Maps textarea size levels to their corresponding scale multipliers
- */
-export const TEXTAREA_SCALE_MULTIPLIERS: Record<'compact' | 'medium' | 'large', number> = {
-  compact: 1,
-  medium: 1.1,
-  large: 1.2,
-} as const

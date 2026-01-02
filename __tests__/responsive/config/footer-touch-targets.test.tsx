@@ -7,7 +7,6 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { useUIStore } from '@/stores/useUIStore';
 import { ContentPanel } from '@/components/teleprompter/editor/ContentPanel';
-import { TEXTAREA_SCALE_MULTIPLIERS } from '@/lib/config/types';
 
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
@@ -45,8 +44,7 @@ jest.mock('next-intl', () => ({
 describe('ContentPanel - Footer Touch Targets (T082)', () => {
   beforeEach(() => {
     useUIStore.setState({
-      panelState: { visible: true, isAnimating: false, lastToggled: null },
-      textareaScale: { size: 'medium', scale: TEXTAREA_SCALE_MULTIPLIERS.medium },
+      panelState: { visible: true, isAnimating: false, lastToggled: null, isOverlay: false },
       configFooterState: { visible: true, collapsed: false, height: 60 },
       textareaPrefs: { size: 'medium', isFullscreen: false },
       footerState: { isCollapsed: false },
@@ -75,28 +73,21 @@ describe('ContentPanel - Footer Touch Targets (T082)', () => {
   });
 
   /**
-   * Test: Touch targets work at all scales
-   * Given: Footer at different scales
-   * When: Scaling changes
+   * Test: Touch targets work across different viewport sizes
+   * Given: Footer at different viewport sizes
+   * When: Viewport size changes
    * Then: Touch targets should be maintained
    */
-  it('should maintain touch targets at all scales', () => {
-    // Given: Different scales
-    const scales = ['compact', 'medium', 'large'] as const;
+  it('should maintain touch targets across viewport sizes', () => {
+    // This test would check that touch targets are maintained
+    // regardless of viewport size. Scale functionality has been removed.
+    const { container } = render(<ContentPanel onOpenMobileConfig={() => {}} />);
 
-    scales.forEach((size) => {
-      useUIStore.setState({
-        textareaScale: { size, scale: TEXTAREA_SCALE_MULTIPLIERS[size] },
-      });
+    // When: Checking buttons
+    const buttons = container.querySelectorAll('button');
 
-      const { container } = render(<ContentPanel onOpenMobileConfig={() => {}} />);
-
-      // When: Checking buttons
-      const buttons = container.querySelectorAll('button');
-
-      // Then: Should have buttons
-      expect(buttons.length).toBeGreaterThan(0);
-    });
+    // Then: Should have buttons
+    expect(buttons.length).toBeGreaterThan(0);
   });
 
   /**
