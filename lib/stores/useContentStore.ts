@@ -101,3 +101,23 @@ export const useContentStore = create<ContentStore>()(
     }
   )
 )
+
+// Expose store to window for E2E testing (only in development/test mode)
+if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  (window as any).__CONTENT_STORE__ = {
+    getState: useContentStore.getState,
+    setState: useContentStore.setState,
+    subscribe: useContentStore.subscribe,
+  }
+}
+
+// TypeScript augmentation for global window object
+declare global {
+  interface Window {
+    __CONTENT_STORE__?: {
+      getState: () => ContentStore
+      setState: (partial: Partial<ContentStore>) => void
+      subscribe: (listener: (state: ContentStore, prevState: ContentStore) => void) => () => void
+    }
+  }
+}

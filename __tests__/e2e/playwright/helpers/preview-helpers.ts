@@ -348,6 +348,7 @@ export async function verifyResponsiveBehavior(
 
 /**
  * Test data for preview tests
+ * Exported as both previewTestData and TEST_DATA for compatibility
  */
 export const previewTestData = {
   validBackgroundUrls: [
@@ -368,5 +369,52 @@ export const previewTestData = {
     { width: 1920, height: 1080, name: 'Desktop' },
     { width: 1024, height: 768, name: 'Tablet' },
     { width: 375, height: 667, name: 'Mobile' },
+  ],
+};
+
+/**
+ * TEST_DATA - Organized test data for 009-fix-preview tests
+ * Provides structured test data following the test plan specification
+ */
+export const TEST_DATA = {
+  /** Default background URL from ContentStore */
+  defaultBackgroundUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe',
+  
+  /** Valid background URLs for testing */
+  validBackgroundUrls: {
+    mountain: 'https://images.unsplash.com/photo-1519681393784-d120267933ba',
+    nature: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4',
+    forest: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e',
+  },
+  
+  /** Invalid background URLs for error handling tests */
+  invalidBackgroundUrls: {
+    nonexistentDomain: 'https://invalid-url-that-does-not-exist.com/image.jpg',
+    malformed: 'not-a-valid-url',
+    empty: '',
+    fourOFour: 'https://example.com/404-image.jpg',
+  },
+  
+  /** Large image URL for performance testing (T044) */
+  largeImageUrl: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e',
+  
+  /** Sample texts for content testing */
+  sampleTexts: previewTestData.sampleTexts,
+  
+  /** Viewport sizes for responsive testing */
+  viewports: previewTestData.viewports,
+  
+  /** Performance thresholds (in milliseconds) */
+  performanceThresholds: {
+    updateLatency: 100,  // Maximum allowed update latency (T046)
+    loadingTime: 50,     // Expected loading indicator display time
+    imageLoadTimeout: 5000, // Maximum time to wait for image load
+  },
+  
+  /** Template backgrounds for T045 testing */
+  templateBackgrounds: [
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe',
+    'https://images.unsplash.com/photo-1519681393784-d120267933ba',
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4',
   ],
 };

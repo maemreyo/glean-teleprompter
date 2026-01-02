@@ -591,34 +591,37 @@ async function measureImageLoadTime(url: string): Promise<number> {
 
 ### 10.1 Store Access in Browser
 
-The Zustand stores need to be accessible via `window` for browser_evaluate:
+The Zustand stores are now accessible via `window` for browser_evaluate:
 
 ```typescript
-// In components or page, expose store to window
-if (typeof window !== 'undefined') {
-  ;(window as any).useContentStore = useContentStore
-  ;(window as any).useConfigStore = useConfigStore
-  ;(window as any).useUIStore = useUIStore
+// ContentStore is exposed in lib/stores/useContentStore.ts
+window.__CONTENT_STORE__ = {
+  getState: useContentStore.getState,
+  setState: useContentStore.setState,
+  subscribe: useContentStore.subscribe,
 }
 ```
 
-**Action Item**: Verify stores are accessible or add exposure logic
+**Status**: ✅ Completed - ContentStore exposed to window (non-production only)
 
 ### 10.2 Test Data Attributes
 
-Components need test-friendly selectors:
+Components now have test-friendly selectors:
 
-```typescript
-// Add to PreviewPanel and FullPreviewDialog
-<div data-testid="preview-background" className="..." />
-<div data-testid="loading-indicator" />
-<div data-testid="error-indicator" />
-<div data-testid="full-preview-dialog" />
-```
+**PreviewPanel ([`PreviewPanel.tsx`](../components/teleprompter/editor/PreviewPanel.tsx)):**
+- `data-testid="preview-panel"` - Root element (desktop/tablet/mobile)
+- `data-testid="preview-background"` - Background image layer
+- `data-testid="preview-text"` - Text display container
 
-**Status**: Already partially implemented in FullPreviewDialog (lines 88, 98)
+**FullPreviewDialog ([`FullPreviewDialog.tsx`](../components/teleprompter/editor/FullPreviewDialog.tsx)):**
+- `data-testid="loading-indicator"` - Loading overlay (line 88)
+- `data-testid="loading-spinner"` - Loading spinner (line 90)
+- `data-testid="loading-message"` - Loading message (line 91)
+- `data-testid="error-indicator"` - Error overlay (line 98)
+- `data-testid="error-icon"` - Error icon (line 100)
+- `data-testid="error-message"` - Error message (line 101)
 
-**Action Item**: Add to PreviewPanel if missing
+**Status**: ✅ Completed - All test IDs added to PreviewPanel
 
 ### 10.3 Screenshot Comparison Strategy
 
@@ -647,6 +650,12 @@ await page.route('**/images/**', route => {
 
 ## 11. Success Criteria
 
+### Prerequisites ✅ Completed
+- [x] Test IDs added to PreviewPanel component
+- [x] Zustand ContentStore exposed to window for E2E testing
+- [x] Store helper functions created (`__tests__/e2e/playwright/helpers/store-helpers.ts`)
+- [x] TypeScript types defined for window store exposure
+
 ### Test Coverage
 - [ ] All 8 tasks (T039-T046) have corresponding E2E tests
 - [ ] Tests cover both PreviewPanel and FullPreviewDialog
@@ -660,9 +669,9 @@ await page.route('**/images/**', route => {
 - [ ] Performance metrics are accurately measured
 
 ### Documentation
-- [ ] Test scenarios are clearly documented
-- [ ] Test data is well-defined
-- [ ] Setup instructions are complete
+- [x] Test scenarios are clearly documented
+- [x] Test data is well-defined
+- [x] Setup instructions are complete
 - [ ] Execution guide is provided
 
 ---
@@ -707,6 +716,11 @@ await page.route('**/images/**', route => {
 - Background layer (lines 222-227 for desktop)
 - Performance monitoring (lines 70-72, 118-129)
 - React.memo optimization (lines 44-47)
+
+**Test Identifiers (NEW):**
+- `preview-panel` - Root element (line 214 desktop, 256 tablet, 311 mobile)
+- `preview-background` - Background image layer (line 224 desktop, 266 tablet, 352 mobile)
+- `preview-text` - Text display container (line 234 desktop, 286 tablet, 363 mobile)
 
 **Performance Threshold:**
 - `PERFORMANCE_THRESHOLD_MS = 100` (line 36)
@@ -756,6 +770,16 @@ https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** 2026-01-02  
-**Next Review:** After implementation begins
+**Document Version:** 1.1
+**Last Updated:** 2026-01-02
+**Changes:**
+- ✅ Added test IDs to PreviewPanel (preview-panel, preview-background, preview-text)
+- ✅ Exposed ContentStore to window.__CONTENT_STORE__ for E2E testing
+- ✅ Created store-helpers.ts with type-safe store access methods
+- ✅ Updated test ID documentation in Appendix A
+
+**Next Steps:**
+- Implement actual E2E test files (.spec.ts)
+- Execute tests using Playwright MCP server
+- Document test execution results
+**Next Review:** After test implementation begins

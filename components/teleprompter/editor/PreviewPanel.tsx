@@ -211,7 +211,7 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
     return (
       <>
         <FullPreviewDialog open={fullPreviewOpen} onOpenChange={setFullPreviewOpen} />
-        <div className={`w-[70%] relative bg-black overflow-hidden ${className}`}>
+        <div data-testid="preview-panel" className={`w-[70%] relative bg-black overflow-hidden ${className}`}>
         {/* T033: [US2] Loading overlay */}
         {isLoading && LoadingOverlay}
         
@@ -220,6 +220,7 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
         
         {/* Background Image Layer */}
         <div
+          data-testid="preview-background"
           className="absolute inset-0 bg-cover bg-center opacity-70 transition-opacity duration-300"
           style={backgroundStyle}
           onError={handleMediaError}
@@ -230,7 +231,7 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
         <div className="absolute inset-0 bg-black/30" />
         
         {/* 007-unified-state-architecture: Use text from useContentStore */}
-        <div className="absolute inset-0 flex items-center justify-center p-12 overflow-hidden">
+        <div data-testid="preview-text" className="absolute inset-0 flex items-center justify-center p-12 overflow-hidden">
           <TeleprompterText
             text={text}
             className="max-h-full overflow-hidden"
@@ -250,6 +251,7 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
   if (isTablet) {
     return (
       <motion.div
+        data-testid="preview-panel"
         initial={{ x: '100%' }}
         animate={{ x: isOpen ? '0%' : '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
@@ -262,7 +264,8 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
         {hasError && ErrorOverlay}
         
         {/* Background Image Layer */}
-        <div 
+        <div
+          data-testid="preview-background"
           className="absolute inset-0 bg-cover bg-center opacity-70 transition-opacity duration-300"
           style={backgroundStyle}
           onError={handleMediaError}
@@ -282,7 +285,7 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
         </button>
         
         {/* 007-unified-state-architecture: Use text from useContentStore */}
-        <div className="absolute inset-0 flex items-center justify-center p-8 overflow-hidden">
+        <div data-testid="preview-text" className="absolute inset-0 flex items-center justify-center p-8 overflow-hidden">
           <TeleprompterText
             text={text}
             className="max-h-full overflow-hidden"
@@ -309,6 +312,7 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
         
         {/* Bottom Sheet */}
         <motion.div
+          data-testid="preview-panel"
           drag="y"
           dragConstraints={{ top: 0, bottom: 300 }}
           dragElastic={0.2}
@@ -348,7 +352,8 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
             {hasError && ErrorOverlay}
             
             {/* Background Image Layer */}
-            <div 
+            <div
+              data-testid="preview-background"
               className="absolute inset-0 bg-cover bg-center opacity-70 transition-opacity duration-300"
               style={backgroundStyle}
               onError={handleMediaError}
@@ -359,7 +364,7 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
             <div className="absolute inset-0 bg-black/30" />
             
             {/* 007-unified-state-architecture: Use text from useContentStore */}
-            <div className="absolute inset-0 flex items-center justify-center p-6 overflow-hidden">
+            <div data-testid="preview-text" className="absolute inset-0 flex items-center justify-center p-6 overflow-hidden">
               <TeleprompterText
                 text={text}
                 className="max-h-full overflow-hidden"
