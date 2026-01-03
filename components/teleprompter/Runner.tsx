@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Edit3, Pause, Play, Music, Camera, CameraOff, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 // 007-unified-state-architecture: Import new stores
@@ -38,6 +38,36 @@ export function Runner() {
     // T032 [US2]: Quick Settings panel state
     const [quickSettingsOpen, setQuickSettingsOpen] = useState(false);
     
+    // 010-runner-settings P2: Track previous valid background URL for error recovery
+    const [previousValidBgUrl, setPreviousValidBgUrl] = useState(bgUrl);
+    
+    // 010-runner-settings P2.1: Memoized background style for stable reference
+    const backgroundStyle = useMemo(() => ({
+      backgroundImage: `url('${bgUrl}')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }), [bgUrl]);
+    
+    // Debug logging for 010-runner-settings
+    useEffect(() => {
+      console.log('[010-runner-settings] bgUrl from useContentStore:', bgUrl);
+      console.log('[010-runner-settings] backgroundStyle:', backgroundStyle);
+    }, [bgUrl, backgroundStyle]);
+    
+    // 010-runner-settings P2.2: Update previous valid URL when bgUrl changes
+    useEffect(() => {
+      if (bgUrl && bgUrl !== previousValidBgUrl) {
+        setPreviousValidBgUrl(bgUrl);
+      }
+    }, [bgUrl, previousValidBgUrl]);
+    
+    // 010-runner-settings P2.3: Handle background image load failures
+    const handleBackgroundError = () => {
+      console.warn('[010-runner-settings] Background image failed to load, reverting to previous URL');
+      // Revert to previous valid URL via content store
+      useContentStore.getState().setBgUrl(previousValidBgUrl);
+    };
+    
     // Auto-start music if URL exists? Or wait for user?
     // Usually teleprompter should auto start everything on play?
     // Let's start music stopped.
@@ -60,9 +90,16 @@ export function Runner() {
 
     // Auto-scroll logic
     // 007-unified-state-architecture: Use animations.autoScrollSpeed from config
+    // 010-runner-settings: Dynamic interval calculation for scroll speed
     useEffect(() => {
         let intervalId: NodeJS.Timeout;
         if (mode === 'running' && isPlaying) {
+          // 010-runner-settings: Calculate interval dynamically from autoScrollSpeed
+          // autoScrollSpeed is in pixels per second, so interval = 1000ms / speed
+          const intervalMs = animations.autoScrollSpeed > 0
+            ? 1000 / animations.autoScrollSpeed
+            : 50;
+          
           intervalId = setInterval(() => {
             if (textContainerRef.current) {
               textContainerRef.current.scrollTop += 1;
@@ -70,10 +107,15 @@ export function Runner() {
                 setIsPlaying(false);
               }
             }
-          }, 50); // Fixed scroll rate - actual speed controlled by config
+          }, intervalMs);
+          
+          // 010-runner-settings: Auto-pause when speed is too low (< 10 pixels/sec)
+          if (animations.autoScrollSpeed < 10 && isPlaying) {
+            setIsPlaying(false);
+          }
         }
         return () => clearInterval(intervalId);
-    }, [isPlaying, mode, setIsPlaying]);
+    }, [isPlaying, mode, setIsPlaying, animations.autoScrollSpeed]);
 
     return (
         <motion.div
@@ -91,10 +133,25 @@ export function Runner() {
                 volume={0.5}
              />
              
-             {/* 007-unified-state-architecture: Use contentStore.bgUrl for background */}
-             <div className="absolute inset-0 bg-cover bg-center transition-all duration-1000 transform scale-105" style={{ backgroundImage: `url('${bgUrl}')` }} />
+             {/* 010-runner-settings P2: Memoized background style with error handling */}
+             <div className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000" style={backgroundStyle}>
+               {/* Invisible img tag to detect load failures */}
+               {bgUrl && (
+                 <img
+                   src={bgUrl}
+                   onError={handleBackgroundError}
+                   alt=""
+                   style={{ display: 'none' }}
+                   aria-hidden="true"
+                 />
+               )}
+             </div>
              {/* 007-unified-state-architecture: Use effects.overlayOpacity from config */}
-             <div className="absolute inset-0 bg-black transition-opacity" style={{ opacity: effects.overlayOpacity }} />
+             {/* Fixed: Use bg-black/30 (30% opacity) as fallback when overlayOpacity is undefined */}
+             <div
+               className="absolute inset-0 bg-black/30 transition-opacity"
+               style={{ opacity: effects.overlayOpacity ?? undefined }}
+             />
 
              {/* Top Control */}
              <div className="absolute top-6 left-6 z-50 flex gap-2 items-center">

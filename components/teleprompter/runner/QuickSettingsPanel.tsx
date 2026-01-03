@@ -44,7 +44,7 @@ interface QuickSettingsPanelProps {
 export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelProps) {
   const t = useTranslations('QuickSettings')
   // Get state from stores
-  const { animations, typography, layout, setAnimations, setTypography, setLayout } = useConfigStore()
+  const { animations, typography, layout, setAnimations, setTypography, setLayout, setAnimationsDebounced } = useConfigStore()
   const { bgUrl, setBgUrl } = useContentStore()
 
   // Track modified settings for visual indication (T031)
@@ -61,9 +61,11 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
   }, [animations.autoScrollSpeed, typography.fontSize, layout.textAlign, bgUrl])
 
   // T026: Scroll speed control
+  // 010-runner-settings: Use debounced version for rapid slider changes (100ms)
   const handleScrollSpeedChange = useCallback((value: number) => {
     try {
-      setAnimations({ autoScrollSpeed: value })
+      // Use debounced version to avoid excessive re-renders during rapid slider movement
+      setAnimationsDebounced({ autoScrollSpeed: value })
     } catch (error) {
       // T030: Error handling with toast notifications
       // T047 [Phase 6]: Ensure 5-second visibility requirement
@@ -72,7 +74,7 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
         duration: 5000,
       })
     }
-  }, [setAnimations, t])
+  }, [setAnimationsDebounced, t])
 
   // T027: Font size control
   const handleFontSizeChange = useCallback((value: number) => {
