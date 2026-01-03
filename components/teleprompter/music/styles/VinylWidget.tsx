@@ -9,14 +9,18 @@
  *
  * @feature 011-music-player-widget
  * @task T020
+ * @task T029
+ * @task T030
  */
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Play, Pause, Disc3 } from 'lucide-react';
 import type { VinylSpeed } from '@/types/music';
 import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export interface VinylWidgetProps {
   isPlaying: boolean;
@@ -36,16 +40,22 @@ function getRPMText(speed: VinylSpeed): string {
 }
 
 /**
- * Get rotation duration based on speed (for Phase 5 animation)
+ * Get rotation duration in seconds based on vinyl speed
+ * RPM to seconds per rotation: 60 / RPM
  */
-function getRotationDuration(speed: VinylSpeed): string {
-  const speeds: Record<VinylSpeed, number> = {
-    '33-1/3': 1.8,
-    '45': 1.33,
-    '78': 0.77,
-    'custom': 1.5,
-  };
-  return `${speeds[speed]}s`;
+function getRotationDuration(speed: VinylSpeed, customBPM?: number): number {
+  switch (speed) {
+    case '33-1/3':
+      return 1.8; // 60 / 33.33
+    case '45':
+      return 1.33; // 60 / 45
+    case '78':
+      return 0.77; // 60 / 78
+    case 'custom':
+      return 60 / (customBPM || 45);
+    default:
+      return 1.8;
+  }
 }
 
 export function VinylWidget({
@@ -54,6 +64,53 @@ export function VinylWidget({
   vinylSpeed,
   className,
 }: VinylWidgetProps) {
+  const prefersReducedMotion = useReducedMotion();
+  
+  // Track current rotation angle
+  const [currentRotation, setCurrentRotation] = useState(0);
+  const rotationVelocity = useMotionValue(0);
+
+  // Handle deceleration when pausing
+  useEffect(() => {
+    if (!isPlaying && rotationVelocity.get() > 0 && !prefersReducedMotion) {
+      // Decelerate over 1 second
+      const controls = animate(rotationVelocity, 0, {
+        duration: 1,
+        ease: 'easeOut',
+      });
+      
+      // Update rotation during deceleration
+      const unsubscribe = rotationVelocity.on('change', (velocity) => {
+        setCurrentRotation((prev) => (prev + velocity) % 360);
+      });
+      
+      return () => {
+        controls.stop();
+        unsubscribe();
+      };
+    } else if (isPlaying && !prefersReducedMotion) {
+      // Set rotation velocity based on speed
+      const duration = getRotationDuration(vinylSpeed);
+      rotationVelocity.set(360 / duration / 60); // degrees per frame at 60fps
+    }
+  }, [isPlaying, vinylSpeed, rotationVelocity, prefersReducedMotion]);
+
+  // Continuous rotation when playing
+  useEffect(() => {
+    if (!isPlaying || prefersReducedMotion) return;
+
+    const duration = getRotationDuration(vinylSpeed);
+    const rotationPerFrame = 360 / (duration * 60); // degrees per frame
+
+    const animateRotation = () => {
+      setCurrentRotation((prev) => (prev + rotationPerFrame) % 360);
+      requestAnimationFrame(animateRotation);
+    };
+
+    const animationId = requestAnimationFrame(animateRotation);
+    return () => cancelAnimationFrame(animationId);
+  }, [isPlaying, vinylSpeed, prefersReducedMotion]);
+
   return (
     <div
       className={cn(
@@ -66,13 +123,25 @@ export function VinylWidget({
       }}
     >
       {/* Vinyl Disc */}
-      <div
+      <motion.div
         className={cn(
           'absolute inset-0 rounded-full',
           'bg-gradient-to-br from-gray-900 via-gray-800 to-black',
           'border-4 border-gray-700 shadow-2xl',
           'overflow-hidden'
         )}
+        animate={{
+          rotate: currentRotation,
+        }}
+        transition={
+          prefersReducedMotion
+            ? {}
+            : {
+                type: 'spring',
+                stiffness: 100,
+                damping: 30,
+              }
+        }
       >
         {/* Vinyl Grooves - concentric circles */}
         <svg
@@ -101,7 +170,7 @@ export function VinylWidget({
             background: 'linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%)',
           }}
         />
-      </div>
+      </motion.div>
 
       {/* Center Label */}
       <div
@@ -117,10 +186,11 @@ export function VinylWidget({
           height: '80px',
         }}
       >
-        {/* Play/Pause Button in center */}
+        {/* T037/T038: Play/Pause Button in center with accessibility */}
         <button
           onClick={onPlayPause}
           className={cn(
+            // T038: Touch target minimum 44px (this is 48px)
             'w-12 h-12 rounded-full flex items-center justify-center',
             'transition-all duration-200',
             'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-red-700',
@@ -130,6 +200,8 @@ export function VinylWidget({
           )}
           aria-label={isPlaying ? 'Pause music' : 'Play music'}
           aria-pressed={isPlaying}
+          role="switch"
+          type="button"
         >
           {isPlaying ? (
             <Pause fill="currentColor" size={18} />
@@ -152,15 +224,26 @@ export function VinylWidget({
       />
 
       {/* Tonearm Indicator (top-right) */}
-      <div
+      <motion.div
         className={cn(
           'absolute -top-2 -right-2',
           'w-12 h-12 rounded-full',
           'bg-gray-800 border-2 border-gray-600',
           'flex items-center justify-center',
-          'shadow-lg',
-          isPlaying && 'animate-bounce'
+          'shadow-lg'
         )}
+        animate={
+          isPlaying && !prefersReducedMotion
+            ? {
+                y: [0, -5, 0],
+              }
+            : {}
+        }
+        transition={{
+          duration: 1,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
       >
         <Disc3
           className={cn(
@@ -169,9 +252,9 @@ export function VinylWidget({
           )}
           size={20}
         />
-      </div>
+      </motion.div>
 
-      {/* RPM Speed Indicator (bottom) */}
+      {/* T037: RPM Speed Indicator (bottom) with descriptive label */}
       <div
         className={cn(
           'absolute -bottom-6 left-1/2 -translate-x-1/2',
@@ -179,6 +262,8 @@ export function VinylWidget({
           'bg-black/60 backdrop-blur-sm border border-white/10',
           'text-[10px] font-bold tracking-wider text-white/70'
         )}
+        role="status"
+        aria-label={`Vinyl speed: ${getRPMText(vinylSpeed)}`}
       >
         {getRPMText(vinylSpeed)}
       </div>

@@ -17,12 +17,22 @@ import ReactPlayer from 'react-player';
 import { useMusicPlayerStore } from '@/lib/stores/useMusicPlayerStore';
 import { constrainPosition, getViewportDimensions, WIDGET_DIMENSIONS } from '@/lib/music/widgetDimensions';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { Settings } from 'lucide-react';
 import { CapsuleWidget } from './styles/CapsuleWidget';
 import { VinylWidget } from './styles/VinylWidget';
 import { SpectrumWidget } from './styles/SpectrumWidget';
 import { cn } from '@/lib/utils';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+
+// ============================================================================
+// Constants
+// ============================================================================
 
 const MUSIC_STORAGE_BUCKET = 'user_music';
+const BASE_Z_INDEX = 1000;
+const MAX_Z_INDEX = 9999;
 
 /**
  * Get Supabase Storage public URL for uploaded music files
@@ -40,7 +50,12 @@ function getMusicFileUrl(fileId: string): string {
 }
 
 export function MusicPlayerWidget() {
+  const t = useTranslations('MusicPlayer');
+  const router = useRouter();
   const store = useMusicPlayerStore();
+  
+  // T039: Dynamic z-index management
+  const [zIndex, setZIndex] = useState(BASE_Z_INDEX);
   
   // State from store
   const position = useMusicPlayerStore((state) => state.position);
@@ -50,6 +65,9 @@ export function MusicPlayerWidget() {
   const youtubeUrl = useMusicPlayerStore((state) => state.youtubeUrl);
   const uploadedFileId = useMusicPlayerStore((state) => state.uploadedFileId);
   const vinylSpeed = useMusicPlayerStore((state) => state.vinylSpeed) || '45';
+  
+  // T038: Touch support - detect mobile viewport
+  const isMobile = useMediaQuery('(max-width: 768px)');
   
   // Refs
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -153,6 +171,11 @@ export function MusicPlayerWidget() {
     y.set(constrained.y);
   }, [x, y, widgetStyle, store]);
   
+  // T039: Handle focus/drag start to bring widget to front
+  const handleFocus = useCallback(() => {
+    setZIndex((prev) => Math.min(prev + 1, MAX_Z_INDEX));
+  }, []);
+  
   // Handle play/pause button click
   const handlePlayPause = useCallback(() => {
     if (playbackState === 'playing') {
@@ -162,25 +185,64 @@ export function MusicPlayerWidget() {
     }
   }, [playbackState, store]);
   
-  // Handle YouTube player errors
+  // T035: Enhanced error handling with translations
   const handleYouTubeError = useCallback((error: any) => {
     console.error('[MusicWidget] YouTube player error:', error);
+    
+    // Determine error type based on error code
+    let errorType: 'youtubeUnavailable' | 'youtubeInvalidUrl' | 'networkError' = 'youtubeUnavailable';
+    let errorKey = 'errors.youtubeUnavailable';
+    
+    if (error?.type === 'not_embeddable' || error?.type === 'unplayable') {
+      errorType = 'youtubeUnavailable';
+      errorKey = 'errors.youtubeUnavailable';
+    } else if (youtubeUrl && !youtubeUrl.includes('youtube.com') && !youtubeUrl.includes('youtu.be')) {
+      errorType = 'youtubeInvalidUrl';
+      errorKey = 'errors.youtubeInvalidUrl';
+    }
+    
     store.setError({
-      type: 'youtube_unavailable',
+      type: errorType === 'youtubeUnavailable' ? 'youtube_unavailable' : 'youtube_invalid_url',
       url: youtubeUrl || '',
     });
-    toast.error('Failed to load YouTube video');
-  }, [store, youtubeUrl]);
+    
+    toast.error(t(errorKey), {
+      description: t('errors.networkError'),
+    });
+  }, [store, youtubeUrl, t]);
   
-  // Handle audio element errors
-  const handleAudioError = useCallback(() => {
-    console.error('[MusicWidget] Audio element error');
+  // Handle audio element errors with enhanced error handling
+  const handleAudioError = useCallback((event: React.SyntheticEvent<HTMLAudioElement, Event>) => {
+    const audioElement = event.currentTarget;
+    const errorCode = (audioElement.error as MediaError)?.code;
+    
+    console.error('[MusicWidget] Audio element error:', errorCode);
+    
+    let errorKey = 'errors.unknownError';
+    
+    switch (errorCode) {
+      case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+        errorKey = 'errors.fileUnsupported';
+        break;
+      case MediaError.MEDIA_ERR_NETWORK:
+        errorKey = 'errors.networkError';
+        break;
+      case MediaError.MEDIA_ERR_DECODE:
+        errorKey = 'errors.fileUnsupported';
+        break;
+      default:
+        errorKey = 'errors.fileNotFound';
+    }
+    
     store.setError({
       type: 'file_not_found',
       fileId: uploadedFileId || '',
     });
-    toast.error('Failed to load audio file');
-  }, [store, uploadedFileId]);
+    
+    toast.error(t(errorKey), {
+      description: t('errors.fileNotFound'),
+    });
+  }, [store, uploadedFileId, t]);
   
   // Handle audio end
   const handleAudioEnd = useCallback(() => {
@@ -250,6 +312,30 @@ export function MusicPlayerWidget() {
         />
       )}
       
+      {/* T036: Reconfigure button - shows on hover (desktop) or always visible (mobile) */}
+      <button
+        onClick={() => router.push('/studio?tab=music')}
+        className={cn(
+          'fixed z-50 p-2 rounded-lg',
+          'bg-black/60 backdrop-blur-sm border border-white/10',
+          'hover:bg-black/80 hover:border-white/20',
+          'transition-all duration-200',
+          'focus:outline-none focus:ring-2 focus:ring-white/50',
+          // Position widget near the widget itself (will be updated dynamically)
+          'cursor-pointer',
+          // T038: Always visible on mobile, hover only on desktop
+          isMobile ? 'opacity-100' : 'opacity-0 hover:opacity-100'
+        )}
+        style={{
+          left: position.x,
+          top: position.y - 40,
+          zIndex: zIndex + 1,
+        }}
+        aria-label={t('widget.reconfigure')}
+      >
+        <Settings className="h-4 w-4 text-white/70 hover:text-white" />
+      </button>
+      
       {/* Draggable Widget Container */}
       <motion.div
         ref={widgetRef}
@@ -257,13 +343,23 @@ export function MusicPlayerWidget() {
         dragMomentum={false}
         dragElastic={0}
         onDragEnd={handleDragEnd}
-        style={{ x, y }}
+        onDragStart={handleFocus}
+        onFocus={handleFocus}
+        style={{ x, y, zIndex }}
         className={cn(
-          'fixed z-50 cursor-move',
+          'fixed cursor-move',
           'hover:scale-105 transition-transform duration-200'
         )}
-        aria-label="Music player widget"
+        aria-label={t('widget.ariaLabel')}
         role="region"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          // T037: Keyboard navigation for play/pause
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handlePlayPause();
+          }
+        }}
       >
         {/* Render appropriate widget style */}
         {widgetStyle === 'capsule' && (
@@ -289,6 +385,16 @@ export function MusicPlayerWidget() {
             sourceType={sourceType}
           />
         )}
+        
+        {/* T037: Live region for screen reader announcements */}
+        <div
+          role="status"
+          aria-live="polite"
+          className="sr-only"
+          aria-label={isPlaying ? t('widget.play') : t('widget.pause')}
+        >
+          {isPlaying ? t('widget.play') : t('widget.pause')}
+        </div>
       </motion.div>
     </>
   );

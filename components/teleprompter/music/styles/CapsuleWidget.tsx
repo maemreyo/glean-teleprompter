@@ -12,9 +12,11 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Play, Pause, Music, Youtube, FileAudio } from 'lucide-react';
 import type { MusicSourceType } from '@/types/music';
 import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export interface CapsuleWidgetProps {
   isPlaying: boolean;
@@ -29,8 +31,10 @@ export function CapsuleWidget({
   sourceType,
   className,
 }: CapsuleWidgetProps) {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
-    <div
+    <motion.div
       className={cn(
         'relative bg-black/60 backdrop-blur-md rounded-full',
         'border border-white/10 shadow-2xl',
@@ -43,11 +47,16 @@ export function CapsuleWidget({
         width: '280px',
         height: '80px',
       }}
+      animate={{
+        opacity: isPlaying ? 1 : 0.6,
+      }}
+      transition={{ duration: 0.3 }}
     >
-      {/* Play/Pause Button (left side) */}
+      {/* Play/Pause Button (left side) - T037: Enhanced accessibility */}
       <button
         onClick={onPlayPause}
         className={cn(
+          // T038: Touch target minimum 44px (this is 56px)
           'flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center',
           'transition-all duration-200',
           'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black',
@@ -57,6 +66,8 @@ export function CapsuleWidget({
         )}
         aria-label={isPlaying ? 'Pause music' : 'Play music'}
         aria-pressed={isPlaying}
+        role="switch"
+        type="button"
       >
         {isPlaying ? (
           <Pause fill="currentColor" size={24} />
@@ -93,18 +104,40 @@ export function CapsuleWidget({
         </div>
       </div>
 
-      {/* Source Type Indicator (right side) */}
-      <div className="flex-shrink-0 flex items-center justify-center">
+      {/* T037: Source Type Indicator (right side) with descriptive labels */}
+      <div
+        className="flex-shrink-0 flex items-center justify-center"
+        role="img"
+        aria-label={`Music source: ${sourceType === 'youtube' ? 'YouTube' : 'uploaded file'}`}
+      >
         {sourceType === 'youtube' ? (
           <div className="p-2 rounded-lg bg-red-500/20 border border-red-500/30">
-            <Youtube className="text-red-400" size={20} />
+            <Youtube className="text-red-400" size={20} aria-hidden="true" />
           </div>
         ) : (
           <div className="p-2 rounded-lg bg-blue-500/20 border border-blue-500/30">
-            <FileAudio className="text-blue-400" size={20} />
+            <FileAudio className="text-blue-400" size={20} aria-hidden="true" />
           </div>
         )}
       </div>
+
+      {/* Pulsing glow effect when playing */}
+      <motion.div
+        className="absolute inset-0 rounded-full bg-primary/20 blur-xl pointer-events-none"
+        animate={
+          isPlaying && !prefersReducedMotion
+            ? {
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.6, 0.3],
+              }
+            : {}
+        }
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
 
       {/* Glassmorphism overlay */}
       <div
@@ -113,6 +146,6 @@ export function CapsuleWidget({
           background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
         }}
       />
-    </div>
+    </motion.div>
   );
 }
