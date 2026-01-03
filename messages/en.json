@@ -778,5 +778,84 @@
   },
   "ProtectedPage": {
     "loading": "Loading..."
+  },
+  "MusicPlayer": {
+    "title": "Music Player",
+    "description": "Configure background music for your teleprompter sessions",
+    "settings": {
+      "title": "Music Settings",
+      "description": "Choose your music source and widget style",
+      "sourceType": "Music Source",
+      "youtube": "YouTube URL",
+      "upload": "Upload File",
+      "widgetStyle": "Widget Style",
+      "vinylSpeed": "Vinyl Speed",
+      "customBpm": "Custom BPM",
+      "save": "Save Music Settings"
+    },
+    "source": {
+      "youtube": {
+        "label": "YouTube URL",
+        "placeholder": "https://youtube.com/watch?v=...",
+        "description": "Paste a YouTube video URL to use as background music",
+        "help": "The video will play audio-only to avoid distractions"
+      },
+      "upload": {
+        "label": "Upload Audio File",
+        "description": "Upload an MP3, WAV, M4A, OGG, AAC, or FLAC file",
+        "maxSize": "Maximum file size: 50MB",
+        "supportedFormats": "Supported formats: MP3, WAV, M4A, OGG, AAC, FLAC",
+        "selectFile": "Select File",
+        "uploading": "Uploading...",
+        "uploadSuccess": "Audio uploaded successfully!",
+        "uploadFailed": "Failed to upload audio file"
+      }
+    },
+    "widgetStyle": {
+      "label": "Widget Style",
+      "description": "Choose how the music player looks in Runner mode",
+      "capsule": {
+        "name": "Capsule",
+        "description": "Glassmorphic pill with pulsing glow"
+      },
+      "vinyl": {
+        "name": "Vinyl Record",
+        "description": "Rotating record with vintage style"
+      },
+      "spectrum": {
+        "name": "Spectrum",
+        "description": "Frequency bars visualization"
+      },
+      "preview": "Preview"
+    },
+    "vinylSpeed": {
+      "label": "Vinyl Rotation Speed",
+      "description": "How fast the record rotates (Vinyl style only)",
+      "33": "33⅓ RPM",
+      "45": "45 RPM",
+      "78": "78 RPM",
+      "custom": "Custom BPM"
+    },
+    "widget": {
+      "play": "Play music",
+      "pause": "Pause music",
+      "reconfigure": "Configure Music",
+      "dragHint": "Drag to move",
+      "ariaLabel": "Music player widget"
+    },
+    "errors": {
+      "youtubeUnavailable": "YouTube video unavailable",
+      "youtubeInvalidUrl": "Invalid YouTube URL",
+      "fileNotFound": "Audio file not found",
+      "fileUnsupported": "Unsupported file format",
+      "fileTooLarge": "File too large",
+      "quotaExceeded": "Storage quota exceeded",
+      "networkError": "Network error",
+      "unknownError": "Unknown error"
+    },
+    "keyboardShortcut": {
+      "togglePlayback": "Press M to play/pause music",
+      "hint": "M: Toggle music"
+    }
   }
 }
