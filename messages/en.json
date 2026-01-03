@@ -274,7 +274,8 @@
       "layout": "Layout",
       "animations": "Animations",
       "presets": "Presets",
-      "media": "Media"
+      "media": "Media",
+      "music": "Music"
     },
     "tabTooltips": {
       "typography": "Configure font family, size, weight, and spacing",
@@ -283,7 +284,8 @@
       "layout": "Adjust margins, padding, alignment, and columns",
       "animations": "Configure scroll, entrance animations, and highlighting",
       "presets": "Save, load, and manage configuration presets",
-      "media": "Set background images and music"
+      "media": "Set background images and music",
+      "music": "Configure background music and player widget"
     },
     "allTabs": "All Tabs",
     "selectTab": "Select a tab to configure settings",

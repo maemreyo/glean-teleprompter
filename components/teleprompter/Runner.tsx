@@ -21,6 +21,9 @@ import { DraggableCamera } from '@/components/teleprompter/camera/DraggableCamer
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 // T032 [US2]: Import QuickSettingsPanel for quick adjustments in Runner
 import { QuickSettingsPanel } from '@/components/teleprompter/runner/QuickSettingsPanel';
+// 011-music-player-widget [T024]: Import MusicPlayerWidget
+import { MusicPlayerWidget } from '@/components/teleprompter/music/MusicPlayerWidget';
+import { useMusicPlayerStore } from '@/lib/stores/useMusicPlayerStore';
 
 export function Runner() {
     const t = useTranslations('Runner');
@@ -32,6 +35,10 @@ export function Runner() {
     const router = useRouter();
     const textContainerRef = useRef<HTMLDivElement>(null);
     const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+    
+    // 011-music-player-widget [T024]: Get music player state
+    const youtubeUrl = useMusicPlayerStore((state) => state.youtubeUrl);
+    const uploadedFileId = useMusicPlayerStore((state) => state.uploadedFileId);
 
     const [isMusicPlaying, setIsMusicPlaying] = useState(false);
     const [cameraVisible, setCameraVisible] = useState(false);
@@ -72,13 +79,37 @@ export function Runner() {
     // Usually teleprompter should auto start everything on play?
     // Let's start music stopped.
 
-    // T046 [Phase 6]: Keyboard shortcut (Ctrl/Cmd+K) to open Quick Settings
+    // 011-music-player-widget [T025]: Keyboard shortcuts for Runner
     useEffect(() => {
       const handleKeyPress = (e: KeyboardEvent) => {
-        // Ctrl+K or Cmd+K to toggle Quick Settings
+        // T046 [Phase 6]: Ctrl+K or Cmd+K to toggle Quick Settings
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
           e.preventDefault()
           setQuickSettingsOpen(prev => !prev)
+        }
+        
+        // 011-music-player-widget [T025]: M key to toggle music playback
+        // Only in Runner mode and when music source is configured
+        if (e.key.toLowerCase() === 'm' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          // Don't trigger when typing in input fields
+          const target = e.target as HTMLElement;
+          if (
+            target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.isContentEditable
+          ) {
+            return;
+          }
+          
+          // Only toggle if in running mode and music is configured
+          if (mode === 'running' && (youtubeUrl || uploadedFileId)) {
+            e.preventDefault();
+            const playbackState = useMusicPlayerStore.getState().playbackState;
+            // Only toggle if not in idle state (widget is initialized)
+            if (playbackState !== 'idle') {
+              useMusicPlayerStore.getState().togglePlayback();
+            }
+          }
         }
       }
 
@@ -86,7 +117,7 @@ export function Runner() {
       return () => {
         document.removeEventListener('keydown', handleKeyPress)
       }
-    }, [])
+    }, [mode, youtubeUrl, uploadedFileId])
 
     // Auto-scroll logic
     // 007-unified-state-architecture: Use animations.autoScrollSpeed from config
@@ -307,6 +338,12 @@ export function Runner() {
                onToggle={() => setCameraVisible(!cameraVisible)}
                quality="standard"
              />
+             
+             {/* 011-music-player-widget [T024]: Music Player Widget */}
+             {/* Only show when in running mode and music source is configured */}
+             {mode === 'running' && (youtubeUrl || uploadedFileId) && (
+               <MusicPlayerWidget />
+             )}
              
              {/* T032 [US2]: Quick Settings Panel */}
              <QuickSettingsPanel

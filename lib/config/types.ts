@@ -329,7 +329,7 @@ export interface ContrastValidation {
  * Configuration tab identifier
  * Identifies different configuration tabs in the UI
  */
-export type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations' | 'presets' | 'media'
+export type TabId = 'typography' | 'colors' | 'effects' | 'layout' | 'animations' | 'presets' | 'media' | 'music'
 
 // ============================================================================
 // Configuration Panel UI/UX Improvements - Phase 1: Setup Types

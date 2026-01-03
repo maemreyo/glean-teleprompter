@@ -10,6 +10,7 @@ import {
   Wand2,
   FolderOpen,
   Film,
+  Music,
   ChevronRight,
   MoreHorizontal,
   X,
@@ -28,6 +29,7 @@ import { AnimationsTab } from './animations/AnimationsTab'
 import { PresetsTab } from './presets/PresetsTab'
 import { MediaTab } from './media/MediaTab'
 import { TabBottomSheet } from './TabBottomSheet'
+import { MusicSettingsPanel } from '../music/settings/MusicSettingsPanel'
 
 interface TabConfig {
   id: TabId
@@ -86,6 +88,13 @@ export const getTabConfig = (t: (key: string) => string): TabConfig[] => [
     tooltipKey: 'tabTooltips.media',
     icon: Film,
     component: MediaTab,
+  },
+  {
+    id: 'music',
+    labelKey: 'tabs.music',
+    tooltipKey: 'tabTooltips.music',
+    icon: Music,
+    component: MusicSettingsPanel,
   },
 ]
 
