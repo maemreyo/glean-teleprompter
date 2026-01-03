@@ -44,10 +44,10 @@ Given that feature description, do this:
       git fetch --all --prune
       ```
 
-   b. Find the highest feature number across all sources for the short-name:
-      - Remote branches: `git ls-remote --heads origin | grep -E 'refs/heads/[0-9]+-<short-name>$'`
-      - Local branches: `git branch | grep -E '^[* ]*[0-9]+-<short-name>$'`
-      - Specs directories: Check for directories matching `specs/[0-9]+-<short-name>`
+   b. Find the highest feature number across ALL branches and specs:
+      - Remote branches: `git ls-remote --heads origin | grep -E 'refs/heads/[0-9]{3}-'`
+      - Local branches: `git branch | grep -E '^[* ]*[0-9]{3}-'`
+      - Specs directories: Check for all directories matching `specs/[0-9]{3}-`
 
    c. Determine the next available number:
       - Extract all numbers from all three sources
@@ -61,8 +61,8 @@ Given that feature description, do this:
 
    **IMPORTANT**:
    - Check all three sources (remote branches, local branches, specs directories) to find the highest number
-   - Only match branches/directories with the exact short-name pattern
-   - If no existing branches/directories found with this short-name, start with number 1
+   - Match ALL branches/directories with the feature number pattern [0-9]{3}-*
+   - If no existing branches/directories found, start with number 1
    - You must only ever run this script once per feature
    - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for
    - The JSON output will contain BRANCH_NAME and SPEC_FILE paths
