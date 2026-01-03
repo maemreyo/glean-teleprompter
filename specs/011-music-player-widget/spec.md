@@ -5,6 +5,20 @@
 **Status**: Draft  
 **Input**: User description: "Floating Music Player Widget with three visual styles (Capsule, Vinyl, Spectrum) for background music in Runner mode"
 
+## Clarifications
+
+### Session 2026-01-03
+
+- **Q: Vinyl Rotation Speed Mechanism** → **A: Manual RPM presets (33⅓, 45, 78) + optional custom BPM input** - Users select rotation speed manually through preset options or custom BPM value. No automatic tempo detection will be implemented to ensure reliability and performance during teleprompter scrolling.
+- **Q: Widget Z-Index Layering Strategy** → **A: Dynamic z-index that auto-increments when clicked** - Widget will use a dynamic z-index management system that brings it to the front when clicked, allowing multiple floating widgets (camera, music player) to coexist without permanent overlap.
+- **Q: File Management UI for Quota Recovery** → **A: Link to settings page only** - When quota is exceeded, error messages will provide a link to navigate to the settings page where users can manage and delete existing audio files. No inline file browser or dedicated management UI will be built.
+- **Q: Cross-Tab Source Change Behavior** → **A: Update active source immediately** - When one tab changes the music source, all other tabs will immediately update their active source reference to match. This ensures consistency across all open tabs.
+- **Q: Spectrum Visualization Fidelity** → **A: Document the limitation** - Spectrum visualization will use simulated animation (pseudo-random pattern) for YouTube sources due to CORS restrictions. Real frequency analysis via Web Audio API will only be available for uploaded audio files. The spec should be updated to clarify this technical constraint.
+
+---
+
+## User Scenarios & Testing *(mandatory)*
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Music Source Selection & Widget Style Configuration (Priority: P1)
@@ -130,6 +144,8 @@ As a content creator, I want to choose from three distinct music player styles (
 - **FR-024**: System MUST handle audio loading errors gracefully with clear error messages and recovery options
 
 **Visual Style Requirements**
+
+**Note**: Due to YouTube CORS restrictions, Spectrum style visualization uses simulated animation (pseudo-random pattern) for YouTube sources. Real frequency analysis via Web Audio API is only available for uploaded audio files.
 
 - **FR-025**: System MUST render Capsule style as a pill-shaped widget with glassmorphic visual design (frosted glass effect)
 - **FR-026**: System MUST render Vinyl style as a circular widget resembling a vinyl record with grooves
