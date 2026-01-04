@@ -29,20 +29,20 @@ const STYLES: {
   {
     id: 'capsule',
     icon: <Circle className="h-5 w-5" />,
-    name: 'MusicPlayer.widgetStyle.capsule.name',
-    description: 'MusicPlayer.widgetStyle.capsule.description',
+    name: 'widgetStyle.capsule.name',
+    description: 'widgetStyle.capsule.description',
   },
   {
     id: 'vinyl',
     icon: <Disc className="h-5 w-5" />,
-    name: 'MusicPlayer.widgetStyle.vinyl.name',
-    description: 'MusicPlayer.widgetStyle.vinyl.description',
+    name: 'widgetStyle.vinyl.name',
+    description: 'widgetStyle.vinyl.description',
   },
   {
     id: 'spectrum',
     icon: <BarChart3 className="h-5 w-5" />,
-    name: 'MusicPlayer.widgetStyle.spectrum.name',
-    description: 'MusicPlayer.widgetStyle.spectrum.description',
+    name: 'widgetStyle.spectrum.name',
+    description: 'widgetStyle.spectrum.description',
   },
 ];
 

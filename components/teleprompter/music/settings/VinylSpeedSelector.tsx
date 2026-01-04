@@ -26,22 +26,22 @@ const SPEED_OPTIONS: {
 }[] = [
   {
     value: '33-1/3',
-    label: 'MusicPlayer.vinylSpeed.33',
+    label: 'vinylSpeed.33',
     description: '33⅓ RPM',
   },
   {
     value: '45',
-    label: 'MusicPlayer.vinylSpeed.45',
+    label: 'vinylSpeed.45',
     description: '45 RPM',
   },
   {
     value: '78',
-    label: 'MusicPlayer.vinylSpeed.78',
+    label: 'vinylSpeed.78',
     description: '78 RPM',
   },
   {
     value: 'custom',
-    label: 'MusicPlayer.vinylSpeed.custom',
+    label: 'vinylSpeed.custom',
     description: 'Custom BPM',
   },
 ];

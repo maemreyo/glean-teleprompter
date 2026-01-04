@@ -582,6 +582,7 @@
     "togglePreview": "Bật tắt xem trước",
     "closePreview": "Đóng xem trước",
     "swipeToClose": "Vuốt xuống để đóng",
+    "loadingBg": "Đang tải hình nền...",
     "failedToLoadBg": "Không thể tải hình nền"
   },
   "Footer": {
@@ -782,50 +783,66 @@
     "loading": "Đang tải..."
   },
   "MusicPlayer": {
+    "title": "Trình phát nhạc",
+    "description": "Cấu hình nhạc nền cho các phiên teleprompter của bạn",
     "settings": {
-      "title": "Nhạc nền",
-      "description": "Cấu hình nhạc nền và trình phát nhạc",
+      "title": "Cài đặt nhạc",
+      "description": "Chọn nguồn nhạc và kiểu trình phát",
+      "sourceType": "Nguồn nhạc",
+      "youtube": "URL YouTube",
+      "upload": "Tải lên tệp",
+      "widgetStyle": "Kiểu trình phát",
+      "vinylSpeed": "Tốc độ đĩa than",
+      "customBpm": "BPM tùy chỉnh",
+      "save": "Lưu cài đặt nhạc",
       "source": {
-        "label": "Nguồn nhạc",
-        "youtube": "YouTube",
-        "upload": "Tải lên"
-      },
+        "youtube": "URL YouTube",
+        "upload": "Tải lên tệp nhạc"
+      }
+    },
+    "source": {
       "youtube": {
         "label": "URL YouTube",
         "placeholder": "https://youtube.com/watch?v=...",
-        "invalidUrl": "URL YouTube không hợp lệ",
-        "videoNotFound": "Không tìm thấy video",
-        "regionRestricted": "Video bị hạn chế khu vực",
-        "playbackFailed": "Không thể phát video"
+        "description": "Dán URL video YouTube để sử dụng làm nhạc nền",
+        "help": "Video sẽ chỉ phát âm thanh để tránh phân tâm"
       },
       "upload": {
         "label": "Tải lên tệp nhạc",
-        "dragDrop": "Kéo thả tệp nhạc vào đây hoặc",
-        "browse": "chọn tệp",
-        "supportedFormats": "Định dạng hỗ trợ: MP3, WAV, OGG, M4A",
-        "maxFileSize": "Kích thước tối đa: 50MB",
-        "quotaExceeded": "Đã hết dung lượng lưu trữ",
-        "invalidFormat": "Định dạng tệp không được hỗ trợ",
-        "fileTooLarge": "Tệp quá lớn (tối đa 50MB)",
+        "description": "Tải lên tệp MP3, WAV, M4A, OGG, AAC hoặc FLAC",
+        "maxSize": "Kích thước tệp tối đa: 50MB",
+        "supportedFormats": "Định dạng hỗ trợ: MP3, WAV, M4A, OGG, AAC, FLAC",
+        "selectFile": "Chọn tệp",
         "uploading": "Đang tải lên...",
-        "uploadSuccess": "Đã tải lên thành công",
-        "uploadFailed": "Tải lên thất bại",
+        "uploadSuccess": "Đã tải lên thành công!",
+        "uploadFailed": "Tải lên tệp thất bại",
         "fileRemoved": "Đã xóa tệp nhạc"
-      },
-      "widgetStyle": {
-        "label": "Kiểu trình phát",
-        "capsule": "Viên nang",
-        "vinyl": "Đĩa than",
-        "spectrum": "Phổ"
-      },
-      "vinylSpeed": {
-        "label": "Tốc độ đĩa than",
-        "rpm33": "33⅓ RPM",
-        "rpm45": "45 RPM",
-        "rpm78": "78 RPM",
-        "custom": "Tùy chỉnh",
-        "bpmPlaceholder": "BPM (10-200)"
       }
+    },
+    "widgetStyle": {
+      "label": "Kiểu trình phát",
+      "description": "Chọn cách hiển thị trình phát nhạc ở chế độ Runner",
+      "capsule": {
+        "name": "Viên nang",
+        "description": "Thuốc nang với hiệu ứng phát sáng"
+      },
+      "vinyl": {
+        "name": "Đĩa than",
+        "description": "Đĩa than phong cách cổ điển"
+      },
+      "spectrum": {
+        "name": "Phổ",
+        "description": "Thanh tần số"
+      },
+      "preview": "Xem trước"
+    },
+    "vinylSpeed": {
+      "label": "Tốc độ xoay đĩa than",
+      "description": "Tốc độ xoay của đĩa than (chỉ cho kiểu đĩa than)",
+      "33": "33⅓ RPM",
+      "45": "45 RPM",
+      "78": "78 RPM",
+      "custom": "BPM tùy chỉnh"
     },
     "widget": {
       "play": "Phát nhạc",

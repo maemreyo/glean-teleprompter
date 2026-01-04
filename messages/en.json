@@ -582,6 +582,7 @@
     "togglePreview": "Toggle Preview",
     "closePreview": "Close Preview",
     "swipeToClose": "Swipe down to close",
+    "loadingBg": "Loading background...",
     "failedToLoadBg": "Failed to load background image"
   },
   "Footer": {
@@ -793,7 +794,11 @@
       "widgetStyle": "Widget Style",
       "vinylSpeed": "Vinyl Speed",
       "customBpm": "Custom BPM",
-      "save": "Save Music Settings"
+      "save": "Save Music Settings",
+      "source": {
+        "youtube": "YouTube URL",
+        "upload": "Upload Audio File"
+      }
     },
     "source": {
       "youtube": {

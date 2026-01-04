@@ -11,6 +11,11 @@ import { useConfigStore } from '@/lib/stores/useConfigStore';
 import { useUIStore } from '@/stores/useUIStore';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { FullPreviewDialog, FullPreviewDialogTrigger } from './FullPreviewDialog';
+// 011-music-player-widget: Music widget preview
+import { useMusicPlayerStore } from '@/lib/stores/useMusicPlayerStore';
+import { CapsuleWidget } from '@/components/teleprompter/music/styles/CapsuleWidget';
+import { VinylWidget } from '@/components/teleprompter/music/styles/VinylWidget';
+import { SpectrumWidget } from '@/components/teleprompter/music/styles/SpectrumWidget';
 
 /**
  * PreviewPanel - The live preview section of the Editor
@@ -54,9 +59,21 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
   const { text, bgUrl } = useContentStore();
   
   // T032: [US2] Subscribe to all config properties that affect preview
-  const { typography, colors, effects, layout, animations } = useConfigStore();
+  const { typography, colors, effects, layout, animations, activeTab } = useConfigStore();
   
   const { previewState, setPreviewState } = useUIStore();
+  
+  // 011-music-player-widget: Music widget preview state
+  const widgetStyle = useMusicPlayerStore((state) => state.widgetStyle);
+  const youtubeUrl = useMusicPlayerStore((state) => state.youtubeUrl);
+  const uploadedFileId = useMusicPlayerStore((state) => state.uploadedFileId);
+  const sourceType = useMusicPlayerStore((state) => state.sourceType);
+  const vinylSpeed = useMusicPlayerStore((state) => state.vinylSpeed) || '45';
+  
+  // Determine if music widget preview should be shown
+  const shouldShowMusicPreview = useMemo(() => {
+    return activeTab === 'music' && (youtubeUrl || uploadedFileId) && widgetStyle;
+  }, [activeTab, youtubeUrl, uploadedFileId, widgetStyle]);
   
   // T033: [US2] Loading state for slow operations
   const [isLoading, setIsLoading] = useState(false);
@@ -206,6 +223,44 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
     </div>
   ), [errorMessage]);
   
+  // 011-music-player-widget: Music widget preview component (read-only)
+  const MusicWidgetPreview = useMemo(() => {
+    if (!shouldShowMusicPreview) return null;
+    
+    return (
+      <div className="music-widget-preview absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-xs text-white/60 bg-black/40 backdrop-blur-sm px-2 py-1 rounded">
+            Widget Preview: {widgetStyle}
+          </span>
+          <div className="pointer-events-none">
+            {widgetStyle === 'capsule' && (
+              <CapsuleWidget
+                isPlaying={false}
+                onPlayPause={() => {}}
+                sourceType={sourceType}
+              />
+            )}
+            {widgetStyle === 'vinyl' && (
+              <VinylWidget
+                isPlaying={false}
+                onPlayPause={() => {}}
+                vinylSpeed={vinylSpeed}
+              />
+            )}
+            {widgetStyle === 'spectrum' && (
+              <SpectrumWidget
+                isPlaying={false}
+                onPlayPause={() => {}}
+                sourceType={sourceType}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }, [shouldShowMusicPreview, widgetStyle, sourceType, vinylSpeed]);
+  
   // T032: [US2] Desktop: Always visible, right-side panel (70% width for two-column layout)
   if (isDesktop) {
     return (
@@ -242,6 +297,9 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
         <div className="absolute top-4 left-4 z-20">
           <FullPreviewDialogTrigger onClick={() => setFullPreviewOpen(true)} />
         </div>
+        
+        {/* 011-music-player-widget: Music widget preview */}
+        {MusicWidgetPreview}
       </div>
       </>
     );
@@ -291,6 +349,9 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
             className="max-h-full overflow-hidden"
           />
         </div>
+        
+        {/* 011-music-player-widget: Music widget preview */}
+        {MusicWidgetPreview}
       </motion.div>
     );
   }
@@ -370,6 +431,9 @@ export const PreviewPanel = React.memo<PreviewPanelProps>(function PreviewPanel(
                 className="max-h-full overflow-hidden"
               />
             </div>
+            
+            {/* 011-music-player-widget: Music widget preview */}
+            {MusicWidgetPreview}
           </div>
         </motion.div>
       </>
