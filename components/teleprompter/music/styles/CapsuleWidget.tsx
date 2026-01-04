@@ -65,7 +65,7 @@ export function CapsuleWidget({
             : 'bg-gradient-to-r from-pink-500 to-violet-600 text-white hover:from-pink-600 hover:to-violet-700'
         )}
         aria-label={isPlaying ? 'Pause music' : 'Play music'}
-        aria-pressed={isPlaying}
+        aria-checked={isPlaying}
         role="switch"
         type="button"
       >

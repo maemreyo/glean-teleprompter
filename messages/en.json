@@ -810,7 +810,8 @@
         "selectFile": "Select File",
         "uploading": "Uploading...",
         "uploadSuccess": "Audio uploaded successfully!",
-        "uploadFailed": "Failed to upload audio file"
+        "uploadFailed": "Failed to upload audio file",
+        "fileRemoved": "Audio file removed"
       }
     },
     "widgetStyle": {

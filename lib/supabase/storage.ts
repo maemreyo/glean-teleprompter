@@ -118,3 +118,104 @@ export async function fileExists(filePath: string): Promise<boolean> {
     return false;
   }
 }
+
+// ============================================================================
+// Music Player Audio File Storage
+// ============================================================================
+
+const MUSIC_STORAGE_BUCKET = 'user-audio-files';
+
+/**
+ * Upload an audio file to Supabase Storage
+ * @param userId - User ID from auth
+ * @param file - File to upload
+ * @returns File ID (path) for storage
+ */
+export async function uploadAudioFile(
+  userId: string,
+  file: File
+): Promise<string> {
+  const supabase = createClient();
+  
+  // Validate file size (50MB limit)
+  const MAX_FILE_SIZE = 50 * 1024 * 1024;
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error('File size exceeds 50MB limit');
+  }
+
+  // Validate file type
+  const SUPPORTED_FORMATS = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/m4a'];
+  if (!SUPPORTED_FORMATS.includes(file.type)) {
+    throw new Error('Unsupported audio format');
+  }
+
+  // Generate unique file ID
+  const fileId = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+  const filePath = `${userId}/${fileId}`;
+
+  // Upload to Supabase
+  const { data, error } = await supabase.storage
+    .from(MUSIC_STORAGE_BUCKET)
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+    });
+
+  if (error) {
+    throw new Error(`Upload failed: ${error.message}`);
+  }
+
+  return fileId;
+}
+
+/**
+ * Delete an audio file from Supabase Storage
+ * @param filePath - Full file path (userId/fileId)
+ */
+export async function deleteAudioFile(filePath: string): Promise<void> {
+  const supabase = createClient();
+  
+  const { error } = await supabase.storage
+    .from(MUSIC_STORAGE_BUCKET)
+    .remove([filePath]);
+
+  if (error) {
+    throw new Error(`Delete failed: ${error.message}`);
+  }
+}
+
+/**
+ * Get public URL for an audio file
+ * @param filePath - Full file path
+ * @returns Public URL for the file
+ */
+export function getAudioFileUrl(filePath: string): string {
+  const supabase = createClient();
+  const { data } = supabase.storage
+    .from(MUSIC_STORAGE_BUCKET)
+    .getPublicUrl(filePath);
+
+  return data.publicUrl;
+}
+
+/**
+ * Get current storage usage for a user
+ * @param userId - User ID
+ * @returns Total bytes used
+ */
+export async function getAudioStorageUsage(userId: string): Promise<number> {
+  const supabase = createClient();
+  
+  const { data, error } = await supabase.storage
+    .from(MUSIC_STORAGE_BUCKET)
+    .list(userId, {
+      sortBy: { column: 'created_at', order: 'asc' },
+    });
+
+  if (error) {
+    throw new Error(`Failed to get usage: ${error.message}`);
+  }
+
+  // Sum up file sizes
+  return data.reduce((total, file) => total + (file.metadata?.size || 0), 0);
+}

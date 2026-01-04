@@ -14,6 +14,8 @@ import { Upload, Music, X, FileText } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { validateAudioFile, validateFileQuota, formatBytes, getAudioFileErrorMessage } from '@/lib/music/audioSourceValidation';
 import { useMusicPlayerStore } from '@/lib/stores/useMusicPlayerStore';
+import { uploadAudioFile, getAudioStorageUsage } from '@/lib/supabase/storage';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +27,7 @@ export function FileUploadInput({ className }: FileUploadInputProps) {
   const t = useTranslations('MusicPlayer');
   const uploadedFileId = useMusicPlayerStore((state) => state.uploadedFileId);
   const setUploadedFileId = useMusicPlayerStore((state) => state.setUploadedFileId);
+  const user = useAuthStore((state) => state.user);
 
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
@@ -42,8 +45,16 @@ export function FileUploadInput({ className }: FileUploadInputProps) {
       return;
     }
 
-    // Check quota (mock implementation - should be replaced with actual Supabase check)
-    const currentUsage = 0; // TODO: Fetch from Supabase
+    // Check quota with actual Supabase usage
+    const userId = user?.id || 'anonymous';
+    let currentUsage = 0;
+    
+    try {
+      currentUsage = await getAudioStorageUsage(userId);
+    } catch (error) {
+      console.warn('Failed to fetch storage usage, assuming 0:', error);
+    }
+    
     const quotaResult = validateFileQuota(file.size, currentUsage);
 
     if (!quotaResult.isValid && quotaResult.error) {
@@ -58,12 +69,9 @@ export function FileUploadInput({ className }: FileUploadInputProps) {
     setIsUploading(true);
 
     try {
-      // TODO: Implement actual Supabase upload
-      // For now, simulate upload
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Mock file ID
-      const fileId = `file_${Date.now()}_${file.name}`;
+      // Upload to Supabase Storage
+      const fileId = await uploadAudioFile(userId, file);
+      
       setUploadedFileId(fileId);
       setUploadedFileName(file.name);
 
@@ -92,7 +100,7 @@ export function FileUploadInput({ className }: FileUploadInputProps) {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    toast.info('Audio file removed');
+    toast.info(t('source.upload.fileRemoved'));
   };
 
   return (

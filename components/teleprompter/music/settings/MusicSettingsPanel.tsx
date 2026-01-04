@@ -62,7 +62,6 @@ export function MusicSettingsPanel({ className }: MusicSettingsPanelProps) {
                 ? 'bg-background text-foreground shadow-sm'
                 : 'hover:bg-background/50'
             )}
-            aria-pressed={activeTab === 'youtube'}
             aria-selected={activeTab === 'youtube'}
             role="tab"
           >
@@ -77,7 +76,6 @@ export function MusicSettingsPanel({ className }: MusicSettingsPanelProps) {
                 ? 'bg-background text-foreground shadow-sm'
                 : 'hover:bg-background/50'
             )}
-            aria-pressed={activeTab === 'upload'}
             aria-selected={activeTab === 'upload'}
             role="tab"
           >
