@@ -165,7 +165,7 @@ export function Runner() {
              />
              
              {/* 010-runner-settings P2: Memoized background style with error handling */}
-             <div className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000" style={backgroundStyle}>
+             <div className="absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-1000" style={backgroundStyle}>
                {/* Invisible img tag to detect load failures */}
                {bgUrl && (
                  <img
@@ -180,7 +180,7 @@ export function Runner() {
              {/* 007-unified-state-architecture: Use effects.overlayOpacity from config */}
              {/* Fixed: Use bg-black/30 (30% opacity) as fallback when overlayOpacity is undefined */}
              <div
-               className="absolute inset-0 bg-black/30 transition-opacity"
+               className="absolute inset-0 z-[1] bg-black/30 transition-opacity"
                style={{ opacity: effects.overlayOpacity ?? undefined }}
              />
 
@@ -341,9 +341,20 @@ export function Runner() {
              
              {/* 011-music-player-widget [T024]: Music Player Widget */}
              {/* Only show when in running mode and music source is configured */}
-             {mode === 'running' && (youtubeUrl || uploadedFileId) && (
-               <MusicPlayerWidget />
-             )}
+             {(() => {
+               // DEBUG: Log widget rendering conditions
+               const shouldRender = mode === 'running' && (youtubeUrl || uploadedFileId);
+               console.log('[DEBUG Runner] MusicPlayerWidget render check:', {
+                 mode,
+                 youtubeUrl,
+                 uploadedFileId,
+                 hasYoutubeUrl: !!youtubeUrl,
+                 hasUploadedFileId: !!uploadedFileId,
+                 shouldRender,
+                 condition: `mode === 'running': ${mode === 'running'}, (youtubeUrl || uploadedFileId): ${!!(youtubeUrl || uploadedFileId)}`
+               });
+               return shouldRender && <MusicPlayerWidget />;
+             })()}
              
              {/* T032 [US2]: Quick Settings Panel */}
              <QuickSettingsPanel

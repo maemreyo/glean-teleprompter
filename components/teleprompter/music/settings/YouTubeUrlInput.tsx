@@ -24,6 +24,7 @@ export function YouTubeUrlInput({ className }: YouTubeUrlInputProps) {
   const t = useTranslations('MusicPlayer');
   const youtubeUrl = useMusicPlayerStore((state) => state.youtubeUrl);
   const setYoutubeUrl = useMusicPlayerStore((state) => state.setYoutubeUrl);
+  const setSourceType = useMusicPlayerStore((state) => state.setSourceType);
 
   const [url, setUrl] = useState(youtubeUrl || '');
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +55,7 @@ export function YouTubeUrlInput({ className }: YouTubeUrlInputProps) {
       setIsValid(true);
       setError(null);
       setYoutubeUrl(value);
+      setSourceType('youtube');
     } else {
       setIsValid(false);
       const errorMsg = getYouTubeErrorMessage(result.error!);

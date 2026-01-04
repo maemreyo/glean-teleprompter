@@ -9,7 +9,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMusicPlayerStore } from '@/lib/stores/useMusicPlayerStore';
 import type { MusicSourceType } from '@/types/music';
@@ -28,7 +28,18 @@ export function MusicSettingsPanel({ className }: MusicSettingsPanelProps) {
   const sourceType = useMusicPlayerStore((state) => state.sourceType);
   const setSourceType = useMusicPlayerStore((state) => state.setSourceType);
   const widgetStyle = useMusicPlayerStore((state) => state.widgetStyle);
+  const youtubeUrl = useMusicPlayerStore((state) => state.youtubeUrl);
+  const uploadedFileId = useMusicPlayerStore((state) => state.uploadedFileId);
   const [activeTab, setActiveTab] = useState<MusicSourceType>(sourceType);
+
+  // Auto-correct sourceType based on actual values (fixes persisted state issues)
+  useEffect(() => {
+    if (youtubeUrl && sourceType !== 'youtube') {
+      setSourceType('youtube');
+    } else if (uploadedFileId && sourceType !== 'upload') {
+      setSourceType('upload');
+    }
+  }, []); // Run once on mount
 
   const handleTabChange = (value: MusicSourceType) => {
     setActiveTab(value);

@@ -65,6 +65,20 @@ export function MusicPlayerWidget() {
   const youtubeUrl = useMusicPlayerStore((state) => state.youtubeUrl);
   const uploadedFileId = useMusicPlayerStore((state) => state.uploadedFileId);
   const vinylSpeed = useMusicPlayerStore((state) => state.vinylSpeed) || '45';
+
+  // DEBUG: Log all store values on component mount and when they change
+  useEffect(() => {
+    console.log('[DEBUG MusicPlayerWidget] Store state:', {
+      sourceType,
+      youtubeUrl,
+      uploadedFileId,
+      widgetStyle,
+      playbackState,
+      position,
+      hasYoutubeUrl: !!youtubeUrl,
+      hasUploadedFileId: !!uploadedFileId
+    });
+  }, [sourceType, youtubeUrl, uploadedFileId, widgetStyle, playbackState, position]);
   
   // T038: Touch support - detect mobile viewport
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -251,7 +265,22 @@ export function MusicPlayerWidget() {
   }, [store]);
   
   // Don't render if no source configured
-  const hasSource = sourceType === 'youtube' ? !!youtubeUrl : !!uploadedFileId;
+  // const hasSource = sourceType === 'youtube' ? !!youtubeUrl : !!uploadedFileId;
+  const hasSource = true;
+  
+  // DEBUG: Log early return condition
+  console.log('[DEBUG MusicPlayerWidget] Early return check:', {
+    sourceType,
+    youtubeUrl,
+    uploadedFileId,
+    hasSource,
+    reason: !hasSource
+      ? sourceType === 'youtube'
+        ? 'sourceType is youtube but youtubeUrl is falsy'
+        : 'sourceType is upload but uploadedFileId is falsy'
+      : 'Will render widget'
+  });
+  
   if (!hasSource) {
     return null;
   }

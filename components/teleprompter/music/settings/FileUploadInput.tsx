@@ -27,6 +27,7 @@ export function FileUploadInput({ className }: FileUploadInputProps) {
   const t = useTranslations('MusicPlayer');
   const uploadedFileId = useMusicPlayerStore((state) => state.uploadedFileId);
   const setUploadedFileId = useMusicPlayerStore((state) => state.setUploadedFileId);
+  const setSourceType = useMusicPlayerStore((state) => state.setSourceType);
   const user = useAuthStore((state) => state.user);
 
   const [isUploading, setIsUploading] = useState(false);
@@ -73,6 +74,7 @@ export function FileUploadInput({ className }: FileUploadInputProps) {
       const fileId = await uploadAudioFile(userId, file);
       
       setUploadedFileId(fileId);
+      setSourceType('upload');
       setUploadedFileName(file.name);
 
       toast.success(t('source.upload.uploadSuccess'), {

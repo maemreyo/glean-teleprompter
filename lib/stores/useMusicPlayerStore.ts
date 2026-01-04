@@ -217,23 +217,32 @@ export const useMusicPlayerStore = create<MusicPlayerStore>()(
         tabId,
 
         // Configuration actions
-        setSourceType: (type) => set({ 
-          sourceType: type, 
-          lastModified: Date.now(),
-          isConfigured: true,
-        }),
+        setSourceType: (type) => {
+          console.log('[DEBUG MusicStore] setSourceType called:', { type, previousSourceType: get().sourceType });
+          set({
+            sourceType: type,
+            lastModified: Date.now(),
+            isConfigured: true,
+          });
+        },
 
-        setYoutubeUrl: (url) => set({ 
-          youtubeUrl: url, 
-          lastModified: Date.now(),
-          isConfigured: true,
-        }),
+        setYoutubeUrl: (url) => {
+          console.log('[DEBUG MusicStore] setYoutubeUrl called:', { url, previousUrl: get().youtubeUrl });
+          set({
+            youtubeUrl: url,
+            lastModified: Date.now(),
+            isConfigured: true,
+          });
+        },
 
-        setUploadedFileId: (fileId) => set({ 
-          uploadedFileId: fileId, 
-          lastModified: Date.now(),
-          isConfigured: true,
-        }),
+        setUploadedFileId: (fileId) => {
+          console.log('[DEBUG MusicStore] setUploadedFileId called:', { fileId, previousFileId: get().uploadedFileId });
+          set({
+            uploadedFileId: fileId,
+            lastModified: Date.now(),
+            isConfigured: true,
+          });
+        },
 
         setWidgetStyle: (style) => set({ 
           widgetStyle: style, 
