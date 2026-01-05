@@ -93,7 +93,9 @@ export function useStoryNavigation(options: UseStoryNavigationOptions): Navigati
         // Center tap: toggle pause (FR-005)
         storeTogglePause();
         if (onPauseChange) {
-          onPauseChange(!isPaused);
+          // Get the current state from store to avoid stale closure
+          const currentIsPaused = useStoryStore.getState().isPaused;
+          onPauseChange(currentIsPaused);
         }
         return;
       }
@@ -107,7 +109,7 @@ export function useStoryNavigation(options: UseStoryNavigationOptions): Navigati
       // Left side (30%): Previous slide
       goToPreviousSlide();
     },
-    [currentSlide, isPaused, storeTogglePause, onPauseChange]
+    [currentSlide, storeTogglePause, onPauseChange]
   );
 
   /**
@@ -140,9 +142,11 @@ export function useStoryNavigation(options: UseStoryNavigationOptions): Navigati
   const togglePause = useCallback(() => {
     storeTogglePause();
     if (onPauseChange) {
-      onPauseChange(!isPaused);
+      // Get the current state from store to avoid stale closure
+      const currentIsPaused = useStoryStore.getState().isPaused;
+      onPauseChange(currentIsPaused);
     }
-  }, [isPaused, storeTogglePause, onPauseChange]);
+  }, [storeTogglePause, onPauseChange]);
 
   /**
    * Auto-advance logic for time-based slides (FR-009, FR-033)

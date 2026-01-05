@@ -8,7 +8,7 @@
  * @feature 012-standalone-story
  */
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useStoryStore } from '@/lib/stores/useStoryStore';
 import { useTeleprompterScroll } from '@/lib/story/hooks/useTeleprompterScroll';
 import { TeleprompterContent } from '../Teleprompter/TeleprompterContent';
@@ -64,10 +64,17 @@ export function TeleprompterSlide({
   }, [hasNextSlide, setSlideProgress, onComplete]);
 
   /**
-   * Get scroll hook - TeleprompterContent will pass its ref
+   * Create a ref for the scroll container
+   * Note: The ref is managed here but the actual scrolling is handled
+   * by TeleprompterContent which receives the callbacks
+   */
+  const containerRef = useRef<HTMLElement>(null);
+
+  /**
+   * Get scroll hook with proper ref initialization
    */
   const { toggleScrolling } = useTeleprompterScroll({
-    containerRef: undefined as unknown as React.RefObject<HTMLElement>,
+    containerRef,
     onScrollProgress: handleScrollProgress,
     onScrollComplete: handleScrollComplete,
   });

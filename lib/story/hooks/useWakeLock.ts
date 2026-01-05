@@ -24,7 +24,7 @@ interface UseWakeLockReturn {
   error: Error | null;
 }
 
-interface WakeLockSentinel {
+interface WakeLockSentinel extends EventTarget {
   release: () => Promise<void>;
 }
 
@@ -61,6 +61,7 @@ export function useWakeLock({
 }: WakeLockOptions = {}): UseWakeLockReturn {
   const sentinelRef = useRef<WakeLockSentinel | null>(null);
   const noSleepRef = useRef<NoSleepInstance | null>(null);
+  const releaseListenerRef = useRef<(() => void) | null>(null);
   const [isWakeLockActive, setIsWakeLockActive] = useState(false);
   const [isWakeLockSupported, setIsWakeLockSupported] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -86,6 +87,8 @@ export function useWakeLock({
       const script = document.createElement('script');
       script.src = 'https://unpkg.com/nosleep.js@0.12.0/dist/NoSleep.min.js';
       script.async = true;
+      script.crossOrigin = 'anonymous';
+      script.integrity = 'sha384-lp0XiAMtqqqjyVLBYjAcDQzxc2XyGj3sGESoiWbccHdpXjNUPUjWrq5GMqaGHGp9';
 
       const loadPromise = new Promise<boolean>((resolve, reject) => {
         script.onload = () => resolve(true);
@@ -158,17 +161,32 @@ export function useWakeLock({
         }
       } else {
         // Use native Wake Lock API
+        
+        // Clean up old event listener from previous wake lock if it exists
+        if (sentinelRef.current && releaseListenerRef.current) {
+          try {
+            sentinelRef.current.removeEventListener('release', releaseListenerRef.current);
+          } catch {
+            // Ignore errors when removing listener from already released sentinel
+          }
+        }
+        
         const wakeLock = await navigator.wakeLock.request('screen');
         sentinelRef.current = wakeLock;
+        
+        // Create and store the release listener function
+        releaseListenerRef.current = () => {
+          setIsWakeLockActive(false);
+          sentinelRef.current = null;
+          releaseListenerRef.current = null;
+          onRelease?.();
+        };
+        
         setIsWakeLockActive(true);
         onRequest?.();
 
         // Listen for wake lock release (system-initiated)
-        wakeLock.addEventListener('release', () => {
-          setIsWakeLockActive(false);
-          sentinelRef.current = null;
-          onRelease?.();
-        });
+        wakeLock.addEventListener('release', releaseListenerRef.current);
       }
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to request wake lock');
@@ -189,8 +207,18 @@ export function useWakeLock({
         setIsWakeLockActive(false);
         onRelease?.();
       } else if (sentinelRef.current) {
+        // Remove event listener before releasing
+        if (releaseListenerRef.current) {
+          try {
+            sentinelRef.current.removeEventListener('release', releaseListenerRef.current);
+          } catch {
+            // Ignore errors when removing listener
+          }
+        }
+        
         sentinelRef.current.release();
         sentinelRef.current = null;
+        releaseListenerRef.current = null;
         setIsWakeLockActive(false);
         onRelease?.();
       }
@@ -241,6 +269,14 @@ export function useWakeLock({
    */
   useEffect(() => {
     return () => {
+      // Clean up event listener if it exists
+      if (sentinelRef.current && releaseListenerRef.current) {
+        try {
+          sentinelRef.current.removeEventListener('release', releaseListenerRef.current);
+        } catch {
+          // Ignore errors during cleanup
+        }
+      }
       releaseWakeLock();
     };
   }, [releaseWakeLock]);

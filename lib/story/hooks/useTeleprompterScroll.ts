@@ -8,6 +8,7 @@
  */
 
 import { useRef, useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { useTeleprompterStore } from '@/lib/stores/useTeleprompterStore';
 import { useWakeLock } from './useWakeLock';
 import {
@@ -104,6 +105,7 @@ const PROGRESS_THROTTLE_MS = 100;
 const BASE_SCROLL_SPEED = 60; // pixels per second at speed 1
 const DECELERATION_FACTOR = 0.95;
 const MIN_SPEED = 0.01;
+const SCROLL_END_TOLERANCE = 1; // pixels - tolerance for detecting scroll end (handles floating-point rounding errors)
 
 /**
  * Hook for managing teleprompter auto-scrolling
@@ -125,6 +127,7 @@ export function useTeleprompterScroll({
   const scrollRatioBeforeFontChangeRef = useRef<number | null>(null);
   const userScrolledRef = useRef<boolean>(false); // T114 - Detect user manual scroll
   const isTabVisibleRef = useRef<boolean>(true); // T117 - Track tab visibility
+  const isAutoScrollingRef = useRef<boolean>(false); // Flag to differentiate auto-scroll from user scroll
   
   // FPS monitor for development (T091)
   const fpsMonitor = useRef(createFPSMonitor());
@@ -235,7 +238,13 @@ export function useTeleprompterScroll({
       );
 
       // Apply scroll
+      // Mark that we're about to auto-scroll so the scroll event handler knows this isn't a user action
+      isAutoScrollingRef.current = true;
       container.scrollTop = newScrollPosition;
+      // Reset flag after a microtask - the scroll event will have fired by then
+      Promise.resolve().then(() => {
+        isAutoScrollingRef.current = false;
+      });
 
       // Calculate scroll depth
       const scrollDepth = calculateScrollDepth(
@@ -254,7 +263,7 @@ export function useTeleprompterScroll({
       }
 
       // Check if we've reached the end
-      if (newScrollPosition >= maxScroll - 1 && !isStoppingRef.current) {
+      if (newScrollPosition >= maxScroll - SCROLL_END_TOLERANCE && !isStoppingRef.current) {
         onScrollComplete?.();
         stopStoreScrolling();
         return;
@@ -373,6 +382,11 @@ export function useTeleprompterScroll({
    * When the user changes font size, the scroll height changes.
    * We preserve the relative scroll position (ratio) so the user
    * continues reading from the same location in the content.
+   *
+   * Note: This effect only runs when fontSize actually changes by comparing
+   * with the previous value stored in previousFontSizeRef. This prevents
+   * unnecessary recalculations on every render where fontSize is read from
+   * the Zustand store.
    */
   useEffect(() => {
     const container = containerRef.current;
@@ -384,74 +398,81 @@ export function useTeleprompterScroll({
       return;
     }
 
-    // Check if font size actually changed
-    if (fontSize !== previousFontSizeRef.current) {
-      const scrollHeight = container.scrollHeight;
-      const viewportHeight = container.clientHeight;
-      const currentScrollTop = container.scrollTop;
-
-      // Calculate current scroll ratio before the change
-      const currentRatio = calculateScrollDepth(
-        currentScrollTop,
-        scrollHeight,
-        viewportHeight
-      );
-
-      // Store the ratio for restoration after layout update
-      scrollRatioBeforeFontChangeRef.current = currentRatio;
-      previousFontSizeRef.current = fontSize;
-
-      // Wait for next frame when layout has updated with new font size
-      requestAnimationFrame(() => {
-        if (!containerRef.current) return;
-
-        const newScrollHeight = containerRef.current.scrollHeight;
-        const newViewportHeight = containerRef.current.clientHeight;
-        const savedRatio = scrollRatioBeforeFontChangeRef.current;
-
-        if (savedRatio !== null) {
-          // Calculate new scroll position that maintains the same ratio
-          const newScrollTop = calculateScrollPosition(
-            savedRatio,
-            newScrollHeight,
-            newViewportHeight
-          );
-
-          // Apply the new scroll position
-          containerRef.current.scrollTop = newScrollTop;
-
-          // Update store with new position
-          const newScrollDepth = calculateScrollDepth(
-            newScrollTop,
-            newScrollHeight,
-            newViewportHeight
-          );
-          updateScrollPosition(newScrollTop, newScrollDepth);
-
-          // Clear saved ratio
-          scrollRatioBeforeFontChangeRef.current = null;
-        }
-      });
+    // Early return if font size hasn't actually changed
+    // This prevents unnecessary recalculations when fontSize is read from Zustand store
+    if (fontSize === previousFontSizeRef.current) {
+      return;
     }
+
+    const scrollHeight = container.scrollHeight;
+    const viewportHeight = container.clientHeight;
+    const currentScrollTop = container.scrollTop;
+
+    // Calculate current scroll ratio before the change
+    const currentRatio = calculateScrollDepth(
+      currentScrollTop,
+      scrollHeight,
+      viewportHeight
+    );
+
+    // Store the ratio for restoration after layout update
+    scrollRatioBeforeFontChangeRef.current = currentRatio;
+    previousFontSizeRef.current = fontSize;
+
+    // Wait for next frame when layout has updated with new font size
+    requestAnimationFrame(() => {
+      if (!containerRef.current) return;
+
+      const newScrollHeight = containerRef.current.scrollHeight;
+      const newViewportHeight = containerRef.current.clientHeight;
+      const savedRatio = scrollRatioBeforeFontChangeRef.current;
+
+      if (savedRatio !== null) {
+        // Calculate new scroll position that maintains the same ratio
+        const newScrollTop = calculateScrollPosition(
+          savedRatio,
+          newScrollHeight,
+          newViewportHeight
+        );
+
+        // Apply the new scroll position
+        containerRef.current.scrollTop = newScrollTop;
+
+        // Update store with new position
+        const newScrollDepth = calculateScrollDepth(
+          newScrollTop,
+          newScrollHeight,
+          newViewportHeight
+        );
+        updateScrollPosition(newScrollTop, newScrollDepth);
+
+        // Clear saved ratio
+        scrollRatioBeforeFontChangeRef.current = null;
+      }
+    });
   }, [fontSize, containerRef, updateScrollPosition]);
 
   /**
    * T114: Detect and handle user manual scroll
    * When user manually scrolls, pause auto-scrolling
+   *
+   * Note: We differentiate between user scroll and auto-scroll by using
+   * isAutoScrollingRef, which is set to true before we programmatically
+   * set scrollTop and reset to false after the scroll event fires.
    */
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const handleScroll = () => {
-      if (isScrolling && !isStoppingRef.current) {
+      // Only pause if this is NOT an auto-scroll event
+      if (isScrolling && !isStoppingRef.current && !isAutoScrollingRef.current) {
         // User manually scrolled - pause auto-scrolling
         userScrolledRef.current = true;
         stopScrolling();
         
-        // T115: Show toast notification (implementation depends on toast library)
-        // This would typically use Sonner toast
-        console.log('Auto-scroll paused - tap to resume');
+        // T115: Show toast notification
+        toast('Auto-scroll paused - tap to resume');
       }
     };
 
@@ -500,6 +521,7 @@ export function useTeleprompterScroll({
 
   /**
    * Expose FPS metrics in development (T091)
+   * Cleanup on unmount to prevent memory leaks
    */
   useEffect(() => {
     if (!isDevMode) return;
@@ -510,6 +532,13 @@ export function useTeleprompterScroll({
         getMetrics: () => fpsMonitor.current.getMetrics(),
       };
     }
+
+    // Cleanup: remove the window attachment on unmount
+    return () => {
+      if (typeof window !== 'undefined' && (window as any).__teleprompterFPS) {
+        delete (window as any).__teleprompterFPS;
+      }
+    };
   }, []);
 
   return {

@@ -128,7 +128,6 @@ export const StoryViewer = memo(function StoryViewer({
       style={{
         // GPU acceleration for smooth rendering (T092)
         transform: 'translateZ(0)',
-        willChange: 'contents',
       }}
     >
       {/* Progress bars */}
@@ -150,6 +149,9 @@ export const StoryViewer = memo(function StoryViewer({
   );
 }, (prevProps, nextProps) => {
   // Only re-render if story data actually changed
+  // Check story ID, slides count, and deep equality of slide content
+  // Using JSON.stringify to properly detect changes in all slide type properties
   return prevProps.story.id === nextProps.story.id &&
-         prevProps.story.slides.length === nextProps.story.slides.length;
+         prevProps.story.slides.length === nextProps.story.slides.length &&
+         JSON.stringify(prevProps.story.slides) === JSON.stringify(nextProps.story.slides);
 });
