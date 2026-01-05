@@ -1,5 +1,8 @@
 import { inter, oswald, robotoMono, merriweather, lobster } from './fonts';
 
+// Re-export z-index constants for centralized layer management
+export * from './constants/z-index';
+
 export const FONT_STYLES = [
   { name: 'Classic', font: inter.className, label: 'Cổ điển' },
   { name: 'Modern', font: oswald.className, label: 'Hiện đại' },

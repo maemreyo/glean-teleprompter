@@ -1,12 +1,19 @@
 /**
- * Music Player Widget Component
+ * Music Player Widget Component - Z-Index Usage
  *
- * Floating draggable widget for Runner mode.
- * Features: Position state, play/pause controls, source detection (YouTube/file upload),
- * style-based rendering (Capsule, Vinyl, Spectrum), position persistence to localStorage.
+ * This component uses centralized z-index constants from @/lib/constants/z-index
+ *
+ * Z-INDEX LAYERS:
+ * - Z_INDEX_MUSIC_WIDGET_BASE (600): Main widget container
+ * - Z_INDEX_MUSIC_WIDGET_CONFIGURE (650): Reconfigure button
+ * - Z_INDEX_MUSIC_WIDGET_MAX (649): Maximum dynamic z-index
+ *
+ * Dynamic z-index management: Widget increments by 10 on focus/drag to bring to front,
+ * allowing it to compete with camera widget (500-599 range) for visibility.
  *
  * @feature 011-music-player-widget
  * @task T018 (with T022, T023)
+ * @module components/teleprompter/music/MusicPlayerWidget
  */
 
 'use client';
@@ -25,14 +32,14 @@ import { VinylWidget } from './styles/VinylWidget';
 import { SpectrumWidget } from './styles/SpectrumWidget';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+// 012-z-index-refactor: Import centralized z-index constants
+import { ZIndex } from '@/lib/constants/z-index';
 
 // ============================================================================
 // Constants
 // ============================================================================
 
 const MUSIC_STORAGE_BUCKET = 'user_music';
-const BASE_Z_INDEX = 1000;
-const MAX_Z_INDEX = 9999;
 
 /**
  * Get Supabase Storage public URL for uploaded music files
@@ -54,8 +61,9 @@ export function MusicPlayerWidget() {
   const router = useRouter();
   const store = useMusicPlayerStore();
   
-  // T039: Dynamic z-index management
-  const [zIndex, setZIndex] = useState(BASE_Z_INDEX);
+  // 012-z-index-refactor: Dynamic z-index management with new constants
+  // Base at Z_INDEX_MUSIC_WIDGET_BASE (600), can increment to Z_INDEX_MUSIC_WIDGET_MAX (649)
+  const [zIndex, setZIndex] = useState(ZIndex.MusicWidgetBase);
   
   // State from store
   const position = useMusicPlayerStore((state) => state.position);
@@ -186,9 +194,10 @@ export function MusicPlayerWidget() {
     y.set(constrained.y);
   }, [x, y, widgetStyle, store]);
   
-  // T039: Handle focus/drag start to bring widget to front
+  // 012-z-index-refactor: Handle focus/drag start to bring widget to front
+  // Increments by 10 each time, capped at Z_INDEX_MUSIC_WIDGET_MAX (649)
   const handleFocus = useCallback(() => {
-    setZIndex((prev) => Math.min(prev + 1, MAX_Z_INDEX));
+    setZIndex((prev) => Math.min(prev + 10, ZIndex.MusicWidgetMax));
   }, []);
   
   // Handle play/pause button click
@@ -342,11 +351,12 @@ export function MusicPlayerWidget() {
         />
       )}
       
+      {/* 012-z-index-refactor: Z_INDEX_MUSIC_WIDGET_CONFIGURE (650) - Reconfigure button */}
       {/* T036: Reconfigure button - shows on hover (desktop) or always visible (mobile) */}
       <button
         onClick={() => router.push('/studio?tab=music')}
         className={cn(
-          'fixed z-50 p-2 rounded-lg',
+          'fixed p-2 rounded-lg',
           'bg-black/60 backdrop-blur-sm border border-white/10',
           'hover:bg-black/80 hover:border-white/20',
           'transition-all duration-200',
@@ -359,7 +369,7 @@ export function MusicPlayerWidget() {
         style={{
           left: position.x,
           top: position.y - 40,
-          zIndex: zIndex + 1,
+          zIndex: ZIndex.MusicWidgetConfigure,
         }}
         aria-label={t('widget.reconfigure')}
       >

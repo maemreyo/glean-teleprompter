@@ -1,7 +1,18 @@
 'use client';
 
 /**
- * DraggableCamera Component
+ * DraggableCamera Component - Z-Index Usage
+ *
+ * This component uses centralized z-index constants from @/lib/constants/z-index
+ *
+ * Z-INDEX LAYERS:
+ * - Z_INDEX_WIDGET_BASE (500): Camera widget base layer
+ * - Z_INDEX_WIDGET_MAX (599): Maximum dynamic z-index
+ * - Z_INDEX_WIDGET_HANDLE (530): Drag handle (nested, no actual effect)
+ *
+ * Dynamic z-index management: Widget increments by 10 on focus/drag to bring to front,
+ * allowing it to compete with music widget (600-649 range) for visibility.
+ *
  * Floating camera widget with drag functionality and position persistence
  * @module components/teleprompter/camera/DraggableCamera
  */
@@ -9,6 +20,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, useDragControls, PanInfo } from 'framer-motion';
 import { CameraWidget } from './CameraWidget';
+// 012-z-index-refactor: Import centralized z-index constants
+import { ZIndex } from '@/lib/constants/z-index';
 
 const STORAGE_KEY = 'camera-widget-position';
 const DEFAULT_POSITION = { x: 20, y: 20 };
@@ -31,6 +44,9 @@ export function DraggableCamera({
 }: DraggableCameraProps) {
   const [position, setPosition] = useState<null | { x: number; y: number }>(null);
   const [isDragging, setIsDragging] = useState(false);
+  // 012-z-index-refactor: Dynamic z-index management
+  // Base at Z_INDEX_WIDGET_BASE (500), can increment to Z_INDEX_WIDGET_MAX (599)
+  const [zIndex, setZIndex] = useState(ZIndex.WidgetBase);
   const dragControls = useDragControls();
   const hasLoadedPosition = useRef(false);
 
@@ -101,9 +117,11 @@ export function DraggableCamera({
     [position, boundPosition, savePosition]
   );
 
-  // Handle drag start for visual feedback
+  // 012-z-index-refactor: Handle drag start to bring widget to front
   const handleDragStart = useCallback(() => {
     setIsDragging(true);
+    // Bring to front by incrementing z-index
+    setZIndex((prev) => Math.min(prev + 10, ZIndex.WidgetMax));
   }, []);
 
   // Handle window resize to keep widget in bounds
@@ -143,12 +161,15 @@ export function DraggableCamera({
         x: position.x,
         y: position.y,
       }}
-      className="fixed z-[100] top-[10px]"
+      className="fixed top-[10px]"
       style={{
+        zIndex: zIndex,
         touchAction: 'none', // Prevent scrolling while dragging on mobile
       }}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 1.05 }}
+      onFocus={() => setZIndex((prev) => Math.min(prev + 10, ZIndex.WidgetMax))}
+      tabIndex={0}
     >
       <motion.div
         className={cn(
@@ -162,8 +183,12 @@ export function DraggableCamera({
         }}
         transition={{ duration: 0.2 }}
       >
-        {/* Drag Handle Indicator */}
-        <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/20 to-transparent z-30 cursor-move flex items-center justify-center group">
+        {/* 012-z-index-refactor: Z_INDEX_WIDGET_HANDLE (530) - Drag handle */}
+        {/* NOTE: Nested z-index has no effect on stacking - only affects children within this parent */}
+        <div
+          className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/20 to-transparent cursor-move flex items-center justify-center group"
+          style={{ zIndex: ZIndex.WidgetHandle }}
+        >
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <div className="w-1 h-1 bg-white/70 rounded-full" />
             <div className="w-1 h-1 bg-white/70 rounded-full" />

@@ -1,11 +1,19 @@
 'use client'
 
 /**
+ * QuickSettingsPanel Component - Z-Index Usage
+ *
+ * This component uses centralized z-index constants from @/lib/constants/z-index
+ *
+ * Z-INDEX LAYER: Z_INDEX_QUICK_SETTINGS (200)
+ * - Must be higher than controls (100-110) to avoid overlap conflict
+ * - Overrides Radix UI Dialog default z-50 to fix critical conflict
+ *
  * T025-T031 [US2] QuickSettingsPanel Component
- * 
+ *
  * A collapsible floating panel for quick adjustments in Runner mode.
  * Uses Radix UI Dialog for accessibility and keyboard navigation.
- * 
+ *
  * Features:
  * - Scroll speed control (T026)
  * - Font size control (T027)
@@ -13,6 +21,7 @@
  * - Background URL input (T029)
  * - Error handling with toast notifications (T030)
  * - Visual indication for modified settings (T031)
+ * @module components/teleprompter/runner/QuickSettingsPanel
  */
 
 import React, { useState, useCallback } from 'react'
@@ -26,6 +35,8 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
+// 012-z-index-refactor: Import centralized z-index constants
+import { ZIndex } from '@/lib/constants/z-index'
 
 // Default values from stores for comparison
 const DEFAULT_SCROLL_SPEED = 50
@@ -128,12 +139,14 @@ export function QuickSettingsPanel({ open, onOpenChange }: QuickSettingsPanelPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* 012-z-index-refactor: Z_INDEX_QUICK_SETTINGS (200) - Override Radix z-50 default to fix critical conflict with controls */}
       <DialogContent
         className={cn(
           "sm:max-w-md",
           "bg-background/95 backdrop-blur-xl",
           "border-border/50 shadow-2xl"
         )}
+        style={{ zIndex: ZIndex.QuickSettings }}
         onEscapeKeyDown={() => onOpenChange(false)}
         showCloseButton={false}
       >

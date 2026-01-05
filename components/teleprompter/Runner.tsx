@@ -1,3 +1,22 @@
+/**
+ * Runner Component - Z-Index Usage
+ *
+ * This component uses centralized z-index constants from @/lib/constants/z-index
+ *
+ * Z-INDEX LAYERS:
+ * - Z_INDEX_BASE (0): Background image
+ * - Z_INDEX_OVERLAY (1): Tint overlay for text contrast
+ * - Z_INDEX_CONTENT (10): Teleprompter scrolling text
+ * - Z_INDEX_CONTROLS_TOP (100): Theme switcher, quick settings, camera toggle
+ * - Z_INDEX_CONTROLS_BOTTOM (110): Playback controls (play/pause, speed, font size)
+ * - Z_INDEX_QUICK_SETTINGS (200): Quick Settings Panel dialog
+ * - Z_INDEX_WIDGET_BASE (500): Camera widget
+ * - Z_INDEX_MUSIC_WIDGET_BASE (600): Music widget
+ *
+ * To modify: Use constants from lib/constants/z-index, never hardcode values
+ * @module components/teleprompter/Runner
+ */
+
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -13,6 +32,8 @@ import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ARIA_LABELS } from '@/lib/a11y/ariaLabels';
+// 012-z-index-refactor: Import centralized z-index constants
+import { ZIndex } from '@/lib/constants/z-index';
 
 // Modular Components
 import { TeleprompterText } from '@/components/teleprompter/display/TeleprompterText';
@@ -164,6 +185,7 @@ export function Runner() {
                 volume={0.5}
              />
              
+             {/* 012-z-index-refactor: Z_INDEX_BASE (0) - Background layer */}
              {/* 010-runner-settings P2: Memoized background style with error handling */}
              <div className="absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-1000" style={backgroundStyle}>
                {/* Invisible img tag to detect load failures */}
@@ -177,15 +199,20 @@ export function Runner() {
                  />
                )}
              </div>
+             {/* 012-z-index-refactor: Z_INDEX_OVERLAY (1) - Tint overlay layer */}
              {/* 007-unified-state-architecture: Use effects.overlayOpacity from config */}
              {/* Fixed: Use bg-black/30 (30% opacity) as fallback when overlayOpacity is undefined */}
              <div
-               className="absolute inset-0 z-[1] bg-black/30 transition-opacity"
+               className="absolute inset-0 bg-black/30 transition-opacity z-[1]"
                style={{ opacity: effects.overlayOpacity ?? undefined }}
              />
 
+             {/* 012-z-index-refactor: Z_INDEX_CONTROLS_TOP (100) - Top control bar */}
              {/* Top Control */}
-             <div className="absolute top-6 left-6 z-50 flex gap-2 items-center">
+             <div
+               className="absolute top-6 left-6 flex gap-2 items-center"
+               style={{ zIndex: ZIndex.ControlsTop }}
+             >
                 <ThemeSwitcher />
                 {/* T032 [US2]: Quick Settings Trigger Button */}
                 <button
@@ -235,9 +262,14 @@ export function Runner() {
                 )}
              </div>
 
+             {/* 012-z-index-refactor: Z_INDEX_CONTENT (10) - Teleprompter text layer */}
              {/* Content (Refactored to use TeleprompterText) */}
              {/* 007-unified-state-architecture: Use contentStore.text for content */}
-             <div ref={textContainerRef} className="relative z-10 h-full overflow-y-auto no-scrollbar mask-gradient-y">
+             <div
+               ref={textContainerRef}
+               className="relative h-full overflow-y-auto no-scrollbar mask-gradient-y"
+               style={{ zIndex: ZIndex.Content }}
+             >
                 <div className="min-h-screen flex flex-col items-center">
                   <div className="h-[45vh]" />
                   <div className="max-w-4xl w-full p-6">
@@ -251,8 +283,12 @@ export function Runner() {
                 </div>
              </div>
 
+             {/* 012-z-index-refactor: Z_INDEX_CONTROLS_BOTTOM (110) - Bottom control bar */}
              {/* Bottom Control Bar */}
-             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-xl">
+             <div
+               className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[90%] max-w-xl"
+               style={{ zIndex: ZIndex.ControlsBottom }}
+             >
                <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-3 shadow-2xl flex items-center justify-between gap-4">
                   {/* 007-unified-state-architecture: Use togglePlaying from usePlaybackStore */}
                   <button
