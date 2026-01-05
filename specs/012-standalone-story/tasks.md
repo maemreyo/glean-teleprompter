@@ -41,14 +41,14 @@ This is a Next.js 14+ web application structure:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 Create Zustand story store in lib/stores/useStoryStore.ts (navigation state)
-- [ ] T007 [P] Create Zustand teleprompter store in lib/stores/useTeleprompterStore.ts (scroll state)
-- [ ] T008 [P] Implement JSON schema validation in lib/story/validation.ts using ajv
-- [ ] T009 [P] Implement URL encoding/decoding in lib/story/utils/urlUtils.ts (js-base64 + pako)
-- [ ] T010 [P] Create story data loading utility in lib/story/utils/storyLoader.ts
-- [ ] T011 [P] Create safe area detection hook in lib/story/hooks/useSafeArea.ts
-- [ ] T012 [P] Create viewport height fix hook in lib/story/hooks/useVHFix.ts
-- [ ] T013 Create error screen component in components/story/ErrorScreen.tsx
+- [x] T006 Create Zustand story store in lib/stores/useStoryStore.ts (navigation state)
+- [x] T007 [P] Create Zustand teleprompter store in lib/stores/useTeleprompterStore.ts (scroll state)
+- [x] T008 [P] Implement JSON schema validation in lib/story/validation.ts using ajv
+- [x] T009 [P] Implement URL encoding/decoding in lib/story/utils/urlUtils.ts (js-base64 + pako)
+- [x] T010 [P] Create story data loading utility in lib/story/utils/storyLoader.ts
+- [x] T011 [P] Create safe area detection hook in lib/story/hooks/useSafeArea.ts
+- [x] T012 [P] Create viewport height fix hook in lib/story/hooks/useVHFix.ts
+- [x] T013 Create error screen component in components/story/ErrorScreen.tsx
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
