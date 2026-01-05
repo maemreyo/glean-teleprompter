@@ -146,20 +146,20 @@ This is a Next.js 14+ web application structure:
 
 ### Tests for User Story 3
 
-- [ ] T058 [P] [US3] Write wake lock unit tests in __tests__/unit/story/hooks/useWakeLock.test.ts (mocked Wake Lock + NoSleep.js)
-- [ ] T059 [P] [US3] Write visibility handling integration tests in __tests__/integration/story/wake-lock-visibility.test.tsx
-- [ ] T060 [P] [US3] Write screen wake E2E tests in __tests__/e2e/story/wake-lock.spec.ts
+- [x] T058 [P] [US3] Write wake lock unit tests in __tests__/unit/story/hooks/useWakeLock.test.ts (mocked Wake Lock + NoSleep.js)
+- [x] T059 [P] [US3] Write visibility handling integration tests in __tests__/integration/story/wake-lock-visibility.test.tsx
+- [x] T060 [P] [US3] Write screen wake E2E tests in __tests__/e2e/story/wake-lock.spec.ts
 
 ### Implementation for User Story 3
 
-- [ ] T061 [P] [US3] Implement useWakeLock hook in lib/story/hooks/useWakeLock.ts (Wake Lock API + NoSleep.js)
-- [ ] T062 [US3] Add NoSleep.js CDN loading with error handling in lib/story/hooks/useWakeLock.ts
-- [ ] T063 [US3] Implement wake lock request on scroll start in lib/story/hooks/useTeleprompterScroll.ts
-- [ ] T064 [US3] Implement wake lock release on scroll stop in lib/story/hooks/useTeleprompterScroll.ts
-- [ ] T065 [US3] Handle tab visibility changes (re-request on return) in lib/story/hooks/useWakeLock.ts
-- [ ] T066 [US3] Create wake lock error screen in components/story/ErrorScreen.tsx (wake lock unavailable)
-- [ ] T067 [US3] Block teleprompter mode if both Wake Lock and NoSleep.js fail in lib/story/hooks/useTeleprompterScroll.ts
-- [ ] T068 [US3] Add graceful degradation for low battery mode in lib/story/hooks/useWakeLock.ts
+- [x] T061 [P] [US3] Implement useWakeLock hook in lib/story/hooks/useWakeLock.ts (Wake Lock API + NoSleep.js)
+- [x] T062 [US3] Add NoSleep.js CDN loading with error handling in lib/story/hooks/useWakeLock.ts
+- [x] T063 [US3] Implement wake lock request on scroll start in lib/story/hooks/useTeleprompterScroll.ts
+- [x] T064 [US3] Implement wake lock release on scroll stop in lib/story/hooks/useTeleprompterScroll.ts
+- [x] T065 [US3] Handle tab visibility changes (re-request on return) in lib/story/hooks/useWakeLock.ts
+- [x] T066 [US3] Create wake lock error screen in components/story/ErrorScreen.tsx (wake lock unavailable)
+- [x] T067 [US3] Block teleprompter mode if both Wake Lock and NoSleep.js fail in lib/story/hooks/useTeleprompterScroll.ts
+- [x] T068 [US3] Add graceful degradation for low battery mode in lib/story/hooks/useWakeLock.ts
 
 **Checkpoint**: At this point, User Story 3 should be fully functional and testable independently
 **Success Criteria**: SC-003 (100% wake lock success on supported browsers)
@@ -176,18 +176,18 @@ This is a Next.js 14+ web application structure:
 
 ### Tests for User Story 4
 
-- [ ] T069 [P] [US4] Write safe area calculation tests in __tests__/unit/story/hooks/useSafeArea.test.ts
-- [ ] T070 [P] [US4] Write orientation change tests in __tests__/integration/story/orientation-change.test.tsx
+- [x] T069 [P] [US4] Write safe area calculation tests in __tests__/unit/story/hooks/useSafeArea.test.ts
+- [x] T070 [P] [US4] Write orientation change tests in __tests__/integration/story/orientation-change.test.tsx
 
 ### Implementation for User Story 4
 
-- [ ] T071 [P] [US4] Implement env(safe-area-inset-*) CSS variables in app/story/[storyId]/page.css
-- [ ] T072 [US4] Adjust focal point from 33vh to 38vh with safe area in components/story/Teleprompter/FocalPointIndicator.tsx
-- [ ] T073 [US4] Apply minimum 2rem padding plus safe area insets in components/story/SafeAreaWrapper.tsx
-- [ ] T074 [US4] Handle orientation changes with layout recalculation in lib/story/hooks/useOrientationChange.ts
-- [ ] T075 [US4] Preserve scroll ratio on orientation change in lib/story/hooks/useTeleprompterScroll.ts
-- [ ] T076 [US4] Create SafeAreaWrapper component in components/story/SafeAreaWrapper.tsx
-- [ ] T077 [US4] Apply safe area to all slide types in components/story/SlideContainer.tsx
+- [x] T071 [P] [US4] Implement env(safe-area-inset-*) CSS variables in app/story/[storyId]/page.css
+- [x] T072 [US4] Adjust focal point from 33vh to 38vh with safe area in components/story/Teleprompter/FocalPointIndicator.tsx
+- [x] T073 [US4] Apply minimum 2rem padding plus safe area insets in components/story/SafeAreaWrapper.tsx
+- [x] T074 [US4] Handle orientation changes with layout recalculation in lib/story/hooks/useOrientationChange.ts
+- [x] T075 [US4] Preserve scroll ratio on orientation change in lib/story/hooks/useTeleprompterScroll.ts
+- [x] T076 [US4] Create SafeAreaWrapper component in components/story/SafeAreaWrapper.tsx
+- [x] T077 [US4] Apply safe area to all slide types in components/story/SlideContainer.tsx
 
 **Checkpoint**: At this point, User Story 4 should be fully functional and testable independently
 **Success Criteria**: SC-005 (100% content visibility on modern mobile devices)
@@ -204,15 +204,15 @@ This is a Next.js 14+ web application structure:
 
 ### Tests for User Story 5
 
-- [ ] T078 [P] [US5] Write gesture conflict prevention tests in __tests__/integration/story/gesture-conflict.test.tsx
-- [ ] T079 [P] [US5] Write E2E tap behavior tests in __tests__/e2e/story/tap-behavior.spec.ts
+- [x] T078 [P] [US5] Write gesture conflict prevention tests in __tests__/integration/story/gesture-conflict.test.tsx
+- [x] T079 [P] [US5] Write E2E tap behavior tests in __tests__/e2e/story/tap-behavior.spec.ts
 
 ### Implementation for User Story 5
 
-- [ ] T080 [US5] Ensure tap zones disabled for teleprompter slides in lib/story/hooks/useStoryNavigation.ts
-- [ ] T081 [US5] Implement tap shows control panel (not slide change) in components/story/Teleprompter/TeleprompterSlide.tsx
-- [ ] T082 [US5] Implement SkipToNext button functionality in lib/story/hooks/useStoryNavigation.ts
-- [ ] T083 [US5] Ensure tap zones work for non-teleprompter slides in lib/story/hooks/useStoryNavigation.ts
+- [x] T080 [US5] Ensure tap zones disabled for teleprompter slides in lib/story/hooks/useStoryNavigation.ts
+- [x] T081 [US5] Implement tap shows control panel (not slide change) in components/story/Teleprompter/TeleprompterSlide.tsx
+- [x] T082 [US5] Implement SkipToNext button functionality in lib/story/hooks/useStoryNavigation.ts
+- [x] T083 [US5] Ensure tap zones work for non-teleprompter slides in lib/story/hooks/useStoryNavigation.ts
 
 **Checkpoint**: At this point, User Story 5 should be fully functional and testable independently
 **Success Criteria**: SC-004 (95% completion without accidental advancement)

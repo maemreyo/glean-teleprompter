@@ -1,14 +1,15 @@
 /**
  * useTeleprompterScroll Hook
- * 
+ *
  * Custom hook for managing auto-scrolling behavior in teleprompter mode.
  * Uses requestAnimationFrame for smooth 30fps+ scrolling.
- * 
+ *
  * @feature 012-standalone-story
  */
 
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useState } from 'react';
 import { useTeleprompterStore } from '@/lib/stores/useTeleprompterStore';
+import { useWakeLock } from './useWakeLock';
 import {
   calculateScrollDepth,
   calculateScrollPosition,
@@ -28,6 +29,7 @@ interface UseTeleprompterScrollReturn {
   stopScrolling: () => void;
   toggleScrolling: () => void;
   isScrolling: boolean;
+  wakeLockError: Error | null;
 }
 
 const PROGRESS_THROTTLE_MS = 100;
@@ -62,6 +64,22 @@ export function useTeleprompterScroll({
     stopScrolling: stopStoreScrolling,
     updateScrollPosition,
   } = useTeleprompterStore();
+
+  // Wake lock integration (T061, T063, T064, T067)
+  const { requestWakeLock, releaseWakeLock, isWakeLockSupported, error: wakeLockError } = useWakeLock({
+    onRequest: () => {
+      // Wake lock acquired successfully
+    },
+    onRelease: () => {
+      // Wake lock released
+    },
+    onError: (error) => {
+      // Log wake lock errors but don't block scrolling
+      console.warn('Wake lock error:', error);
+    },
+  });
+
+  const [hasAttemptedWakeLock, setHasAttemptedWakeLock] = useState(false);
 
   /**
    * Scroll animation frame handler
@@ -161,9 +179,9 @@ export function useTeleprompterScroll({
   );
 
   /**
-   * Start scrolling animation
+   * Start scrolling animation (T063 - request wake lock)
    */
-  const startScrolling = useCallback(() => {
+  const startScrolling = useCallback(async () => {
     if (isScrolling) return;
 
     const container = containerRef.current;
@@ -177,23 +195,70 @@ export function useTeleprompterScroll({
       return;
     }
 
+    // Attempt to request wake lock (T067 - block if both fail)
+    if (!hasAttemptedWakeLock) {
+      setHasAttemptedWakeLock(true);
+      if (isWakeLockSupported) {
+        try {
+          await requestWakeLock();
+        } catch (err) {
+          // If wake lock fails on first attempt, this is a critical error
+          // that should block teleprompter mode (T067)
+          stopStoreScrolling();
+          return;
+        }
+      }
+    } else {
+      // Re-request wake lock on subsequent starts
+      if (isWakeLockSupported) {
+        try {
+          await requestWakeLock();
+        } catch (err) {
+          // Log but don't block - wake lock may have been released by system
+          console.warn('Failed to re-request wake lock:', err);
+        }
+      }
+    }
+
     isStoppingRef.current = false;
     currentSpeedRef.current = scrollSpeed;
     lastTimestampRef.current = 0;
     startStoreScrolling();
 
     rafIdRef.current = requestAnimationFrame(scrollFrame);
-  }, [containerRef, isScrolling, scrollSpeed, startStoreScrolling, scrollFrame]);
+  }, [
+    containerRef,
+    isScrolling,
+    scrollSpeed,
+    startStoreScrolling,
+    scrollFrame,
+    hasAttemptedWakeLock,
+    isWakeLockSupported,
+    requestWakeLock,
+  ]);
 
   /**
-   * Stop scrolling with smooth deceleration
+   * Stop scrolling with smooth deceleration (T064 - release wake lock)
    */
   const stopScrolling = useCallback(() => {
     if (!isScrolling) return;
 
     // Enable deceleration mode
     isStoppingRef.current = true;
+
+    // Release wake lock when scrolling stops completely
+    // Note: We don't release immediately - we wait for deceleration to complete
+    // The actual release happens in the scrollFrame when speed reaches 0
   }, [isScrolling]);
+
+  /**
+   * Release wake lock when scrolling fully stops
+   */
+  useEffect(() => {
+    if (!isScrolling && hasAttemptedWakeLock && isWakeLockSupported) {
+      releaseWakeLock();
+    }
+  }, [isScrolling, hasAttemptedWakeLock, isWakeLockSupported, releaseWakeLock]);
 
   /**
    * Toggle scrolling state
@@ -290,5 +355,6 @@ export function useTeleprompterScroll({
     stopScrolling,
     toggleScrolling,
     isScrolling,
+    wakeLockError,
   };
 }
