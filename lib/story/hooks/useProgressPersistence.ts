@@ -40,7 +40,6 @@ export function useProgressPersistence({
   onSave,
   onLoad,
 }: UseProgressPersistenceOptions): UseProgressPersistenceReturn {
-  const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastSaveTimeRef = useRef<number>(0);
   const saveErrorRef = useRef<Error | null>(null);
   const hasSavedProgressRef = useRef<boolean>(false);
@@ -146,23 +145,6 @@ export function useProgressPersistence({
       return false;
     }
   }, [getStorageKey, slideId]);
-
-  /**
-   * Auto-save progress periodically (T097)
-   */
-  useEffect(() => {
-    // Set up interval to save progress every 2 seconds
-    saveIntervalRef.current = setInterval(() => {
-      // Actual save is triggered by the component via saveProgress
-      // This interval just ensures regular saves if not manually triggered
-    }, SAVE_INTERVAL_MS);
-
-    return () => {
-      if (saveIntervalRef.current) {
-        clearInterval(saveIntervalRef.current);
-      }
-    };
-  }, []);
 
   /**
    * Check for saved progress on mount

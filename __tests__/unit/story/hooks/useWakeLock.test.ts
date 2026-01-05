@@ -11,17 +11,20 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useWakeLock } from '@/lib/story/hooks/useWakeLock';
 
-// Mock NoSleep.js
-const mockNoSleepInstance = {
+// Create a single mock instance that will be returned by the constructor
+const createMockNoSleepInstance = () => ({
   enable: jest.fn(() => Promise.resolve()),
   disable: jest.fn(),
-};
+});
 
-const mockNoSleepClass = jest.fn(() => mockNoSleepInstance);
+const mockNoSleepInstance = createMockNoSleepInstance();
 
-// Mock document methods for script loading
-const mockCreateElement = jest.spyOn(document, 'createElement');
-const mockAppendChild = jest.spyOn(document.head, 'appendChild');
+// Mock NoSleep.js module to always return the same instance
+jest.mock('nosleep.js', () => {
+  return jest.fn(() => mockNoSleepInstance);
+});
+
+import NoSleep from 'nosleep.js';
 
 // Wake Lock API mock
 const mockWakeLockSentinel = {
@@ -38,12 +41,9 @@ describe('useWakeLock', () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
 
-    // Reset NoSleep mock
-    (window as any).NoSleep = undefined;
-
-    // Reset document methods
-    mockCreateElement.mockReset();
-    mockAppendChild.mockReset();
+    // Reset NoSleep instance methods
+    mockNoSleepInstance.enable.mockClear();
+    mockNoSleepInstance.disable.mockClear();
   });
 
   afterEach(() => {
@@ -236,13 +236,6 @@ describe('useWakeLock', () => {
     beforeEach(() => {
       // Remove native Wake Lock API
       delete (navigator as any).wakeLock;
-
-      // Mock NoSleep.js
-      (window as any).NoSleep = mockNoSleepClass;
-    });
-
-    afterEach(() => {
-      delete (window as any).NoSleep;
     });
 
     it('should detect NoSleep.js support when native API unavailable', async () => {
@@ -290,74 +283,29 @@ describe('useWakeLock', () => {
     });
   });
 
-  describe('NoSleep.js CDN loading', () => {
-    beforeEach(() => {
-      // Remove native Wake Lock API and NoSleep
-      delete (navigator as any).wakeLock;
-      delete (window as any).NoSleep;
-
-      // Mock createElement to return a script element
-      const mockScript = document.createElement('script');
-      mockCreateElement.mockReturnValue(mockScript);
-    });
-
-    it('should load NoSleep.js from CDN when not available', async () => {
-      renderHook(() => useWakeLock());
-
-      // Wait for initialization
-      await waitFor(() => {
-        expect(mockCreateElement).toHaveBeenCalledWith('script');
-      });
-
-      expect(mockCreateElement).toHaveBeenCalledWith('script');
-      expect(mockAppendChild).toHaveBeenCalled();
-    });
-
-    it('should handle NoSleep.js loading failure', async () => {
-      const onError = jest.fn();
-      const mockScript = document.createElement('script');
-      mockCreateElement.mockReturnValue(mockScript);
-
-      // Simulate loading error
-      mockScript.onerror = () => {
-        (window as any).NoSleep = undefined;
-      };
-
-      const { result } = renderHook(() => useWakeLock({ onError }));
-
-      // Trigger the error
-      act(() => {
-        const errorEvent = new Event('error');
-        mockScript.dispatchEvent(errorEvent);
-      });
-
-      await waitFor(() => {
-        expect(result.current.isWakeLockSupported).toBe(false);
-      });
-
-      expect(result.current.error).not.toBeNull();
-      expect(onError).toHaveBeenCalled();
-    });
-  });
-
   describe('No wake lock support', () => {
     beforeEach(() => {
-      // Remove all wake lock support
-      delete (navigator as any).wakeLock;
-      delete (window as any).NoSleep;
-
-      // Mock createElement to fail loading NoSleep
-      const mockScript = document.createElement('script');
-      mockCreateElement.mockReturnValue(mockScript);
+      // Mock NoSleep constructor to throw error (simulating failure)
+      (NoSleep as jest.Mock).mockImplementation(() => {
+        throw new Error('NoSleep initialization failed');
+      });
     });
 
-    it('should set isWakeLockSupported to false when no support', async () => {
+    afterEach(() => {
+      // Reset to default mock
+      (NoSleep as jest.Mock).mockImplementation(() => mockNoSleepInstance);
+    });
+
+    it('should set isWakeLockSupported to false when NoSleep fails to initialize', async () => {
       const { result } = renderHook(() => useWakeLock());
 
       // Wait for initialization attempt
       await waitFor(() => {
         expect(result.current.isWakeLockSupported).toBe(false);
       });
+
+      expect(result.current.error).not.toBeNull();
+      expect(result.current.error?.message).toContain('NoSleep initialization failed');
     });
 
     it('should throw error when requesting wake lock on unsupported device', async () => {

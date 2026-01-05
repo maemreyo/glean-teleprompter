@@ -44,14 +44,18 @@ export function validateStoryData(data: unknown): ValidationResult {
       return { valid: true };
     }
 
-    // Collect all validation errors
+    // Collect all validation errors with user-friendly messages
     const errors: string[] = [];
     
     if (validateStory.errors) {
       for (const error of validateStory.errors) {
         const path = error.instancePath || 'root';
         const message = error.message || 'Unknown error';
-        errors.push(`${path}: ${message}`);
+        
+        // Convert technical schema paths to user-friendly messages
+        const userFriendlyPath = formatSchemaPath(path);
+        const userFriendlyMessage = formatValidationMessage(message, userFriendlyPath);
+        errors.push(userFriendlyMessage);
       }
     }
 
@@ -59,13 +63,84 @@ export function validateStoryData(data: unknown): ValidationResult {
       valid: false,
       errors,
     };
-  } catch (error) {
+  } catch (unknownError) {
     // Handle unexpected errors during validation
+    const error = unknownError instanceof Error ? unknownError : new Error(String(unknownError));
     return {
       valid: false,
-      errors: [`Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`],
+      errors: [`Story validation failed unexpectedly: ${error.message}`],
     };
   }
+}
+
+/**
+ * Format JSON schema path to user-friendly location description
+ *
+ * Examples:
+ * - "" -> "Story"
+ * - "/slides" -> "Story slides"
+ * - "/slides/0" -> "Slide 1"
+ * - "/slides/2/content" -> "Slide 3 content"
+ */
+function formatSchemaPath(path: string): string {
+  if (!path || path === '/' || path === '') {
+    return 'Story';
+  }
+  
+  // Remove leading slash and split by /
+  const parts = path.replace(/^\//, '').split('/');
+  
+  const formatted: string[] = ['Story'];
+  
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    
+    // Array indices (0-based) - convert to 1-based for users
+    if (/^\d+$/.test(part)) {
+      formatted.push(`#${parseInt(part) + 1}`);
+    } else if (part === 'slides') {
+      formatted.push('slides');
+    } else if (part === 'content') {
+      formatted.push('content');
+    } else if (part === 'type') {
+      formatted.push('type');
+    } else {
+      formatted.push(part);
+    }
+  }
+  
+  return formatted.join(' ');
+}
+
+/**
+ * Format validation error message to be more actionable
+ */
+function formatValidationMessage(message: string, path: string): string {
+  // Map common AJV errors to user-friendly messages
+  const messageMap: Record<string, string> = {
+    'must have required property': 'is missing',
+    'must be string': 'must be text',
+    'must be array': 'must be a list',
+    'must be object': 'must be an object',
+    'must be null': 'must be empty',
+    'must be boolean': 'must be true or false',
+    'must be number': 'must be a number',
+    'must be integer': 'must be a whole number',
+    'must match pattern': 'has invalid format',
+    'must be equal to one of the allowed values': 'has invalid value',
+    'must match "then" schema': 'has invalid configuration',
+    'must match "else" schema': 'has invalid configuration',
+  };
+  
+  // Try to match and replace the message
+  for (const [key, replacement] of Object.entries(messageMap)) {
+    if (message.includes(key)) {
+      return `${path} ${replacement}`;
+    }
+  }
+  
+  // If no specific mapping found, return generic message
+  return `${path}: ${message}`;
 }
 
 /**
@@ -90,8 +165,11 @@ export function validateStoryOrThrow(data: unknown): StoryScript {
   const result = validateStoryData(data);
   
   if (!result.valid) {
-    const errorMessages = result.errors?.join(', ') || 'Unknown validation error';
-    throw new Error(`Invalid story data: ${errorMessages}`);
+    const errorMessages = result.errors?.join('; ') || 'Unknown validation error';
+    throw new Error(
+      `Invalid story data: ${errorMessages}\n\n` +
+      `Please check the story structure and ensure all required fields are present.`
+    );
   }
   
   return data as StoryScript;

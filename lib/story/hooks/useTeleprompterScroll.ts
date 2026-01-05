@@ -4,142 +4,121 @@
  * Custom hook for managing auto-scrolling behavior in teleprompter mode.
  * Uses requestAnimationFrame for smooth 30fps+ scrolling.
  *
+ * Refactored from original 551-line monolith into smaller, focused hooks:
+ * - useTeleprompterFPS: FPS monitoring (dev only)
+ * - useTeleprompterScrollDetection: User scroll detection, end-of-content, direction
+ * - useTeleprompterFontSize: Font size preservation with ResizeObserver
+ *
  * @feature 012-standalone-story
  */
 
 import { useRef, useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import { useTeleprompterStore } from '@/lib/stores/useTeleprompterStore';
 import { useWakeLock } from './useWakeLock';
+import { useTeleprompterFPS } from './useTeleprompterFPS';
+import { useTeleprompterScrollDetection } from './useTeleprompterScrollDetection';
+import { useTeleprompterFontSize } from './useTeleprompterFontSize';
 import {
   calculateScrollDepth,
-  calculateScrollPosition,
   calculateScrollDelta,
   clampScrollPosition,
   isContentScrollable,
 } from '@/lib/story/utils/scrollUtils';
 
 /**
- * FPS monitoring utilities (T091 - dev mode only)
+ * Options for useTeleprompterScroll hook
  */
-const isDevMode = process.env.NODE_ENV === 'development';
-
-interface FPSMetrics {
-  currentFPS: number;
-  averageFPS: number;
-  minFPS: number;
-  maxFPS: number;
-  frameCount: number;
-}
-
-function createFPSMonitor(): {
-  recordFrame: () => void;
-  getMetrics: () => FPSMetrics;
-  reset: () => void;
-} {
-  let frameCount = 0;
-  let lastTime = performance.now();
-  let fpsSum = 0;
-  let fpsCount = 0;
-  let minFPS = Infinity;
-  let maxFPS = 0;
-
-  const recordFrame = () => {
-    if (!isDevMode) return;
-
-    const now = performance.now();
-    const delta = now - lastTime;
-    lastTime = now;
-
-    const fps = 1000 / delta;
-    fpsSum += fps;
-    fpsCount++;
-    minFPS = Math.min(minFPS, fps);
-    maxFPS = Math.max(maxFPS, fps);
-    frameCount++;
-
-    // Log every 60 frames (approx 2 seconds at 30fps)
-    if (frameCount % 60 === 0) {
-      const avgFPS = fpsSum / fpsCount;
-      console.debug(
-        `[Teleprompter FPS] Current: ${fps.toFixed(1)}, Avg: ${avgFPS.toFixed(1)}, Min: ${minFPS.toFixed(1)}, Max: ${maxFPS.toFixed(1)}`
-      );
-    }
-  };
-
-  const getMetrics = (): FPSMetrics => ({
-    currentFPS: fpsCount > 0 ? fpsSum / fpsCount : 0,
-    averageFPS: fpsSum / fpsCount || 0,
-    minFPS: minFPS === Infinity ? 0 : minFPS,
-    maxFPS,
-    frameCount,
-  });
-
-  const reset = () => {
-    frameCount = 0;
-    fpsSum = 0;
-    fpsCount = 0;
-    minFPS = Infinity;
-    maxFPS = 0;
-    lastTime = performance.now();
-  };
-
-  return { recordFrame, getMetrics, reset };
-}
-
 interface UseTeleprompterScrollOptions {
-  containerRef: React.RefObject<HTMLElement>;
+  /** Reference to the scrollable container element (can be null) */
+  containerRef: React.RefObject<HTMLElement | null>;
+  /** Callback when scroll progress changes (throttled) */
   onScrollProgress?: (depth: number) => void;
+  /** Callback when scroll reaches end of content */
   onScrollComplete?: () => void;
 }
 
+/**
+ * Return type for useTeleprompterScroll hook
+ */
 interface UseTeleprompterScrollReturn {
+  /** Start auto-scrolling */
   startScrolling: () => void;
+  /** Stop auto-scrolling (with deceleration) */
   stopScrolling: () => void;
+  /** Toggle auto-scrolling state */
   toggleScrolling: () => void;
+  /** Whether currently scrolling (including deceleration) */
   isScrolling: boolean;
+  /** Wake lock error, if any */
   wakeLockError: Error | null;
 }
 
+/**
+ * Throttle for scroll progress updates (ms)
+ */
 const PROGRESS_THROTTLE_MS = 100;
-const BASE_SCROLL_SPEED = 60; // pixels per second at speed 1
-const DECELERATION_FACTOR = 0.95;
-const MIN_SPEED = 0.01;
-const SCROLL_END_TOLERANCE = 1; // pixels - tolerance for detecting scroll end (handles floating-point rounding errors)
 
 /**
- * Hook for managing teleprompter auto-scrolling
- * 
- * Manages scroll animation loop using requestAnimationFrame,
- * handles smooth deceleration on pause, and reports scroll progress.
+ * Base scroll speed: pixels per second at speed 1
  */
+const BASE_SCROLL_SPEED = 60;
+
+/**
+ * Deceleration factor when stopping (multiplied each frame)
+ */
+const DECELERATION_FACTOR = 0.95;
+
+/**
+ * Minimum speed threshold to stop deceleration
+ */
+const MIN_SPEED = 0.01;
+
+
 export function useTeleprompterScroll({
   containerRef,
   onScrollProgress,
   onScrollComplete,
 }: UseTeleprompterScrollOptions): UseTeleprompterScrollReturn {
+  // Compose smaller hooks
+  const { recordFrame } = useTeleprompterFPS();
+  const {
+    markAutoScrolling,
+    resetUserScrolled,
+    checkAtEnd,
+  } = useTeleprompterScrollDetection({
+    containerRef,
+    isScrolling: useTeleprompterStore((s) => s.isScrolling),
+    onStopScrolling: () => {
+      // Triggered when user scrolls during auto-scroll
+      stopStoreScrolling();
+    },
+  });
+  
+  const { isProcessingChange: isProcessingFontChange } = useTeleprompterFontSize({
+    containerRef,
+    fontSize: useTeleprompterStore((s) => s.fontSize),
+    updateScrollPosition: (scrollTop, scrollDepth) => {
+      updateScrollPosition(scrollTop, scrollDepth);
+    },
+  });
+
+  // Animation loop refs
   const rafIdRef = useRef<number | null>(null);
   const lastTimestampRef = useRef<number>(0);
   const currentSpeedRef = useRef<number>(0);
   const lastProgressUpdateRef = useRef<number>(0);
-  const isStoppingRef = useRef<boolean>(false);
-  const previousFontSizeRef = useRef<number | null>(null);
-  const scrollRatioBeforeFontChangeRef = useRef<number | null>(null);
-  const userScrolledRef = useRef<boolean>(false); // T114 - Detect user manual scroll
-  const isTabVisibleRef = useRef<boolean>(true); // T117 - Track tab visibility
-  const isAutoScrollingRef = useRef<boolean>(false); // Flag to differentiate auto-scroll from user scroll
   
-  // FPS monitor for development (T091)
-  const fpsMonitor = useRef(createFPSMonitor());
-
+  // Store integration
   const {
-    fontSize,
     scrollSpeed,
     isScrolling,
     startScrolling: startStoreScrolling,
     stopScrolling: stopStoreScrolling,
     updateScrollPosition,
   } = useTeleprompterStore();
+
+  // Deceleration state ref (separate from store's isScrolling)
+  const isStoppingRef = useRef<boolean>(false);
 
   // Wake lock integration (T061, T063, T064, T067)
   const { requestWakeLock, releaseWakeLock, isWakeLockSupported, error: wakeLockError } = useWakeLock({
@@ -165,17 +144,8 @@ export function useTeleprompterScroll({
       const container = containerRef.current;
       if (!container) return;
 
-      // T117: Pause auto-scrolling when browser tab is inactive
-      if (!isTabVisibleRef.current) {
-        // Don't process frames when tab is hidden
-        rafIdRef.current = requestAnimationFrame(scrollFrame);
-        return;
-      }
-
-      // Record FPS in development mode (T091)
-      if (isDevMode) {
-        fpsMonitor.current.recordFrame();
-      }
+      // Record FPS in development mode
+      recordFrame();
 
       // Initialize timestamp on first frame
       if (lastTimestampRef.current === 0) {
@@ -191,23 +161,12 @@ export function useTeleprompterScroll({
       const scrollHeight = container.scrollHeight;
       const viewportHeight = container.clientHeight;
 
-      // T113: Check if content is scrollable - disable auto-scrolling when content height < viewport
+      // Check if content is scrollable - disable auto-scrolling when content height < viewport
       if (!isContentScrollable(scrollHeight, viewportHeight)) {
-        // Content fits on screen, no scrolling needed
         stopStoreScrolling();
         return;
       }
 
-      // T114: Pause auto-scrolling when user manually scrolls
-      // Detect if current scrollTop doesn't match expected position from auto-scroll
-      const expectedScrollDelta = calculateScrollDelta(
-        currentSpeedRef.current,
-        deltaTime,
-        BASE_SCROLL_SPEED
-      );
-      // If user scrolled, we detect it and pause
-      // This is handled by a separate scroll event listener below
-      
       const maxScroll = scrollHeight - viewportHeight;
 
       // Handle deceleration when stopping
@@ -239,12 +198,8 @@ export function useTeleprompterScroll({
 
       // Apply scroll
       // Mark that we're about to auto-scroll so the scroll event handler knows this isn't a user action
-      isAutoScrollingRef.current = true;
+      markAutoScrolling();
       container.scrollTop = newScrollPosition;
-      // Reset flag after a microtask - the scroll event will have fired by then
-      Promise.resolve().then(() => {
-        isAutoScrollingRef.current = false;
-      });
 
       // Calculate scroll depth
       const scrollDepth = calculateScrollDepth(
@@ -263,7 +218,7 @@ export function useTeleprompterScroll({
       }
 
       // Check if we've reached the end
-      if (newScrollPosition >= maxScroll - SCROLL_END_TOLERANCE && !isStoppingRef.current) {
+      if (checkAtEnd(newScrollPosition, maxScroll) && !isStoppingRef.current) {
         onScrollComplete?.();
         stopStoreScrolling();
         return;
@@ -273,13 +228,15 @@ export function useTeleprompterScroll({
       rafIdRef.current = requestAnimationFrame(scrollFrame);
     },
     [
-      containerRef,
       scrollSpeed,
-      startStoreScrolling,
       stopStoreScrolling,
       updateScrollPosition,
       onScrollProgress,
       onScrollComplete,
+      containerRef,
+      recordFrame,
+      markAutoScrolling,
+      checkAtEnd,
     ]
   );
 
@@ -325,9 +282,12 @@ export function useTeleprompterScroll({
       }
     }
 
-    isStoppingRef.current = false;
+    // Reset user scrolled flag when starting auto-scroll
+    resetUserScrolled();
+
     currentSpeedRef.current = scrollSpeed;
     lastTimestampRef.current = 0;
+    isStoppingRef.current = false;
     startStoreScrolling();
 
     rafIdRef.current = requestAnimationFrame(scrollFrame);
@@ -335,11 +295,13 @@ export function useTeleprompterScroll({
     containerRef,
     isScrolling,
     scrollSpeed,
-    startStoreScrolling,
     scrollFrame,
     hasAttemptedWakeLock,
     isWakeLockSupported,
     requestWakeLock,
+    resetUserScrolled,
+    startStoreScrolling,
+    stopStoreScrolling,
   ]);
 
   /**
@@ -377,120 +339,11 @@ export function useTeleprompterScroll({
   }, [isScrolling, startScrolling, stopScrolling]);
 
   /**
-   * Preserve scroll position ratio when font size changes (T052)
-   *
-   * When the user changes font size, the scroll height changes.
-   * We preserve the relative scroll position (ratio) so the user
-   * continues reading from the same location in the content.
-   *
-   * Note: This effect only runs when fontSize actually changes by comparing
-   * with the previous value stored in previousFontSizeRef. This prevents
-   * unnecessary recalculations on every render where fontSize is read from
-   * the Zustand store.
-   */
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    // Initialize previous font size on first render
-    if (previousFontSizeRef.current === null) {
-      previousFontSizeRef.current = fontSize;
-      return;
-    }
-
-    // Early return if font size hasn't actually changed
-    // This prevents unnecessary recalculations when fontSize is read from Zustand store
-    if (fontSize === previousFontSizeRef.current) {
-      return;
-    }
-
-    const scrollHeight = container.scrollHeight;
-    const viewportHeight = container.clientHeight;
-    const currentScrollTop = container.scrollTop;
-
-    // Calculate current scroll ratio before the change
-    const currentRatio = calculateScrollDepth(
-      currentScrollTop,
-      scrollHeight,
-      viewportHeight
-    );
-
-    // Store the ratio for restoration after layout update
-    scrollRatioBeforeFontChangeRef.current = currentRatio;
-    previousFontSizeRef.current = fontSize;
-
-    // Wait for next frame when layout has updated with new font size
-    requestAnimationFrame(() => {
-      if (!containerRef.current) return;
-
-      const newScrollHeight = containerRef.current.scrollHeight;
-      const newViewportHeight = containerRef.current.clientHeight;
-      const savedRatio = scrollRatioBeforeFontChangeRef.current;
-
-      if (savedRatio !== null) {
-        // Calculate new scroll position that maintains the same ratio
-        const newScrollTop = calculateScrollPosition(
-          savedRatio,
-          newScrollHeight,
-          newViewportHeight
-        );
-
-        // Apply the new scroll position
-        containerRef.current.scrollTop = newScrollTop;
-
-        // Update store with new position
-        const newScrollDepth = calculateScrollDepth(
-          newScrollTop,
-          newScrollHeight,
-          newViewportHeight
-        );
-        updateScrollPosition(newScrollTop, newScrollDepth);
-
-        // Clear saved ratio
-        scrollRatioBeforeFontChangeRef.current = null;
-      }
-    });
-  }, [fontSize, containerRef, updateScrollPosition]);
-
-  /**
-   * T114: Detect and handle user manual scroll
-   * When user manually scrolls, pause auto-scrolling
-   *
-   * Note: We differentiate between user scroll and auto-scroll by using
-   * isAutoScrollingRef, which is set to true before we programmatically
-   * set scrollTop and reset to false after the scroll event fires.
-   */
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleScroll = () => {
-      // Only pause if this is NOT an auto-scroll event
-      if (isScrolling && !isStoppingRef.current && !isAutoScrollingRef.current) {
-        // User manually scrolled - pause auto-scrolling
-        userScrolledRef.current = true;
-        stopScrolling();
-        
-        // T115: Show toast notification
-        toast('Auto-scroll paused - tap to resume');
-      }
-    };
-
-    container.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      container.removeEventListener('scroll', handleScroll);
-    };
-  }, [isScrolling, stopScrolling, containerRef]);
-
-  /**
    * T117: Pause auto-scrolling when browser tab becomes inactive
    * Uses Page Visibility API
    */
   useEffect(() => {
     const handleVisibilityChange = () => {
-      isTabVisibleRef.current = !document.hidden;
-      
       if (document.hidden && isScrolling) {
         // Tab became hidden - pause scrolling
         stopScrolling();
@@ -512,32 +365,6 @@ export function useTeleprompterScroll({
       if (rafIdRef.current !== null) {
         cancelAnimationFrame(rafIdRef.current);
       }
-      // Reset FPS monitor on unmount (T091)
-      if (isDevMode) {
-        fpsMonitor.current.reset();
-      }
-    };
-  }, []);
-
-  /**
-   * Expose FPS metrics in development (T091)
-   * Cleanup on unmount to prevent memory leaks
-   */
-  useEffect(() => {
-    if (!isDevMode) return;
-    
-    // Make FPS metrics available via window for debugging
-    if (typeof window !== 'undefined') {
-      (window as any).__teleprompterFPS = {
-        getMetrics: () => fpsMonitor.current.getMetrics(),
-      };
-    }
-
-    // Cleanup: remove the window attachment on unmount
-    return () => {
-      if (typeof window !== 'undefined' && (window as any).__teleprompterFPS) {
-        delete (window as any).__teleprompterFPS;
-      }
     };
   }, []);
 
@@ -549,3 +376,5 @@ export function useTeleprompterScroll({
     wakeLockError,
   };
 }
+
+export type { UseTeleprompterScrollOptions, UseTeleprompterScrollReturn };

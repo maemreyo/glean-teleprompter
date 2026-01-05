@@ -29,6 +29,14 @@ import type { StoryScript, DecodedStoryResult } from '@/lib/story/types';
  */
 export function loadStoryFromUrl(urlParams: string): DecodedStoryResult {
   try {
+    // Validate input is not empty
+    if (!urlParams || urlParams.trim().length === 0) {
+      return {
+        success: false,
+        error: 'Failed to load story: No story data provided. The URL may be incomplete.',
+      };
+    }
+    
     // Decode the URL data
     const decoded = decodeStoryFromUrl(urlParams);
     
@@ -42,7 +50,8 @@ export function loadStoryFromUrl(urlParams: string): DecodedStoryResult {
     if (!validation.valid) {
       return {
         success: false,
-        error: `Story data validation failed:\n${validation.errors?.join('\n') || 'Unknown error'}`,
+        error: `Failed to load story: Invalid story format.\n\nValidation errors:\n${validation.errors?.join('\n') || 'Unknown error'}\n\n` +
+          `Please ensure the story data is properly formatted.`,
       };
     }
     
@@ -50,10 +59,11 @@ export function loadStoryFromUrl(urlParams: string): DecodedStoryResult {
       success: true,
       data: decoded.data,
     };
-  } catch (error) {
+  } catch (unknownError) {
+    const error = unknownError instanceof Error ? unknownError : new Error(String(unknownError));
     return {
       success: false,
-      error: `Failed to load story: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      error: `Failed to load story: Unexpected error - ${error.message}`,
     };
   }
 }
@@ -67,7 +77,7 @@ export function loadStoryFromCurrentUrl(): DecodedStoryResult {
   if (typeof window === 'undefined') {
     return {
       success: false,
-      error: 'Cannot load story: window object not available',
+      error: 'Failed to load story: Cannot access browser environment. This function only works in a browser.',
     };
   }
 
@@ -76,7 +86,9 @@ export function loadStoryFromCurrentUrl(): DecodedStoryResult {
   if (!encodedData) {
     return {
       success: false,
-      error: 'No story data found in URL',
+      error: 'Failed to load story: No story data found in URL. ' +
+        'The URL may be malformed or missing story data. ' +
+        'Expected format: /story/{encoded_data}',
     };
   }
   

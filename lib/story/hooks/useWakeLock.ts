@@ -9,6 +9,7 @@
  */
 
 import { useRef, useCallback, useEffect, useState } from 'react';
+import NoSleep from 'nosleep.js';
 
 interface WakeLockOptions {
   onRequest?: () => void;
@@ -32,18 +33,6 @@ interface WakeLockType {
   request: (type: 'screen') => Promise<WakeLockSentinel>;
 }
 
-// NoSleep.js interface
-interface NoSleepInstance {
-  enable: () => Promise<void>;
-  disable: () => void;
-}
-
-// Extend Window interface with NoSleep
-declare global {
-  interface Window {
-    NoSleep?: new () => NoSleepInstance;
-  }
-}
 
 /**
  * Hook for managing screen wake lock
@@ -59,8 +48,8 @@ export function useWakeLock({
   onRelease,
   onError,
 }: WakeLockOptions = {}): UseWakeLockReturn {
-  const sentinelRef = useRef<WakeLockSentinel | null>(null);
-  const noSleepRef = useRef<NoSleepInstance | null>(null);
+const sentinelRef = useRef<WakeLockSentinel | null>(null);
+const noSleepRef = useRef<InstanceType<typeof NoSleep> | null>(null);
   const releaseListenerRef = useRef<(() => void) | null>(null);
   const [isWakeLockActive, setIsWakeLockActive] = useState(false);
   const [isWakeLockSupported, setIsWakeLockSupported] = useState(false);
@@ -75,37 +64,6 @@ export function useWakeLock({
   }, []);
 
   /**
-   * Load NoSleep.js from CDN (T062)
-   */
-  const loadNoSleep = useCallback(async (): Promise<boolean> => {
-    // Check if NoSleep is already loaded
-    if (window.NoSleep) {
-      return true;
-    }
-
-    try {
-      const script = document.createElement('script');
-      script.src = 'https://unpkg.com/nosleep.js@0.12.0/dist/NoSleep.min.js';
-      script.async = true;
-      script.crossOrigin = 'anonymous';
-      script.integrity = 'sha384-lp0XiAMtqqqjyVLBYjAcDQzxc2XyGj3sGESoiWbccHdpXjNUPUjWrq5GMqaGHGp9';
-
-      const loadPromise = new Promise<boolean>((resolve, reject) => {
-        script.onload = () => resolve(true);
-        script.onerror = () => reject(new Error('Failed to load NoSleep.js from CDN'));
-      });
-
-      document.head.appendChild(script);
-      return await loadPromise;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Unknown error loading NoSleep.js');
-      setError(error);
-      onError?.(error);
-      return false;
-    }
-  }, [onError]);
-
-  /**
    * Initialize wake lock support detection and load fallback if needed
    */
   useEffect(() => {
@@ -115,23 +73,18 @@ export function useWakeLock({
       setIsWakeLockSupported(true);
       isUsingFallbackRef.current = false;
     } else {
-      // Try to load NoSleep.js as fallback
-      loadNoSleep().then((loaded) => {
-        if (loaded && window.NoSleep) {
-          setIsWakeLockSupported(true);
-          isUsingFallbackRef.current = true;
-          noSleepRef.current = new window.NoSleep();
-        } else {
-          setIsWakeLockSupported(false);
-          setError(
-            new Error(
-              'Screen wake lock not available. Please try a different browser or check your network connection.'
-            )
-          );
-        }
-      });
+      // Use NoSleep.js as fallback (bundled locally)
+      try {
+        noSleepRef.current = new NoSleep();
+        setIsWakeLockSupported(true);
+        isUsingFallbackRef.current = true;
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error('Failed to initialize NoSleep.js');
+        setError(error);
+        setIsWakeLockSupported(false);
+      }
     }
-  }, [checkSupport, loadNoSleep]);
+  }, [checkSupport]);
 
   /**
    * Request wake lock (T061, T063)
@@ -150,8 +103,8 @@ export function useWakeLock({
     try {
       if (isUsingFallbackRef.current) {
         // Use NoSleep.js fallback
-        if (!noSleepRef.current && window.NoSleep) {
-          noSleepRef.current = new window.NoSleep();
+        if (!noSleepRef.current) {
+          noSleepRef.current = new NoSleep();
         }
 
         if (noSleepRef.current) {

@@ -44,51 +44,51 @@ export function useSafeArea(): SafeAreaInsets {
   });
 
   useEffect(() => {
-    // Check if CSS env() is supported
-    const testElement = document.createElement('div');
-    testElement.style.paddingTop = 'env(safe-area-inset-top)';
-    document.body.appendChild(testElement);
+    // Create a test element with env() values applied to read actual pixel values
+    const measureElement = document.createElement('div');
+    measureElement.style.position = 'fixed';
+    measureElement.style.top = '0';
+    measureElement.style.left = '0';
+    measureElement.style.right = '0';
+    measureElement.style.bottom = '0';
+    measureElement.style.paddingTop = 'env(safe-area-inset-top)';
+    measureElement.style.paddingBottom = 'env(safe-area-inset-bottom)';
+    measureElement.style.paddingLeft = 'env(safe-area-inset-left)';
+    measureElement.style.paddingRight = 'env(safe-area-inset-right)';
+    measureElement.style.pointerEvents = 'none';
+    measureElement.style.visibility = 'hidden';
+    document.body.appendChild(measureElement);
 
-    const computedStyle = window.getComputedStyle(testElement);
-    const hasEnvSupport = computedStyle.paddingTop !== 'env(safe-area-inset-top)';
-    document.body.removeChild(testElement);
+    // Read the computed values from the element
+    const updateSafeArea = () => {
+      const computedStyle = window.getComputedStyle(measureElement);
+      const top = parseInt(computedStyle.paddingTop || '0', 10);
+      const bottom = parseInt(computedStyle.paddingBottom || '0', 10);
+      const left = parseInt(computedStyle.paddingLeft || '0', 10);
+      const right = parseInt(computedStyle.paddingRight || '0', 10);
 
-    if (hasEnvSupport) {
-      // Use getComputedStyle to get actual values
-      const updateSafeArea = () => {
-        const rootStyle = window.getComputedStyle(document.documentElement);
-        const top = parseInt(rootStyle.getPropertyValue('env(safe-area-inset-top)') || '0', 10);
-        const bottom = parseInt(rootStyle.getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
-        const left = parseInt(rootStyle.getPropertyValue('env(safe-area-inset-left)') || '0', 10);
-        const right = parseInt(rootStyle.getPropertyValue('env(safe-area-inset-right)') || '0', 10);
+      setSafeArea({
+        top,
+        bottom,
+        left,
+        right,
+        hasSafeArea: top > 0 || bottom > 0 || left > 0 || right > 0,
+      });
+    };
 
-        setSafeArea({
-          top,
-          bottom,
-          left,
-          right,
-          hasSafeArea: top > 0 || bottom > 0 || left > 0 || right > 0,
-        });
-      };
+    updateSafeArea();
 
-      updateSafeArea();
+    // Update on orientation change (safe areas can change when rotating)
+    const handleOrientationChange = () => {
+      requestAnimationFrame(updateSafeArea);
+    };
 
-      // Update on resize/orientation change
-      const handleResize = () => {
-        requestAnimationFrame(updateSafeArea);
-      };
+    window.addEventListener('orientationchange', handleOrientationChange);
 
-      window.addEventListener('resize', handleResize);
-      window.addEventListener('orientationchange', handleResize);
-
-      return () => {
-        window.removeEventListener('resize', handleResize);
-        window.removeEventListener('orientationchange', handleResize);
-      };
-    }
-
-    // Fallback for older browsers
-    setSafeArea({ top: 0, bottom: 0, left: 0, right: 0, hasSafeArea: false });
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      document.body.removeChild(measureElement);
+    };
   }, []);
 
   return safeArea;

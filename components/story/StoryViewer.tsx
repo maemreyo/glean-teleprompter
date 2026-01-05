@@ -15,9 +15,12 @@
 import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { useStoryStore } from '@/lib/stores/useStoryStore';
 import { useStoryNavigation } from '@/lib/story/hooks/useStoryNavigation';
+import { useProgressPersistence, type SavedProgress } from '@/lib/story/hooks/useProgressPersistence';
+import { RestoreProgressDialog } from './RestoreProgressDialog';
 import { StoryProgressBar } from './StoryProgressBar';
 import { SlideContainer } from './SlideContainer';
 import type { StoryScript } from '@/lib/story/types';
+import equal from 'fast-deep-equal';
 
 export interface StoryViewerProps {
   story: StoryScript;
@@ -50,10 +53,33 @@ export const StoryViewer = memo(function StoryViewer({
   const totalSlides = slides.length;
 
   // Get navigation state from store
-  const { currentSlideIndex, isPaused, slideProgress, setSlideProgress } = useStoryStore();
+  const { currentSlideIndex, isPaused, slideProgress, setSlideProgress, goToSlide, reset: resetStory } = useStoryStore();
 
   // Track actual slide progress based on duration and pause state
   const [actualProgress, setActualProgress] = useState(0);
+
+  // Restore progress dialog state
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+  const [savedProgress, setSavedProgress] = useState<{ slideIndex: number } | null>(null);
+
+  // Get the current slide ID for progress persistence
+  const currentSlideId = useMemo(
+    () => slides[currentSlideIndex]?.id || '',
+    [slides, currentSlideIndex]
+  );
+
+  // Progress persistence hook - check for saved progress on mount
+  const { loadProgress, clearProgress } = useProgressPersistence({
+    slideId: currentSlideId,
+    onLoad: useCallback((progress: SavedProgress) => {
+      // Store the saved progress for the dialog
+      const slideIndex = slides.findIndex(s => s.id === progress.slideId);
+      if (slideIndex >= 0) {
+        setSavedProgress({ slideIndex });
+        setShowRestoreDialog(true);
+      }
+    }, [slides]),
+  });
 
   // Memoize current slide to prevent unnecessary recalculations
   const currentSlide = useMemo(
@@ -87,6 +113,32 @@ export const StoryViewer = memo(function StoryViewer({
     return () => clearInterval(interval);
   }, [currentSlide, isPaused, setSlideProgress]);
 
+  // Check for saved progress on mount
+  useEffect(() => {
+    const saved = loadProgress();
+    if (saved) {
+      const slideIndex = slides.findIndex(s => s.id === saved.slideId);
+      if (slideIndex >= 0) {
+        setSavedProgress({ slideIndex });
+        setShowRestoreDialog(true);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount - loadProgress and slides intentionally omitted
+
+  // Handle restore progress
+  const handleRestore = useCallback(() => {
+    if (savedProgress) {
+      goToSlide(savedProgress.slideIndex);
+    }
+  }, [savedProgress, goToSlide]);
+
+  // Handle start over
+  const handleStartOver = useCallback(() => {
+    resetStory();
+    clearProgress();
+  }, [resetStory, clearProgress]);
+
   // Memoize navigation handlers to prevent recreating on every render (T092)
   const onSlideChange = useCallback((index: number) => {
     // Reset progress when changing slides
@@ -116,9 +168,10 @@ export const StoryViewer = memo(function StoryViewer({
         slide={slide}
         index={index}
         isCurrent={index === currentSlideIndex}
+        totalSlides={totalSlides}
       />
     )),
-    [slides, currentSlideIndex]
+    [slides, currentSlideIndex, totalSlides]
   );
 
   return (
@@ -145,13 +198,28 @@ export const StoryViewer = memo(function StoryViewer({
 
       {/* Pause indicator when paused */}
       {isPaused && <PauseIndicator />}
+
+      {/* Restore progress dialog */}
+      <RestoreProgressDialog
+        open={showRestoreDialog}
+        onOpenChange={setShowRestoreDialog}
+        onRestore={handleRestore}
+        onStartOver={handleStartOver}
+        progress={savedProgress ? {
+          slideId: slides[savedProgress.slideIndex]?.id || '',
+          scrollRatio: 0,
+          timestamp: Date.now(),
+        } : null}
+        totalSlides={totalSlides}
+        currentSlideIndex={savedProgress?.slideIndex}
+      />
     </div>
   );
 }, (prevProps, nextProps) => {
   // Only re-render if story data actually changed
   // Check story ID, slides count, and deep equality of slide content
-  // Using JSON.stringify to properly detect changes in all slide type properties
+  // Using fast-deep-equal for performant deep comparison in hot path
   return prevProps.story.id === nextProps.story.id &&
          prevProps.story.slides.length === nextProps.story.slides.length &&
-         JSON.stringify(prevProps.story.slides) === JSON.stringify(nextProps.story.slides);
+         equal(prevProps.story.slides, nextProps.story.slides);
 });

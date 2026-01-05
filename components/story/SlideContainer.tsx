@@ -8,18 +8,20 @@
  */
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Transition } from 'framer-motion';
 import { useStoryStore } from '@/lib/stores/useStoryStore';
 import { TextHighlightSlide } from './SlideTypes/TextHighlightSlide';
 import { WidgetChartSlide } from './SlideTypes/WidgetChartSlide';
 import { ImageSlide } from './SlideTypes/ImageSlide';
 import { PollSlide } from './SlideTypes/PollSlide';
+import { TeleprompterSlide } from './SlideTypes/TeleprompterSlide';
 import type { AnySlide, AnimationEffect } from '@/lib/story/types';
 
 export interface SlideContainerProps {
   slide: AnySlide;
   index: number;
   isCurrent: boolean;
+  totalSlides?: number;
 }
 
 /**
@@ -30,53 +32,53 @@ const slideVariants = {
     x: direction > 0 ? '100%' : '-100%',
     opacity: 0,
     scale: 0.95,
-  }),
+  }) as const,
   center: {
     x: 0,
     opacity: 1,
     scale: 1,
     zIndex: 1,
-  },
+  } as const,
   exit: (direction: number) => ({
     x: direction < 0 ? '100%' : '-100%',
     opacity: 0,
     scale: 0.95,
     zIndex: 0,
-  }),
+  }) as const,
 };
 
 const fadeVariants = {
   enter: {
     opacity: 0,
     scale: 0.95,
-  },
+  } as const,
   center: {
     opacity: 1,
     scale: 1,
     zIndex: 1,
-  },
+  } as const,
   exit: {
     opacity: 0,
     scale: 1.05,
     zIndex: 0,
-  },
+  } as const,
 };
 
 const zoomVariants = {
   enter: {
     scale: 0.8,
     opacity: 0,
-  },
+  } as const,
   center: {
     scale: 1,
     opacity: 1,
     zIndex: 1,
-  },
+  } as const,
   exit: {
     scale: 1.1,
     opacity: 0,
     zIndex: 0,
-  },
+  } as const,
 };
 
 /**
@@ -102,29 +104,29 @@ function getVariants(animation?: AnimationEffect) {
 /**
  * Get transition configuration based on animation
  */
-function getTransition(animation?: AnimationEffect) {
+function getTransition(animation?: AnimationEffect): Transition {
   // Default simple transition
   if (!animation) {
     return {
       duration: 0.3,
-      ease: 'easeOut',
-    } as const;
+      ease: 'easeOut' as const,
+    };
   }
 
   const duration = animation.duration / 1000; // Convert ms to seconds
 
-  // Return simple transition - Framer Motion will accept these string values
-  // Using 'as any' to bypass Framer Motion's strict typing for ease strings
+  // Return properly typed transition configuration
+  // Framer Motion's Easing type accepts string values like 'easeOut', 'easeIn', etc.
   return {
     duration,
-    ease: animation.easing || 'easeOut',
-  } as any;
+    ease: (animation.easing || 'easeOut') as Transition['ease'],
+  };
 }
 
 /**
  * Render the appropriate slide component based on slide type
  */
-function renderSlide(slide: AnySlide): React.ReactNode {
+function renderSlide(slide: AnySlide, slideIndex: number, totalSlides = 1): React.ReactNode {
   switch (slide.type) {
     case 'text-highlight':
       return <TextHighlightSlide slide={slide} />;
@@ -135,26 +137,23 @@ function renderSlide(slide: AnySlide): React.ReactNode {
     case 'poll':
       return <PollSlide slide={slide} />;
     case 'teleprompter':
-      return (
-        <div className="flex h-full w-full items-center justify-center">
-          <p className="text-white text-center">
-            Teleprompter slide - TeleprompterSlide component will be implemented in Phase 4
-          </p>
-        </div>
-      );
-    default:
+      return <TeleprompterSlide slide={slide} slideIndex={slideIndex} totalSlides={totalSlides} />;
+    default: {
+      // Exhaustiveness check - ensure all slide types are handled
+      const _exhaustiveCheck: never = slide;
       return (
         <div className="flex h-full w-full items-center justify-center">
           <p className="text-white text-center">Unknown slide type</p>
         </div>
       );
+    }
   }
 }
 
 /**
  * Slide container with transition animations
  */
-export function SlideContainer({ slide, index, isCurrent }: SlideContainerProps): React.ReactElement {
+export function SlideContainer({ slide, index, isCurrent, totalSlides }: SlideContainerProps): React.JSX.Element {
   const { direction } = useStoryStore();
   const animation = slide.animation;
 
@@ -171,10 +170,10 @@ export function SlideContainer({ slide, index, isCurrent }: SlideContainerProps)
           initial="enter"
           animate="center"
           exit="exit"
-          transition={transition}
+          transition={transition satisfies Transition}
           className="absolute inset-0 flex items-center justify-center"
         >
-          {renderSlide(slide)}
+          {renderSlide(slide, index, totalSlides)}
         </motion.div>
       )}
     </AnimatePresence>
