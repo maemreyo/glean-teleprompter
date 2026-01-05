@@ -64,11 +64,11 @@ This is a Next.js 14+ web application structure:
 
 ### Tests for User Story 1
 
-- [ ] T014 [P] [US1] Write navigation logic unit tests in __tests__/unit/story/hooks/useStoryNavigation.test.ts
+- [X] T014 [P] [US1] Write navigation logic unit tests in __tests__/unit/story/hooks/useStoryNavigation.test.ts
 - [ ] T015 [P] [US1] Write validation unit tests in __tests__/unit/story/validation.test.ts
 - [ ] T016 [P] [US1] Write URL encoding/decoding tests in __tests__/unit/story/utils/urlUtils.test.ts
-- [ ] T017 [P] [US1] Write slide transition integration tests in __tests__/integration/story/slide-transitions.test.tsx
-- [ ] T018 [P] [US1] Write E2E mobile gesture tests in __tests__/e2e/story/mobile-gestures.spec.ts
+- [X] T017 [P] [US1] Write slide transition integration tests in __tests__/integration/story/slide-transitions.test.tsx
+- [X] T018 [P] [US1] Write E2E mobile gesture tests in __tests__/e2e/story/mobile-gestures.spec.ts
 
 ### Implementation for User Story 1
 
@@ -80,10 +80,10 @@ This is a Next.js 14+ web application structure:
 - [ ] T024 [P] [US1] Create ImageSlide component in components/story/SlideTypes/ImageSlide.tsx
 - [ ] T025 [P] [US1] Create PollSlide component in components/story/SlideTypes/PollSlide.tsx
 - [ ] T026 [US1] Create story viewer page in app/story/[storyId]/page.tsx (data loading + error handling)
-- [ ] T027 [US1] Create story layout in app/story/layout.tsx (minimal, no nav/footer)
+- [X] T027 [US1] Create story layout in app/story/layout.tsx (minimal, no nav/footer)
 - [ ] T028 [US1] Implement useStoryNavigation hook in lib/story/hooks/useStoryNavigation.ts (tap zones)
-- [ ] T029 [US1] Add slide preloading logic in lib/story/utils/preload.ts (+1 and +2 ahead)
-- [ ] T030 [US1] Implement 9:16 aspect ratio CSS with --vh fix in app/story/[storyId]/page.css
+- [X] T029 [US1] Add slide preloading logic in lib/story/utils/preload.ts (+1 and +2 ahead)
+- [X] T030 [US1] Implement 9:16 aspect ratio CSS with --vh fix in app/story/[storyId]/page.css
 - [ ] T031 [US1] Add slide transition animations with Framer Motion in components/story/SlideContainer.tsx
 - [ ] T032 [US1] Implement pause/resume logic for time-based slides in lib/stores/useStoryStore.ts
 - [ ] T033 [US1] Add auto-advance logic for non-manual slides in lib/story/hooks/useStoryNavigation.ts
