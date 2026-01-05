@@ -105,9 +105,9 @@ This is a Next.js 14+ web application structure:
 
 - [x] T034 [P] [US2] Write scroll logic unit tests in __tests__/unit/story/hooks/useTeleprompterScroll.test.ts
 - [x] T035 [P] [US2] Write scroll utils tests in __tests__/unit/story/utils/scrollUtils.test.ts
-- [ ] T036 [P] [US2] Write progress sync integration tests in __tests__/integration/story/progress-sync.test.tsx
-- [ ] T037 [P] [US2] Write teleprompter controls integration tests in __tests__/integration/story/teleprompter-controls.test.tsx
-- [ ] T038 [P] [US2] Write scrolling performance E2E tests in __tests__/e2e/story/teleprompter-scrolling.spec.ts
+- [x] T036 [P] [US2] Write progress sync integration tests in __tests__/integration/story/progress-sync.test.tsx
+- [x] T037 [P] [US2] Write teleprompter controls integration tests in __tests__/integration/story/teleprompter-controls.test.tsx
+- [x] T038 [P] [US2] Write scrolling performance E2E tests in __tests__/e2e/story/teleprompter-scrolling.spec.ts
 
 ### Implementation for User Story 2
 

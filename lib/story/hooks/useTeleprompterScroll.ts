@@ -11,6 +11,7 @@ import { useRef, useCallback, useEffect } from 'react';
 import { useTeleprompterStore } from '@/lib/stores/useTeleprompterStore';
 import {
   calculateScrollDepth,
+  calculateScrollPosition,
   calculateScrollDelta,
   clampScrollPosition,
   isContentScrollable,
@@ -50,8 +51,11 @@ export function useTeleprompterScroll({
   const currentSpeedRef = useRef<number>(0);
   const lastProgressUpdateRef = useRef<number>(0);
   const isStoppingRef = useRef<boolean>(false);
+  const previousFontSizeRef = useRef<number | null>(null);
+  const scrollRatioBeforeFontChangeRef = useRef<number | null>(null);
 
   const {
+    fontSize,
     scrollSpeed,
     isScrolling,
     startScrolling: startStoreScrolling,
@@ -201,6 +205,74 @@ export function useTeleprompterScroll({
       startScrolling();
     }
   }, [isScrolling, startScrolling, stopScrolling]);
+
+  /**
+   * Preserve scroll position ratio when font size changes (T052)
+   *
+   * When the user changes font size, the scroll height changes.
+   * We preserve the relative scroll position (ratio) so the user
+   * continues reading from the same location in the content.
+   */
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Initialize previous font size on first render
+    if (previousFontSizeRef.current === null) {
+      previousFontSizeRef.current = fontSize;
+      return;
+    }
+
+    // Check if font size actually changed
+    if (fontSize !== previousFontSizeRef.current) {
+      const scrollHeight = container.scrollHeight;
+      const viewportHeight = container.clientHeight;
+      const currentScrollTop = container.scrollTop;
+
+      // Calculate current scroll ratio before the change
+      const currentRatio = calculateScrollDepth(
+        currentScrollTop,
+        scrollHeight,
+        viewportHeight
+      );
+
+      // Store the ratio for restoration after layout update
+      scrollRatioBeforeFontChangeRef.current = currentRatio;
+      previousFontSizeRef.current = fontSize;
+
+      // Wait for next frame when layout has updated with new font size
+      requestAnimationFrame(() => {
+        if (!containerRef.current) return;
+
+        const newScrollHeight = containerRef.current.scrollHeight;
+        const newViewportHeight = containerRef.current.clientHeight;
+        const savedRatio = scrollRatioBeforeFontChangeRef.current;
+
+        if (savedRatio !== null) {
+          // Calculate new scroll position that maintains the same ratio
+          const newScrollTop = calculateScrollPosition(
+            savedRatio,
+            newScrollHeight,
+            newViewportHeight
+          );
+
+          // Apply the new scroll position
+          containerRef.current.scrollTop = newScrollTop;
+
+          // Update store with new position
+          const newScrollDepth = calculateScrollDepth(
+            newScrollTop,
+            newScrollHeight,
+            newViewportHeight
+          );
+          updateScrollPosition(newScrollTop, newScrollDepth);
+
+          // Clear saved ratio
+          scrollRatioBeforeFontChangeRef.current = null;
+        }
+      });
+    }
+  }, [fontSize, containerRef, updateScrollPosition]);
 
   /**
    * Cleanup on unmount
