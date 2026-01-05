@@ -1,10 +1,12 @@
+"use client";
+
 /**
  * Teleprompter Slide Component
- * 
+ *
  * Main component for teleprompter slide type.
  * Integrates auto-scrolling, focal point indicator, control panel,
  * and progress synchronization.
- * 
+ *
  * @feature 012-standalone-story
  */
 

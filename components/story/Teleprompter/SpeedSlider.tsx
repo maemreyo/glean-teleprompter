@@ -1,8 +1,10 @@
+"use client";
+
 /**
  * Speed Slider Component
- * 
+ *
  * Allows user to adjust teleprompter scrolling speed from 0 to 5.
- * 
+ *
  * @feature 012-standalone-story
  */
 

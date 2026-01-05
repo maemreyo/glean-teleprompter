@@ -1,9 +1,11 @@
+"use client";
+
 /**
  * Focal Point Indicator Component
- * 
+ *
  * Displays a yellow horizontal line indicating the optimal reading position.
  * Positioned at 33% from top (38% with safe area).
- * 
+ *
  * @feature 012-standalone-story
  */
 

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Slide Container Component
  *

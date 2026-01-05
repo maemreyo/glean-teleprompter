@@ -1,9 +1,11 @@
+"use client";
+
 /**
  * Skip to Next Button Component
- * 
+ *
  * Explicit button to advance to the next slide from teleprompter mode.
  * Prevents accidental slide advancement during reading.
- * 
+ *
  * @feature 012-standalone-story
  */
 

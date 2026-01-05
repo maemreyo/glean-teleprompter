@@ -53,6 +53,7 @@
     "@types/jest-axe": "^3.5.9",
     "@types/node": "^20",
     "@types/nosleep.js": "^0.9.0",
+    "@types/pako": "^2.0.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.20",

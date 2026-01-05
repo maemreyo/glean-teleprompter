@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Restore Progress Dialog Component
  *

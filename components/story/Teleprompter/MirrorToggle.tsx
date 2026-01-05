@@ -1,9 +1,11 @@
+"use client";
+
 /**
  * Mirror Toggle Component
- * 
+ *
  * Toggles mirror mode for teleprompter glass compatibility.
  * Uses scaleX(-1) to horizontally flip the content.
- * 
+ *
  * @feature 012-standalone-story
  */
 

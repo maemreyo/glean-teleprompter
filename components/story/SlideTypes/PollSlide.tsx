@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Poll Slide Component
  *

@@ -1,9 +1,11 @@
+"use client";
+
 /**
  * Safe Area Detection Hook
- * 
+ *
  * Detect safe area insets for notched devices (iPhone, Android).
  * Provides CSS env() values for padding adjustments.
- * 
+ *
  * @feature 012-standalone-story
  */
 

@@ -1,13 +1,15 @@
+"use client";
+
 /**
  * Teleprompter Content Component
- * 
+ *
  * Displays scrollable teleprompter text content with:
  * - Top/bottom gradient overlays (35vh each)
  * - Mirror mode support (scaleX(-1))
  * - Font size adjustment
  * - GPU acceleration for smooth scrolling
  * - Text selection disabled during scrolling
- * 
+ *
  * @feature 012-standalone-story
  */
 

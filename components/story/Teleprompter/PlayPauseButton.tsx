@@ -1,8 +1,10 @@
+"use client";
+
 /**
  * Play/Pause Button Component
- * 
+ *
  * Toggles teleprompter auto-scrolling with smooth deceleration on pause.
- * 
+ *
  * @feature 012-standalone-story
  */
 

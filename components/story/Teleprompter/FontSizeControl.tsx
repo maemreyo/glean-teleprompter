@@ -1,9 +1,11 @@
+"use client";
+
 /**
  * Font Size Control Component
- * 
+ *
  * Allows user to adjust teleprompter font size from 16px to 48px.
  * Maintains scroll position ratio when font size changes.
- * 
+ *
  * @feature 012-standalone-story
  */
 

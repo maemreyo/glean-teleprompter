@@ -1,9 +1,11 @@
+"use client";
+
 /**
  * Story Container Component
- * 
+ *
  * 9:16 aspect ratio container with safe area padding support.
  * Integration point for story store and slide rendering.
- * 
+ *
  * @feature 012-standalone-story
  */
 

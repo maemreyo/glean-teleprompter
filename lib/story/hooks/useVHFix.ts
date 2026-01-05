@@ -1,9 +1,11 @@
+"use client";
+
 /**
  * Viewport Height Fix Hook
- * 
+ *
  * Fix mobile viewport height issues by setting --vh CSS custom property.
  * Addresses address bar overlap on mobile browsers.
- * 
+ *
  * @feature 012-standalone-story
  */
 

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Safe Area Wrapper Component
  *
