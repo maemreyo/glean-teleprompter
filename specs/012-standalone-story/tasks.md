@@ -27,11 +27,11 @@ This is a Next.js 14+ web application structure:
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create directory structure for story feature (app/story, components/story, lib/story, __tests__/story)
-- [ ] T002 Install required dependencies (js-base64, pako, ajv, @types/nosleep.js)
-- [ ] T003 [P] Create TypeScript type definitions in lib/story/types.ts
-- [ ] T004 [P] Add NoSleep.js TypeScript declarations in types/nosleep.d.ts
-- [ ] T005 [P] Configure StoryScript JSON schema in specs/012-standalone-story/contracts/story-schema.json
+- [x] T001 Create directory structure for story feature (app/story, components/story, lib/story, __tests__/story)
+- [x] T002 Install required dependencies (js-base64, pako, ajv, @types/nosleep.js)
+- [x] T003 [P] Create TypeScript type definitions in lib/story/types.ts
+- [x] T004 [P] Add NoSleep.js TypeScript declarations in types/nosleep.d.ts
+- [x] T005 [P] Configure StoryScript JSON schema in specs/012-standalone-story/contracts/story-schema.json
 
 ---
 

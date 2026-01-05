@@ -1,0 +1,406 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://glean-teleprompter.com/schemas/story-script-v1.json",
+  "title": "StoryScript",
+  "description": "Schema for validating standalone story data with teleprompter support",
+  "type": "object",
+  "required": ["id", "title", "slides", "version"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique story identifier (UUID v4 format)"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Display title for the story"
+    },
+    "slides": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "description": "Array of slides in sequence",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/definitions/textHighlightSlide" },
+          { "$ref": "#/definitions/widgetChartSlide" },
+          { "$ref": "#/definitions/imageSlide" },
+          { "$ref": "#/definitions/pollSlide" },
+          { "$ref": "#/definitions/teleprompterSlide" }
+        ]
+      }
+    },
+    "autoAdvance": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether slides auto-advance after duration"
+    },
+    "showProgress": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether to show progress bars at top"
+    },
+    "createdAt": {
+      "type": "integer",
+      "description": "Unix timestamp when story was created"
+    },
+    "version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Story schema version"
+    }
+  },
+  "definitions": {
+    "baseSlide": {
+      "type": "object",
+      "required": ["id", "type", "duration"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique slide identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["text-highlight", "widget-chart", "image", "poll", "teleprompter"],
+          "description": "Slide type discriminator"
+        },
+        "duration": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1000,
+              "maximum": 60000,
+              "description": "Duration in milliseconds"
+            },
+            {
+              "type": "string",
+              "enum": ["manual"],
+              "description": "Manual advancement"
+            }
+          ]
+        },
+        "animation": {
+          "$ref": "#/definitions/animationEffect"
+        },
+        "effects": {
+          "$ref": "#/definitions/slideEffects"
+        }
+      }
+    },
+    "animationEffect": {
+      "type": "object",
+      "required": ["type", "duration"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["slide-in", "fade", "zoom"],
+          "description": "Animation type"
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["left", "right", "up", "down"],
+          "description": "Direction for slide-in animations"
+        },
+        "duration": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 1000,
+          "description": "Animation duration in milliseconds"
+        },
+        "easing": {
+          "type": "string",
+          "default": "ease-out",
+          "description": "CSS easing function"
+        }
+      }
+    },
+    "slideEffects": {
+      "type": "object",
+      "properties": {
+        "glow": {
+          "$ref": "#/definitions/glowEffect"
+        },
+        "shadow": {
+          "$ref": "#/definitions/shadowEffect"
+        },
+        "backdrop": {
+          "$ref": "#/definitions/backdropEffect"
+        }
+      }
+    },
+    "glowEffect": {
+      "type": "object",
+      "required": ["color", "intensity", "blur"],
+      "properties": {
+        "color": {
+          "type": "string",
+          "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+          "description": "Hex color for glow"
+        },
+        "intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity/intensity (0-1)"
+        },
+        "blur": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50,
+          "description": "Blur radius in pixels"
+        }
+      }
+    },
+    "shadowEffect": {
+      "type": "object",
+      "required": ["color", "offsetX", "offsetY", "blur"],
+      "properties": {
+        "color": {
+          "type": "string",
+          "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+          "description": "Shadow color"
+        },
+        "offsetX": {
+          "type": "integer",
+          "minimum": -50,
+          "maximum": 50,
+          "description": "X offset in pixels"
+        },
+        "offsetY": {
+          "type": "integer",
+          "minimum": -50,
+          "maximum": 50,
+          "description": "Y offset in pixels"
+        },
+        "blur": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50,
+          "description": "Blur radius in pixels"
+        }
+      }
+    },
+    "backdropEffect": {
+      "type": "object",
+      "required": ["type", "value", "opacity"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["blur", "gradient", "solid"],
+          "description": "Effect type"
+        },
+        "value": {
+          "type": "string",
+          "description": "Effect value (px for blur, color for others)"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity (0-1)"
+        }
+      }
+    },
+    "textHighlightSlide": {
+      "allOf": [
+        { "$ref": "#/definitions/baseSlide" },
+        {
+          "type": "object",
+          "required": ["type", "content"],
+          "properties": {
+            "type": { "const": "text-highlight" },
+            "content": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Main text content"
+            },
+            "highlights": {
+              "type": "array",
+              "maxItems": 20,
+              "items": {
+                "$ref": "#/definitions/textHighlight"
+              },
+              "description": "Highlighted text ranges"
+            }
+          }
+        }
+      ]
+    },
+    "textHighlight": {
+      "type": "object",
+      "required": ["startIndex", "endIndex", "color"],
+      "properties": {
+        "startIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Start index in content string"
+        },
+        "endIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "End index in content string"
+        },
+        "color": {
+          "type": "string",
+          "description": "Highlight color (hex or named)"
+        },
+        "fontWeight": {
+          "type": "string",
+          "enum": ["normal", "bold"],
+          "default": "normal",
+          "description": "Font weight"
+        }
+      }
+    },
+    "widgetChartSlide": {
+      "allOf": [
+        { "$ref": "#/definitions/baseSlide" },
+        {
+          "type": "object",
+          "required": ["type", "data"],
+          "properties": {
+            "type": { "const": "widget-chart" },
+            "data": {
+              "$ref": "#/definitions/widgetData"
+            }
+          }
+        }
+      ]
+    },
+    "widgetData": {
+      "type": "object",
+      "required": ["type", "labels", "values"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["bar", "line", "pie", "doughnut"],
+          "description": "Chart type"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Chart title"
+        },
+        "labels": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 20,
+          "items": {
+            "type": "string"
+          },
+          "description": "Data labels"
+        },
+        "values": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 20,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "description": "Data values (non-negative)"
+        },
+        "colors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+          },
+          "description": "Bar/segment colors (hex)"
+        }
+      }
+    },
+    "imageSlide": {
+      "allOf": [
+        { "$ref": "#/definitions/baseSlide" },
+        {
+          "type": "object",
+          "required": ["type", "content"],
+          "properties": {
+            "type": { "const": "image" },
+            "content": {
+              "type": "string",
+              "pattern": "^https://|^data:image/",
+              "description": "Image URL (https:// or data: URI)"
+            },
+            "alt": {
+              "type": "string",
+              "description": "Alt text for accessibility"
+            }
+          }
+        }
+      ]
+    },
+    "pollSlide": {
+      "allOf": [
+        { "$ref": "#/definitions/baseSlide" },
+        {
+          "type": "object",
+          "required": ["type", "question", "options"],
+          "properties": {
+            "type": { "const": "poll" },
+            "question": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Poll question text"
+            },
+            "options": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 10,
+              "items": {
+                "$ref": "#/definitions/pollOption"
+              },
+              "description": "Poll options"
+            }
+          }
+        }
+      ]
+    },
+    "pollOption": {
+      "type": "object",
+      "required": ["id", "text"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Option identifier"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Option text"
+        },
+        "votes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Vote count (for results)"
+        }
+      }
+    },
+    "teleprompterSlide": {
+      "allOf": [
+        { "$ref": "#/definitions/baseSlide" },
+        {
+          "type": "object",
+          "required": ["type", "content", "duration"],
+          "properties": {
+            "type": { "const": "teleprompter" },
+            "content": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Teleprompter script text"
+            },
+            "duration": {
+              "const": "manual",
+              "description": "Always manual for teleprompter"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
