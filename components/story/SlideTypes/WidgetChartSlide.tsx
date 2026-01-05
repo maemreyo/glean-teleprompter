@@ -4,6 +4,8 @@
  * Displays interactive chart widgets (bar, line, pie, doughnut).
  * Simple SVG-based rendering for story format.
  *
+ * Performance: Uses React.memo to prevent unnecessary re-renders (T090)
+ *
  * @feature 012-standalone-story
  */
 
@@ -16,8 +18,12 @@ export interface WidgetChartSlideProps {
 
 /**
  * Render a widget chart slide
+ *
+ * Memoized to prevent re-renders when slide data hasn't changed (T090)
  */
-export function WidgetChartSlide({ slide }: WidgetChartSlideProps): React.JSX.Element {
+export const WidgetChartSlide = React.memo(function WidgetChartSlide({
+  slide
+}: WidgetChartSlideProps): React.JSX.Element {
   const { data } = slide;
   const { type, title, labels, values, colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'] } = slide.data;
 
@@ -163,4 +169,14 @@ export function WidgetChartSlide({ slide }: WidgetChartSlideProps): React.JSX.El
       <div className="flex-1">{renderChart()}</div>
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison for memo - only re-render if slide content actually changed
+  return (
+    prevProps.slide.id === nextProps.slide.id &&
+    prevProps.slide.type === nextProps.slide.type &&
+    prevProps.slide.data.type === nextProps.slide.data.type &&
+    prevProps.slide.data.title === nextProps.slide.data.title &&
+    JSON.stringify(prevProps.slide.data.values) === JSON.stringify(nextProps.slide.data.values) &&
+    JSON.stringify(prevProps.slide.data.labels) === JSON.stringify(nextProps.slide.data.labels)
+  );
+});

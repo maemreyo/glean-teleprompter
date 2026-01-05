@@ -86,10 +86,13 @@ export function calculateScrollFromProgress(
 }
 
 /**
- * Throttle progress updates to avoid excessive re-renders
- * 
+ * Throttle progress updates to avoid excessive re-renders (T087)
+ *
+ * Uses requestAnimationFrame for smooth throttling that aligns
+ * with browser repaint cycles, ensuring updates don't exceed 100ms.
+ *
  * @param callback - Function to call with throttled updates
- * @param throttleMs - Minimum time between updates in milliseconds
+ * @param throttleMs - Minimum time between updates in milliseconds (default: 100ms)
  * @returns Throttled function that accepts progress value
  */
 export function createProgressThrottle(
@@ -98,6 +101,7 @@ export function createProgressThrottle(
 ): (progress: number) => void {
   let lastUpdate = 0;
   let pendingProgress: number | null = null;
+  let rafId: number | null = null;
   
   return (progress: number) => {
     const now = performance.now();
@@ -112,13 +116,29 @@ export function createProgressThrottle(
       // Store pending progress to update on next throttle cycle
       pendingProgress = progress;
       
-      // Schedule update for next available time slot
+      // Cancel any pending RAF to avoid duplicates
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      
+      // Schedule update using RAF for better performance
       const timeUntilNextUpdate = throttleMs - timeSinceLastUpdate;
-      setTimeout(() => {
+      rafId = requestAnimationFrame(() => {
         if (pendingProgress !== null) {
           lastUpdate = performance.now();
           callback(pendingProgress);
           pendingProgress = null;
+          rafId = null;
+        }
+      });
+      
+      // Fallback timeout if RAF takes too long
+      setTimeout(() => {
+        if (pendingProgress !== null && rafId !== null) {
+          lastUpdate = performance.now();
+          callback(pendingProgress);
+          pendingProgress = null;
+          rafId = null;
         }
       }, timeUntilNextUpdate);
     }

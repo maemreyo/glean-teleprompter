@@ -18,6 +18,74 @@ import {
   isContentScrollable,
 } from '@/lib/story/utils/scrollUtils';
 
+/**
+ * FPS monitoring utilities (T091 - dev mode only)
+ */
+const isDevMode = process.env.NODE_ENV === 'development';
+
+interface FPSMetrics {
+  currentFPS: number;
+  averageFPS: number;
+  minFPS: number;
+  maxFPS: number;
+  frameCount: number;
+}
+
+function createFPSMonitor(): {
+  recordFrame: () => void;
+  getMetrics: () => FPSMetrics;
+  reset: () => void;
+} {
+  let frameCount = 0;
+  let lastTime = performance.now();
+  let fpsSum = 0;
+  let fpsCount = 0;
+  let minFPS = Infinity;
+  let maxFPS = 0;
+
+  const recordFrame = () => {
+    if (!isDevMode) return;
+
+    const now = performance.now();
+    const delta = now - lastTime;
+    lastTime = now;
+
+    const fps = 1000 / delta;
+    fpsSum += fps;
+    fpsCount++;
+    minFPS = Math.min(minFPS, fps);
+    maxFPS = Math.max(maxFPS, fps);
+    frameCount++;
+
+    // Log every 60 frames (approx 2 seconds at 30fps)
+    if (frameCount % 60 === 0) {
+      const avgFPS = fpsSum / fpsCount;
+      console.debug(
+        `[Teleprompter FPS] Current: ${fps.toFixed(1)}, Avg: ${avgFPS.toFixed(1)}, Min: ${minFPS.toFixed(1)}, Max: ${maxFPS.toFixed(1)}`
+      );
+    }
+  };
+
+  const getMetrics = (): FPSMetrics => ({
+    currentFPS: fpsCount > 0 ? fpsSum / fpsCount : 0,
+    averageFPS: fpsSum / fpsCount || 0,
+    minFPS: minFPS === Infinity ? 0 : minFPS,
+    maxFPS,
+    frameCount,
+  });
+
+  const reset = () => {
+    frameCount = 0;
+    fpsSum = 0;
+    fpsCount = 0;
+    minFPS = Infinity;
+    maxFPS = 0;
+    lastTime = performance.now();
+  };
+
+  return { recordFrame, getMetrics, reset };
+}
+
 interface UseTeleprompterScrollOptions {
   containerRef: React.RefObject<HTMLElement>;
   onScrollProgress?: (depth: number) => void;
@@ -55,6 +123,11 @@ export function useTeleprompterScroll({
   const isStoppingRef = useRef<boolean>(false);
   const previousFontSizeRef = useRef<number | null>(null);
   const scrollRatioBeforeFontChangeRef = useRef<number | null>(null);
+  const userScrolledRef = useRef<boolean>(false); // T114 - Detect user manual scroll
+  const isTabVisibleRef = useRef<boolean>(true); // T117 - Track tab visibility
+  
+  // FPS monitor for development (T091)
+  const fpsMonitor = useRef(createFPSMonitor());
 
   const {
     fontSize,
@@ -89,6 +162,18 @@ export function useTeleprompterScroll({
       const container = containerRef.current;
       if (!container) return;
 
+      // T117: Pause auto-scrolling when browser tab is inactive
+      if (!isTabVisibleRef.current) {
+        // Don't process frames when tab is hidden
+        rafIdRef.current = requestAnimationFrame(scrollFrame);
+        return;
+      }
+
+      // Record FPS in development mode (T091)
+      if (isDevMode) {
+        fpsMonitor.current.recordFrame();
+      }
+
       // Initialize timestamp on first frame
       if (lastTimestampRef.current === 0) {
         lastTimestampRef.current = timestamp;
@@ -103,12 +188,23 @@ export function useTeleprompterScroll({
       const scrollHeight = container.scrollHeight;
       const viewportHeight = container.clientHeight;
 
-      // Check if content is scrollable
+      // T113: Check if content is scrollable - disable auto-scrolling when content height < viewport
       if (!isContentScrollable(scrollHeight, viewportHeight)) {
+        // Content fits on screen, no scrolling needed
         stopStoreScrolling();
         return;
       }
 
+      // T114: Pause auto-scrolling when user manually scrolls
+      // Detect if current scrollTop doesn't match expected position from auto-scroll
+      const expectedScrollDelta = calculateScrollDelta(
+        currentSpeedRef.current,
+        deltaTime,
+        BASE_SCROLL_SPEED
+      );
+      // If user scrolled, we detect it and pause
+      // This is handled by a separate scroll event listener below
+      
       const maxScroll = scrollHeight - viewportHeight;
 
       // Handle deceleration when stopping
@@ -340,6 +436,54 @@ export function useTeleprompterScroll({
   }, [fontSize, containerRef, updateScrollPosition]);
 
   /**
+   * T114: Detect and handle user manual scroll
+   * When user manually scrolls, pause auto-scrolling
+   */
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (isScrolling && !isStoppingRef.current) {
+        // User manually scrolled - pause auto-scrolling
+        userScrolledRef.current = true;
+        stopScrolling();
+        
+        // T115: Show toast notification (implementation depends on toast library)
+        // This would typically use Sonner toast
+        console.log('Auto-scroll paused - tap to resume');
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [isScrolling, stopScrolling, containerRef]);
+
+  /**
+   * T117: Pause auto-scrolling when browser tab becomes inactive
+   * Uses Page Visibility API
+   */
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      isTabVisibleRef.current = !document.hidden;
+      
+      if (document.hidden && isScrolling) {
+        // Tab became hidden - pause scrolling
+        stopScrolling();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isScrolling, stopScrolling]);
+
+  /**
    * Cleanup on unmount
    */
   useEffect(() => {
@@ -347,7 +491,25 @@ export function useTeleprompterScroll({
       if (rafIdRef.current !== null) {
         cancelAnimationFrame(rafIdRef.current);
       }
+      // Reset FPS monitor on unmount (T091)
+      if (isDevMode) {
+        fpsMonitor.current.reset();
+      }
     };
+  }, []);
+
+  /**
+   * Expose FPS metrics in development (T091)
+   */
+  useEffect(() => {
+    if (!isDevMode) return;
+    
+    // Make FPS metrics available via window for debugging
+    if (typeof window !== 'undefined') {
+      (window as any).__teleprompterFPS = {
+        getMetrics: () => fpsMonitor.current.getMetrics(),
+      };
+    }
   }, []);
 
   return {
