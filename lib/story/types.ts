@@ -179,6 +179,8 @@ export interface StoryState {
   currentSlideIndex: number;
   direction: number; // 1 for forward, -1 for backward
   isPaused: boolean;
+  slideProgress: number; // 0.0 - 1.0 progress for current slide
+  progressOverride: number | null; // Manual override for teleprompter slides
 }
 
 export interface StoryActions {
@@ -186,6 +188,8 @@ export interface StoryActions {
   previousSlide: () => void;
   goToSlide: (index: number) => void;
   togglePause: () => void;
+  setSlideProgress: (progress: number) => void;
+  setProgressOverride: (override: number | null) => void;
   reset: () => void;
 }
 
