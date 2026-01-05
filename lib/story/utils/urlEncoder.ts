@@ -10,6 +10,7 @@
 import { Base64 } from 'js-base64';
 import pako from 'pako';
 import type { StoryScript, DecodedStoryResult } from '@/lib/story/types';
+import { validateStoryOrThrow } from '@/lib/story/validation';
 
 /**
  * Maximum URL length to enforce (32KB for cross-browser compatibility)
@@ -89,34 +90,32 @@ export function encodeStoryForUrl(story: StoryScript): string {
 
 /**
  * Decode story data from URL
- * 
+ *
  * Process: Base64 (URL-safe) → gunzip → JSON.parse
- * 
+ * Fallback: Base64 → JSON.parse (for non-compressed URLs)
+ *
  * @param encoded - Encoded data from URL
  * @returns Decoded story result with data or error
  */
 export function decodeStoryFromUrl(encoded: string): DecodedStoryResult {
+  // Validate input is not empty
+  if (!encoded || encoded.trim().length === 0) {
+    return {
+      success: false,
+      error: 'Failed to decode story URL: No story data provided. The URL may be incomplete.',
+    };
+  }
+
+  let data: unknown;
+
+  // Try gzip-compressed format first (current behavior)
   try {
-    // Validate input is not empty
-    if (!encoded || encoded.trim().length === 0) {
-      return {
-        success: false,
-        error: 'Failed to decode story URL: No story data provided. The URL may be incomplete.',
-      };
-    }
-    
     // Step 1: Decode from Base64 (URL-safe)
     let compressed: Uint8Array;
     try {
       compressed = Base64.toUint8Array(encoded);
     } catch (unknownError) {
-      const error = unknownError instanceof Error ? unknownError : new Error(String(unknownError));
-      return {
-        success: false,
-        error: `Failed to decode story URL: Corrupted or invalid URL encoding. ` +
-          `The story data in the URL is damaged or incomplete. ` +
-          `Technical detail: ${error.message}`,
-      };
+      throw new Error(`Base64 decoding failed: ${unknownError instanceof Error ? unknownError.message : String(unknownError)}`);
     }
     
     // Step 2: Decompress gzip
@@ -124,37 +123,45 @@ export function decodeStoryFromUrl(encoded: string): DecodedStoryResult {
     try {
       decompressed = pako.ungzip(compressed, { to: 'string' });
     } catch (unknownError) {
-      const error = unknownError instanceof Error ? unknownError : new Error(String(unknownError));
-      return {
-        success: false,
-        error: `Failed to decode story URL: Unsupported or corrupted compression format. ` +
-          `The story data could not be decompressed. ` +
-          `Technical detail: ${error.message}`,
-      };
+      throw new Error(`Gzip decompression failed: ${unknownError instanceof Error ? unknownError.message : String(unknownError)}`);
     }
     
     // Step 3: Parse JSON
-    let data: unknown;
     try {
       data = JSON.parse(decompressed);
     } catch (unknownError) {
-      const error = unknownError instanceof Error ? unknownError : new Error(String(unknownError));
+      throw new Error(`JSON parsing failed: ${unknownError instanceof Error ? unknownError.message : String(unknownError)}`);
+    }
+  } catch (gzipError) {
+    // Gzip format failed - try plain Base64-encoded JSON as fallback
+    try {
+      // URL-decode first to handle %7B, %22, etc.
+      const urlDecoded = decodeURIComponent(encoded);
+      const json = atob(urlDecoded);
+      data = JSON.parse(json);
+    } catch (fallbackError) {
+      // Both formats failed - return detailed error
       return {
         success: false,
-        error: `Failed to decode story URL: Invalid story data format. ` +
-          `The decompressed data is not valid JSON. ` +
-          `Technical detail: ${error.message}`,
+        error: `Failed to decode story URL: The story data could not be decoded. ` +
+          `The URL may be corrupted, incomplete, or use an unsupported format. ` +
+          `Technical detail: Gzip format failed - ${gzipError instanceof Error ? gzipError.message : String(gzipError)}; ` +
+          `Plain Base64 format also failed - ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`,
       };
     }
-    
+  }
+
+  // Validate the parsed story data
+  try {
+    const validatedStory = validateStoryOrThrow(data);
     return {
       success: true,
-      data: data as StoryScript,
+      data: validatedStory,
     };
-  } catch (error) {
+  } catch (validationError) {
     return {
       success: false,
-      error: `Failed to decode story URL: Unexpected error - ${error instanceof Error ? error.message : String(error)}`,
+      error: `Failed to decode story URL: ${validationError instanceof Error ? validationError.message : String(validationError)}`,
     };
   }
 }

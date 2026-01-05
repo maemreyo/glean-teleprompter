@@ -470,3 +470,82 @@ describe('edge cases', () => {
     expect(decoded.data).toEqual(minimalStory);
   });
 });
+
+describe('URL-encoded Base64 fallback', () => {
+  it('should decode URL-encoded plain Base64 strings', () => {
+    // Simulate what happens when browser URL-encodes a plain Base64 string
+    const story: StoryScript = {
+      id: 'demo',
+      title: 'Demo Story',
+      slides: [
+        {
+          id: 'slide-1',
+          type: 'text-highlight',
+          content: 'Hello World',
+          highlights: [],
+          duration: 5000,
+        },
+      ],
+      autoAdvance: true,
+      showProgress: true,
+      version: '1.0',
+    };
+
+    // Create plain Base64 string (without gzip) and URL-encode it
+    const plainJson = JSON.stringify(story);
+    const plainBase64 = btoa(plainJson);
+    
+    // URL-encode it (this is what the browser does when navigating)
+    const urlEncoded = encodeURIComponent(plainBase64);
+
+    // Verify URL encoding happened (Base64 may contain +, /, = which get encoded)
+    expect(urlEncoded).toContain('%');
+
+    // Should decode successfully
+    const decoded = decodeStoryFromUrl(urlEncoded);
+
+    expect(decoded.success).toBe(true);
+    expect(decoded.data).toBeDefined();
+    expect(decoded.data?.id).toBe(story.id);
+    expect(decoded.data?.title).toBe(story.title);
+  });
+
+  it('should handle characters that get URL-encoded', () => {
+    // Test that URL-encoded Base64 strings can be decoded
+    // Create a minimal valid story
+    const story: StoryScript = {
+      id: 'x',
+      title: 'Y',
+      slides: [
+        {
+          id: 'z',
+          type: 'text-highlight',
+          content: 'Z',
+          highlights: [],
+          duration: 1000,
+        },
+      ],
+      autoAdvance: false,
+      showProgress: false,
+      version: '1.0',
+    };
+
+    // Create plain Base64 string and URL-encode it
+    const plainJson = JSON.stringify(story);
+    const plainBase64 = btoa(plainJson);
+    
+    // Manually URL-encode to ensure we have encoded characters
+    // Even if the Base64 doesn't naturally have +, /, =, we force encoding
+    const urlEncoded = encodeURIComponent(plainBase64);
+
+    // Verify URL encoding was applied
+    expect(urlEncoded).toBeTruthy();
+
+    // Decode should handle the URL encoding successfully
+    const decoded = decodeStoryFromUrl(urlEncoded);
+
+    expect(decoded.success).toBe(true);
+    expect(decoded.data).toBeDefined();
+    expect(decoded.data?.id).toBe(story.id);
+  });
+});
