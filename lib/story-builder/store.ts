@@ -347,17 +347,26 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
   },
 
   /**
-   * Set the active slide index.
-   */
+    * Set the active slide index.
+    */
   setActiveSlide: (index: number) => {
     const state = get();
 
+    console.log('[Store] setActiveSlide called:', {
+      newIndex: index,
+      currentIndex: state.activeSlideIndex,
+      slidesCount: state.slides.length,
+      isValid: index >= 0 && index < state.slides.length
+    });
+
     // Validate index
     if (index < 0 || index >= state.slides.length) {
+      console.error('[Store] setActiveSlide validation failed:', { index, slidesCount: state.slides.length });
       toast.error(`Cannot set active slide: index ${index} out of bounds`);
       return;
     }
 
+    console.log('[Store] Updating activeSlideIndex to:', index);
     set({
       activeSlideIndex: index,
     });

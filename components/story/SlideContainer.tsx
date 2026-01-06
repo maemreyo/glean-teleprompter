@@ -173,7 +173,7 @@ export function SlideContainer({ slide, index, isCurrent, totalSlides }: SlideCo
           animate="center"
           exit="exit"
           transition={transition satisfies Transition}
-          className="absolute inset-0 flex items-center justify-center"
+          className="absolute inset-0 flex items-center justify-center h-full w-full"
         >
           {renderSlide(slide, index, totalSlides)}
         </motion.div>

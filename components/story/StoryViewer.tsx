@@ -178,7 +178,7 @@ export const StoryViewer = memo(function StoryViewer({
 
   return (
     <div
-      className="story-viewer relative h-full w-full overflow-hidden bg-black touch-manipulation-none"
+      className="story-viewer relative h-full w-full overflow-hidden bg-black touch-manipulation-none flex flex-col"
       onClick={handleTap}
       style={{
         // GPU acceleration for smooth rendering (T092)

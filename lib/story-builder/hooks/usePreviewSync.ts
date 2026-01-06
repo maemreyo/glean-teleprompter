@@ -36,6 +36,16 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
       previousActiveIndexRef.current !== activeSlideIndex ||
       JSON.stringify(slides) !== JSON.stringify(previousSlidesRef.current);
 
+    console.log('[usePreviewSync] State changed:', {
+      hasChanged,
+      slidesCount: slides.length,
+      activeSlideIndex,
+      previousCount: previousSlidesRef.current.length,
+      previousIndex: previousActiveIndexRef.current,
+      iframeExists: !!iframeRef.current,
+      iframeContentWindow: !!iframeRef.current?.contentWindow
+    });
+
     if (!hasChanged) return;
 
     // Clear existing timeout to prevent multiple pending updates
@@ -43,32 +53,33 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
       clearTimeout(timeoutRef.current);
     }
 
-    // Debounce updates to 100ms threshold
-    // This prevents excessive iframe updates during rapid editing
-    timeoutRef.current = setTimeout(() => {
+    const sendUpdate = () => {
       const iframe = iframeRef.current;
       if (iframe?.contentWindow) {
         const message: PreviewMessage = {
           type: 'UPDATE_STORY',
           payload: { slides, activeSlideIndex },
         };
-        // Send update to preview iframe via postMessage
-        // Use specific origin for security (must match story-preview page)
         iframe.contentWindow.postMessage(message, window.location.origin);
         
-        // Mark performance measurement point
-        // Used by performance monitoring below to detect slow updates
         if (typeof performance !== 'undefined') {
           performance.mark('preview-update-sent');
         }
       }
 
-      // Update refs to prevent duplicate updates (only if changed)
-      if (hasChanged) {
-        previousSlidesRef.current = slides;
-        previousActiveIndexRef.current = activeSlideIndex;
-      }
-    }, 100);
+      // Update refs
+      previousSlidesRef.current = slides;
+      previousActiveIndexRef.current = activeSlideIndex;
+    };
+
+    // If only the active index changed, update immediately for responsiveness
+    const contentChanged = JSON.stringify(slides) !== JSON.stringify(previousSlidesRef.current);
+    if (!contentChanged && previousActiveIndexRef.current !== activeSlideIndex) {
+      sendUpdate();
+    } else {
+      // Debounce content updates
+      timeoutRef.current = setTimeout(sendUpdate, 100);
+    }
 
     return () => {
       if (timeoutRef.current) {

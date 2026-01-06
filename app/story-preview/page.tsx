@@ -53,7 +53,11 @@ function convertBuilderSlideToStorySlide(slide: BuilderSlide): AnySlide {
         ...baseSlide,
         type: 'poll',
         question: sanitizeText((slide as any).question || ''),
-        options: ((slide as any).options || []).map((opt: string) => sanitizeText(opt)),
+        options: ((slide as any).options || []).map((opt: any) => ({
+          id: typeof opt === 'string' ? opt : opt.id,
+          text: sanitizeText(typeof opt === 'string' ? opt : opt.text),
+          votes: typeof opt === 'string' ? 0 : opt.votes || 0,
+        })),
       };
 
     case 'teleprompter':
@@ -77,14 +81,28 @@ export default function StoryPreviewPage() {
   const goToSlide = useStoryStore(state => state.goToSlide);
 
   useEffect(() => {
+    console.log('[Preview] Page mounted');
+  }, []);
+
+  useEffect(() => {
+      console.log('[Preview] Setting up message listener');
+      
       const handleMessage = (event: MessageEvent<PreviewMessage>) => {
+        console.log('[Preview] Received message:', {
+          type: event.data?.type,
+          origin: event.origin,
+          currentOrigin: window.location.origin,
+          data: event.data
+        });
+
         // Validate origin for security (relaxed for development)
         if (process.env.NODE_ENV === 'production' && event.origin !== window.location.origin) {
+          console.warn('[Preview] Message rejected - origin mismatch');
           return;
         }
 
       if (event.data?.type === 'UPDATE_STORY') {
-        console.log('[Preview] Received update:', event.data.payload);
+        console.log('[Preview] Processing UPDATE_STORY:', event.data.payload);
         try {
           const { slides, activeSlideIndex } = event.data.payload;
           
@@ -97,6 +115,7 @@ export default function StoryPreviewPage() {
             throw new Error('Story cannot exceed 20 slides');
           }
 
+          console.log('[Preview] Setting story state:', { slidesCount: slides.length, activeSlideIndex });
           setStory({ slides, activeSlideIndex });
           setError(null);
         } catch (err) {
@@ -107,12 +126,17 @@ export default function StoryPreviewPage() {
     };
 
     window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    console.log('[Preview] Message listener attached successfully');
+    return () => {
+      console.log('[Preview] Cleaning up message listener');
+      window.removeEventListener('message', handleMessage);
+    };
   }, []);
 
   // Navigate to the active slide when story updates
   useEffect(() => {
     if (story && story.activeSlideIndex !== null) {
+      console.log('[Preview] Navigating to slide:', story.activeSlideIndex);
       goToSlide(story.activeSlideIndex);
     }
   }, [story, goToSlide]);
@@ -142,7 +166,7 @@ export default function StoryPreviewPage() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen bg-black text-white">
+      <div className="flex items-center justify-center min-h-screen bg-black text-white">
         <p className="text-red-400">{error}</p>
       </div>
     );
@@ -150,11 +174,23 @@ export default function StoryPreviewPage() {
 
   if (!story || story.slides.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen bg-black text-white">
+      <div className="flex items-center justify-center min-h-screen bg-black text-white">
         <p className="text-muted">Waiting for story data...</p>
       </div>
     );
   }
 
-  return <StoryViewer story={storyScript} />;
+  return (
+    <main className="h-screen w-full bg-black overflow-hidden overscroll-none">
+      <style jsx global>{`
+        html, body, #__next, [data-nextjs-scroll-focus-boundary] {
+          height: 100% !important;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+        }
+      `}</style>
+      <StoryViewer story={storyScript} />
+    </main>
+  );
 }
