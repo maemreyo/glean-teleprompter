@@ -29,8 +29,3 @@ export default function StoryBuilderPage() {
     </ErrorBoundary>
   );
 }
-
-export const metadata = {
-  title: 'Story Builder',
-  description: 'Create visual stories with drag-and-drop',
-};
