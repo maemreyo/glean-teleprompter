@@ -77,14 +77,14 @@ export default function StoryPreviewPage() {
   const goToSlide = useStoryStore(state => state.goToSlide);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent<PreviewMessage>) => {
-      // Validate origin for security
-      if (event.origin !== window.location.origin) {
-        console.warn('Rejected message from untrusted origin:', event.origin);
-        return;
-      }
+      const handleMessage = (event: MessageEvent<PreviewMessage>) => {
+        // Validate origin for security (relaxed for development)
+        if (process.env.NODE_ENV === 'production' && event.origin !== window.location.origin) {
+          return;
+        }
 
       if (event.data?.type === 'UPDATE_STORY') {
+        console.log('[Preview] Received update:', event.data.payload);
         try {
           const { slides, activeSlideIndex } = event.data.payload;
           

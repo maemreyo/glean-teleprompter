@@ -8,7 +8,6 @@
  */
 
 import React from 'react';
-import Image from 'next/image';
 import type { ImageSlide as ImageSlideType } from '@/lib/story/types';
 
 export interface ImageSlideProps {
@@ -24,13 +23,11 @@ export function ImageSlide({ slide }: ImageSlideProps): React.JSX.Element {
   return (
     <div className="relative h-full w-full">
       {/* Full-bleed image */}
-      <Image
+      <img
         src={content}
         alt={alt}
-        fill
-        className="object-cover"
-        sizes="(max-width: 768px) 100vw, 50vw"
-        priority
+        className="h-full w-full object-cover"
+        loading="eager"
       />
     </div>
   );

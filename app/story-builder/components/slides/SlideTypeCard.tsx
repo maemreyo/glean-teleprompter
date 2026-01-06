@@ -14,12 +14,14 @@ import {
   type LucideIcon 
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useStoryBuilderStore } from '@/lib/story-builder/store';
 
 interface SlideTypeCardProps {
   type: BuilderSlideType;
 }
 
 export function SlideTypeCard({ type }: SlideTypeCardProps) {
+  const addSlide = useStoryBuilderStore(state => state.addSlide);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `type-${type}`,
     data: { type, source: 'library' },
@@ -40,6 +42,7 @@ export function SlideTypeCard({ type }: SlideTypeCardProps) {
       whileHover={{ scale: 1.02, y: -2 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+      onClick={() => addSlide(type)}
     >
       <Card
         ref={setNodeRef}

@@ -29,10 +29,12 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
   useEffect(() => {
     // Shallow comparison to detect changes in slides or active index
     // Compare length and slide IDs for efficient change detection
+    // Detect changes in slides or active index
+    // We use JSON.stringify for a deep comparison of slide content
     const hasChanged =
       slides.length !== previousSlidesRef.current.length ||
-      slides.some((slide, index) => slide.id !== previousSlidesRef.current[index]?.id) ||
-      previousActiveIndexRef.current !== activeSlideIndex;
+      previousActiveIndexRef.current !== activeSlideIndex ||
+      JSON.stringify(slides) !== JSON.stringify(previousSlidesRef.current);
 
     if (!hasChanged) return;
 

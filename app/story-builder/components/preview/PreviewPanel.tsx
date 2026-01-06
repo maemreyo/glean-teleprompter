@@ -36,7 +36,7 @@ export function PreviewPanel() {
 
       <div className="flex-1 flex items-center justify-center p-6 bg-gradient-to-b from-muted/50 to-muted/20 relative overflow-hidden">
         {isLoading && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/40 backdrop-blur-[2px]">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/40 backdrop-blur-[2px] rounded-b-2xl">
             <div className="relative w-12 h-12">
               <div className="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping" />
               <div className="absolute inset-0 rounded-full border-t-2 border-primary animate-spin" />
@@ -51,22 +51,25 @@ export function PreviewPanel() {
           </div>
         )}
 
-        <div className="relative w-full h-full flex items-center justify-center">
-          <iframe
-            ref={iframeRef}
-            src="/story-preview"
-            className={cn(
-              'w-full h-full bg-black rounded-[2rem] shadow-2xl transition-all duration-700',
-              isLoading ? 'opacity-0 scale-95 blur-sm' : 'opacity-100 scale-100 blur-0'
-            )}
-            style={{
-              aspectRatio: '9/16',
-              maxHeight: '100%',
-              boxShadow: '0 0 0 12px #1a1a1a, 0 0 0 14px #333',
-            }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Story preview"
-          />
+        {/* Device Frame Wrapper */}
+        <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
+          <div className="relative w-full max-w-[320px] aspect-[9/16] pointer-events-auto">
+            <div className="absolute inset-0 rounded-[3rem] ring-[12px] ring-[#1a1a1a] ring-inset z-10 pointer-events-none" />
+            <div className="absolute inset-0 rounded-[3rem] ring-[1px] ring-[#333] ring-offset-2 ring-offset-[#1a1a1a] z-10 pointer-events-none" />
+            <iframe
+              ref={iframeRef}
+              src="/story-preview"
+              className={cn(
+                'w-full h-full bg-black rounded-[2.5rem] transition-all duration-700 relative z-0',
+                isLoading ? 'opacity-0 scale-95 blur-sm' : 'opacity-100 scale-100 blur-0'
+              )}
+              style={{
+                boxShadow: '0 30px 60px -15px rgba(0,0,0,0.5)',
+              }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Story preview"
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -58,7 +58,7 @@ graph TB
 Horizontal scrollable thumbnail strip showing all story slides.
 
 **Layout**
-- Height: 240px (16px padding + 213px thumbnails + 12px gap)
+- Height: 320px (16px padding + 213px thumbnails + 12px gap)
 - Padding: 16px horizontal
 - Gap between thumbnails: 12px
 - Thumbnail size: 120×213px (9:16 ratio)
@@ -80,7 +80,7 @@ Horizontal scrollable thumbnail strip showing all story slides.
   px-4 py-3
   scroll-smooth
   scrollbar-hide
-  min-h-[240px]
+  min-h-[320px]
 ">
   {/* Add slide button */}
   <button className="flex-shrink-0 w-[120px] h-[213px] rounded-2xl 

@@ -19,11 +19,12 @@ import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { BuilderSlide } from '@/lib/story-builder/types';
 import { getSlideTypeLabel } from '@/lib/story-builder/templates/slideTypes';
-import { X } from 'lucide-react';
+import { X, FileText, Image as ImageIcon, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useStoryBuilderStore } from '@/lib/story-builder/store';
+import { SLIDE_TYPES } from '@/lib/story-builder/templates/slideTypes';
 
 interface SlideCardProps {
   slide: BuilderSlide;
@@ -85,20 +86,54 @@ export const SlideCard = memo(function SlideCard({ slide, index, isActive }: Sli
         aria-pressed={isActive}
         onClick={handleClick}
         className={cn(
-          'w-[120px] h-[213px] rounded-2xl cursor-grab active:cursor-grabbing transition-all relative overflow-hidden border-2',
+          'w-[120px] h-[180px] rounded-2xl cursor-grab active:cursor-grabbing transition-all relative overflow-hidden border-2',
           'hover:scale-105 hover:shadow-xl hover:border-primary/20',
           isActive ? 'border-transparent bg-origin-border bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 p-[2px]' : 'border-muted',
           isDragging && 'opacity-50 scale-95 shadow-2xl ring-4 ring-primary/20'
         )}
       >
         <div className={cn(
-          "w-full h-full rounded-[14px] p-3 flex flex-col",
+          "w-full h-full rounded-[14px] p-3 flex flex-col gap-2",
           isActive ? "bg-card/90 backdrop-blur-sm" : "bg-card"
         )}>
-          <h3 className="font-display text-xs font-bold truncate tracking-tight">{getSlideTypeLabel(slide.type)}</h3>
-          <span className="text-[10px] text-muted-foreground mt-auto font-medium">
-            {typeof slide.duration === 'number' ? `${slide.duration}s` : slide.duration}
-          </span>
+          <div className="flex items-center gap-2">
+            <div className={cn(
+              "w-6 h-6 rounded-md flex items-center justify-center shrink-0",
+              "bg-gradient-to-br from-purple-500/10 to-pink-500/10 text-primary"
+            )}>
+              {slide.type === 'teleprompter' || slide.type === 'text-highlight' ? <FileText className="w-3.5 h-3.5" /> :
+               slide.type === 'image' ? <ImageIcon className="w-3.5 h-3.5" /> :
+               <MessageSquare className="w-3.5 h-3.5" />}
+            </div>
+            <h3 className="font-display text-xs font-bold truncate tracking-tight uppercase opacity-70 italic">{getSlideTypeLabel(slide.type)}</h3>
+          </div>
+
+          <div className="flex-1 overflow-hidden relative group/preview">
+            {slide.type === 'image' && (slide as any).content ? (
+              <div className="w-full h-full rounded-lg bg-muted overflow-hidden">
+                <img 
+                  src={(slide as any).content} 
+                  alt="Slide preview" 
+                  className="w-full h-full object-cover opacity-80 group-hover/preview:opacity-100 transition-opacity"
+                />
+              </div>
+            ) : (
+              <div className="w-full h-full rounded-lg bg-muted/30 p-2 border border-muted-foreground/5 overflow-hidden">
+                <p className="text-[10px] leading-relaxed text-muted-foreground line-clamp-6 break-words">
+                  {slide.type === 'poll' ? (slide as any).question || 'No question set' :
+                   slide.type === 'widget-chart' ? (slide as any).data?.title || 'Chart slide' :
+                   (slide as any).content || 'Empty slide'}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-between items-center px-0.5">
+            <span className="text-[10px] text-muted-foreground font-medium bg-muted/50 px-1.5 py-0.5 rounded-full">
+              {typeof slide.duration === 'number' ? `${slide.duration}s` : slide.duration}
+            </span>
+            <span className="text-[10px] font-bold text-muted-foreground/30 italic">#{index + 1}</span>
+          </div>
         </div>
         
         <AnimatePresence>

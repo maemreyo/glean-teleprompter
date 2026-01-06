@@ -75,14 +75,14 @@ export function StoryRail({ className }: StoryRailProps) {
   }, [activeSlideIndex, slides.length, setActiveSlide]);
 
   return (
-    <div className={cn('flex flex-col bg-background border rounded-lg', className)} style={{ height: '240px' }} role="region" aria-labelledby="story-rail-heading">
-      <div className="p-3 border-b shrink-0">
-        <h2 id="story-rail-heading" className="text-sm font-medium">Story Rail</h2>
+    <div className={cn('flex flex-col border border-border/60 bg-muted/50 rounded-md', className)} style={{ height: '320px' }} role="region" aria-labelledby="story-rail-heading">
+      <div className="p-3 border-b border-border/40 shrink-0">
+        <h2 id="story-rail-heading" className="text-sm font-medium text-foreground">Story Rail</h2>
         <p className="text-xs text-muted-foreground">
           {slides.length} {slides.length === 1 ? 'slide' : 'slides'}
         </p>
         {slides.length > 1 && (
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Tip: Use ← → arrow keys to navigate between slides
           </p>
         )}
