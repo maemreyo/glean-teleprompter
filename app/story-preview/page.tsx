@@ -5,6 +5,7 @@ import { StoryViewer } from '@/components/story/StoryViewer';
 import { BuilderSlide } from '@/lib/story-builder/types';
 import type { AnySlide, StoryScript } from '@/lib/story/types';
 import { useStoryStore } from '@/lib/stores/useStoryStore';
+import { sanitizeText, sanitizeUrl } from '@/lib/story-builder/utils/xssProtection';
 
 type PreviewMessage = {
   type: 'UPDATE_STORY';
@@ -28,38 +29,38 @@ function convertBuilderSlideToStorySlide(slide: BuilderSlide): AnySlide {
       return {
         ...baseSlide,
         type: 'text-highlight',
-        content: (slide as any).content,
-        highlights: (slide as any).highlights,
+        content: sanitizeText((slide as any).content || ''),
+        highlights: (slide as any).highlights || [],
       };
 
     case 'widget-chart':
       return {
         ...baseSlide,
         type: 'widget-chart',
-        data: (slide as any).data,
+        data: (slide as any).data || {},
       };
 
     case 'image':
       return {
         ...baseSlide,
         type: 'image',
-        content: (slide as any).content,
-        alt: (slide as any).alt,
+        content: sanitizeUrl((slide as any).content || ''),
+        alt: sanitizeText((slide as any).alt || ''),
       };
 
     case 'poll':
       return {
         ...baseSlide,
         type: 'poll',
-        question: (slide as any).question,
-        options: (slide as any).options,
+        question: sanitizeText((slide as any).question || ''),
+        options: ((slide as any).options || []).map((opt: string) => sanitizeText(opt)),
       };
 
     case 'teleprompter':
       return {
         ...baseSlide,
         type: 'teleprompter',
-        content: (slide as any).content,
+        content: sanitizeText((slide as any).content || ''),
         duration: 'manual' as const,
       };
 

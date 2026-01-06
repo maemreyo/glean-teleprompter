@@ -132,7 +132,11 @@ export function StoryBuilder() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div
+      className="flex flex-col h-screen bg-background"
+      role="application"
+      aria-label="Visual Story Builder"
+    >
       <Header />
       
       <DndContext
@@ -141,10 +145,11 @@ export function StoryBuilder() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_320px] lg:grid-cols-[280px_1fr_320px] gap-4 p-4 overflow-hidden">
+        <main className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_320px] lg:grid-cols-[280px_1fr_320px] gap-4 p-4 overflow-hidden" role="main">
           {/* Mobile-only tabs */}
-          <div className="md:hidden flex border-b mb-4" role="tablist">
+          <div className="md:hidden flex border-b mb-4" role="tablist" aria-label="Story builder sections">
             <button
+              id="library-tab"
               onClick={() => setActiveTab('library')}
               role="tab"
               aria-selected={activeTab === 'library'}
@@ -158,6 +163,7 @@ export function StoryBuilder() {
               Library
             </button>
             <button
+              id="story-tab"
               onClick={() => setActiveTab('story')}
               role="tab"
               aria-selected={activeTab === 'story'}
@@ -171,6 +177,7 @@ export function StoryBuilder() {
               Story
             </button>
             <button
+              id="preview-tab"
               onClick={() => setActiveTab('preview')}
               role="tab"
               aria-selected={activeTab === 'preview'}
@@ -186,10 +193,10 @@ export function StoryBuilder() {
           </div>
 
           {/* Mobile content based on active tab */}
-          <div className="md:hidden" id="library-panel" role="tabpanel" aria-labelledby="library-tab">
+          <section className="md:hidden" id="library-panel" role="tabpanel" aria-labelledby="library-tab">
             {activeTab === 'library' && <SlideLibrary />}
-          </div>
-          <div className="md:hidden" id="story-panel" role="tabpanel" aria-labelledby="story-tab">
+          </section>
+          <section className="md:hidden" id="story-panel" role="tabpanel" aria-labelledby="story-tab">
             {activeTab === 'story' && (
               <div className="flex flex-col gap-4 overflow-hidden">
                 <StoryRail />
@@ -198,34 +205,40 @@ export function StoryBuilder() {
                 </div>
               </div>
             )}
-          </div>
-          <div className="md:hidden" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
+          </section>
+          <section className="md:hidden" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
             {activeTab === 'preview' && <PreviewPanel />}
-          </div>
+          </section>
 
           {/* Tablet: Show editor + preview, library accessible via mobile tabs */}
-          <div className="hidden md:grid lg:hidden md:grid-cols-[1fr_320px] gap-4 overflow-hidden">
-            <div className="flex flex-col gap-4 overflow-hidden">
+          <section className="hidden md:grid lg:hidden md:grid-cols-[1fr_320px] gap-4 overflow-hidden" aria-label="Tablet layout: editor and preview">
+            <section className="flex flex-col gap-4 overflow-hidden" aria-label="Story editor and rail">
               <StoryRail />
               <div className="flex-1 bg-muted/30 rounded-lg p-4">
                 <SlideEditor />
               </div>
-            </div>
-            <PreviewPanel />
-          </div>
+            </section>
+            <aside aria-label="Preview panel">
+              <PreviewPanel />
+            </aside>
+          </section>
 
           {/* Desktop: Show all three columns */}
-          <div className="hidden lg:grid lg:grid-cols-[280px_1fr_320px] gap-4 overflow-hidden">
-            <SlideLibrary />
-            <div className="flex flex-col gap-4 overflow-hidden">
+          <section className="hidden lg:grid lg:grid-cols-[280px_1fr_320px] gap-4 overflow-hidden" aria-label="Desktop layout: library, editor, and preview">
+            <aside aria-label="Slide library">
+              <SlideLibrary />
+            </aside>
+            <section className="flex flex-col gap-4 overflow-hidden" aria-label="Story editor and rail">
               <StoryRail />
               <div className="flex-1 bg-muted/30 rounded-lg p-4">
                 <SlideEditor />
               </div>
-            </div>
-            <PreviewPanel />
-          </div>
-        </div>
+            </section>
+            <aside aria-label="Preview panel">
+              <PreviewPanel />
+            </aside>
+          </section>
+        </main>
         
         <DragOverlay>
           {activeDrag && (

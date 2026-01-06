@@ -135,6 +135,7 @@ export default {
         hero: ["7.5rem", { lineHeight: "8.5rem", fontWeight: "900" }], // 120px
       },
       spacing: {
+        "2-5": "0.625rem", // 10px - Half step between space-2 and space-3
         "11": "2.75rem", // 44px - Touch target minimum
         "18": "4.5rem", // 72px
         "22": "5.5rem", // 88px

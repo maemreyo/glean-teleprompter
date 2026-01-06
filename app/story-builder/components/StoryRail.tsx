@@ -7,6 +7,8 @@
  * Supports drag-and-drop reordering with visual drop indicators.
  * Includes aria-live region for screen reader announcements.
  * Supports arrow key navigation between slides.
+ *
+ * Performance: Uses react-virtuoso for virtualization
  */
 
 import { useDroppable } from '@dnd-kit/core';
@@ -15,20 +17,35 @@ import { useStoryBuilderStore } from '@/lib/story-builder/store';
 import { SlideCard } from './slides/SlideCard';
 import { EmptyState } from '@/components/story-builder/EmptyState';
 import { cn } from '@/lib/utils';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 interface StoryRailProps {
   className?: string;
 }
 
+const ESTIMATED_CARD_WIDTH = 180; // width + gap
+
 export function StoryRail({ className }: StoryRailProps) {
-  const { slides, activeSlideIndex, setActiveSlide } = useStoryBuilderStore();
+  const { activeSlideIndex, slides, setActiveSlide } = useStoryBuilderStore();
   const { setNodeRef } = useDroppable({
     id: 'story-rail',
     data: { container: 'rail' },
   });
 
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
   const slideIds = slides.map((s) => s.id);
+
+  // Scroll to active slide when it changes
+  useEffect(() => {
+    if (activeSlideIndex !== null && virtuosoRef.current) {
+      virtuosoRef.current.scrollToIndex({
+        index: activeSlideIndex,
+        align: 'center',
+        behavior: 'smooth',
+      });
+    }
+  }, [activeSlideIndex]);
 
   // Keyboard navigation for arrow keys
   useEffect(() => {
@@ -44,19 +61,10 @@ export function StoryRail({ className }: StoryRailProps) {
           if (e.key === 'ArrowLeft' && activeSlideIndex > 0) {
             e.preventDefault();
             setActiveSlide(activeSlideIndex - 1);
-            // Focus the previous slide card
-            const prevCard = document.querySelector(`[data-slide-index="${activeSlideIndex - 1}"]`);
-            if (prevCard instanceof HTMLElement) {
-              prevCard.focus();
-            }
+            // Focus is handled by the slide card itself if needed, or we rely on virtual scroll
           } else if (e.key === 'ArrowRight' && activeSlideIndex < slides.length - 1) {
             e.preventDefault();
             setActiveSlide(activeSlideIndex + 1);
-            // Focus the next slide card
-            const nextCard = document.querySelector(`[data-slide-index="${activeSlideIndex + 1}"]`);
-            if (nextCard instanceof HTMLElement) {
-              nextCard.focus();
-            }
           }
         }
       }
@@ -67,8 +75,8 @@ export function StoryRail({ className }: StoryRailProps) {
   }, [activeSlideIndex, slides.length, setActiveSlide]);
 
   return (
-    <div className={cn('flex flex-col bg-background border rounded-lg', className)} role="region" aria-labelledby="story-rail-heading">
-      <div className="p-3 border-b">
+    <div className={cn('flex flex-col bg-background border rounded-lg h-full', className)} role="region" aria-labelledby="story-rail-heading">
+      <div className="p-3 border-b shrink-0">
         <h2 id="story-rail-heading" className="text-sm font-medium">Story Rail</h2>
         <p className="text-xs text-muted-foreground">
           {slides.length} {slides.length === 1 ? 'slide' : 'slides'}
@@ -92,22 +100,30 @@ export function StoryRail({ className }: StoryRailProps) {
       
       <div
         ref={setNodeRef}
-        className="flex-1 p-4 overflow-x-auto"
+        className="flex-1 overflow-hidden p-4"
+        style={{ minHeight: '140px' }} // Height buffer for cards
       >
         {slides.length === 0 ? (
           <EmptyState />
         ) : (
           <SortableContext items={slideIds} strategy={horizontalListSortingStrategy}>
-            <div className="flex gap-3">
-              {slides.map((slide, index) => (
-                <SlideCard
-                  key={slide.id}
-                  slide={slide}
-                  index={index}
-                  isActive={index === activeSlideIndex}
-                />
-              ))}
-            </div>
+            <Virtuoso
+              ref={virtuosoRef}
+              horizontalDirection
+              data={slides}
+              totalCount={slides.length}
+              itemContent={(index, slide) => (
+                <div style={{ marginRight: '12px', display: 'inline-block', height: '100%' }}>
+                  <SlideCard
+                    key={slide.id}
+                    slide={slide}
+                    index={index}
+                    isActive={index === activeSlideIndex}
+                  />
+                </div>
+              )}
+              style={{ height: '100%', width: '100%' }}
+            />
           </SortableContext>
         )}
       </div>
