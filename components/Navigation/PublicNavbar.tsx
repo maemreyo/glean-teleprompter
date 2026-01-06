@@ -24,6 +24,9 @@ export function PublicNavbar() {
           <Link href="/demo" className="text-muted-foreground hover:text-foreground transition-colors">
             {t('tryDemo')}
           </Link>
+          <Link href="/story-builder" className="text-muted-foreground hover:text-foreground transition-colors">
+            Story Builder
+          </Link>
           <Link href="/quickstart" className="text-muted-foreground hover:text-foreground transition-colors">
             {t('templates')}
           </Link>
@@ -79,6 +82,9 @@ export function PublicNavbar() {
       <div className="md:hidden border-t border-border py-3 flex justify-around items-center">
         <Link href="/demo" className="text-sm text-muted-foreground hover:text-foreground">
           {t('demo')}
+        </Link>
+        <Link href="/story-builder" className="text-sm text-muted-foreground hover:text-foreground">
+          Story Builder
         </Link>
         <Link href="/quickstart" className="text-sm text-muted-foreground hover:text-foreground">
           {t('templates')}
