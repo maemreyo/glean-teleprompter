@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { AuthInitializer } from "@/components/auth/AuthInitializer";
 import { getTranslations } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { inter, plusJakartaSans, jetBrainsMono } from "@/lib/fonts";
 
 import "./globals.css";
 
@@ -22,13 +22,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  display: "swap",
-  subsets: ["latin"],
-});
-
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -38,8 +31,8 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+    <html lang={locale} className={`${inter.variable} ${plusJakartaSans.variable} ${jetBrainsMono.variable}`} suppressHydrationWarning>
+      <body className={`${inter.className} font-sans antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider
             attribute="class"

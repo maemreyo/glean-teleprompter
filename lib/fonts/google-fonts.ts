@@ -84,6 +84,13 @@ export const fontLibrary = {
   ],
   display: [
     {
+      name: 'Plus Jakarta Sans',
+      weights: [400, 500, 600, 700, 800],
+      variable: true,
+      url: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap',
+      previewText: 'The quick brown fox jumps over the lazy dog',
+    },
+    {
       name: 'Oswald',
       weights: [200, 300, 400, 500, 600, 700],
       variable: false,
