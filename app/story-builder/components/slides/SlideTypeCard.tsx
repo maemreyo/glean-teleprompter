@@ -29,6 +29,9 @@ export function SlideTypeCard({ type }: SlideTypeCardProps) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      role="button"
+      tabIndex={0}
+      aria-label={`Drag ${getSlideTypeLabel(type)} slide to story rail`}
       className={cn(
         'p-3 cursor-grab active:cursor-grabbing transition-all hover:shadow-md',
         isDragging && 'opacity-50 scale-95'

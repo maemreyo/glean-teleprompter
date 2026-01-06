@@ -222,20 +222,79 @@ export interface Template {
 export type TemplateCategory = 'business' | 'education' | 'social';
 
 /**
- * Slide type definition for the library.
+ * Default content union for all slide types.
  */
-export interface SlideTypeDefinition {
-  id: BuilderSlideType;            // Type identifier
+export type SlideDefaultContent =
+  | TextContent
+  | ImageContent
+  | TeleprompterContent
+  | PollContent
+  | WidgetContent;
+
+/**
+ * Discriminated union for slide type definitions.
+ * The `id` field discriminates which specific type is being used.
+ */
+export type SlideTypeDefinition =
+  | TextSlideTypeDefinition
+  | ImageSlideTypeDefinition
+  | TeleprompterSlideTypeDefinition
+  | PollSlideTypeDefinition
+  | WidgetSlideTypeDefinition;
+
+/**
+ * Base fields shared by all slide type definitions.
+ */
+interface BaseSlideTypeDefinition {
   name: string;                    // Display name (e.g., "Text Slide")
   icon: string;                    // Lucide icon name (e.g., "Type")
   description: string;             // Short description
-  defaultContent: any;             // Default content for new slides
   defaultDuration: SlideDuration;  // Default duration (e.g., 5)
   defaultBackgroundColor: string;  // Default color (e.g., "#FFFFFF")
   
   // UI hints
   category?: SlideCategory;        // For grouping in library
   requiresMedia?: boolean;         // Needs external media
+}
+
+/**
+ * Text slide type definition with typed default content.
+ */
+export interface TextSlideTypeDefinition extends BaseSlideTypeDefinition {
+  id: 'text-highlight';
+  defaultContent: TextContent;
+}
+
+/**
+ * Image slide type definition with typed default content.
+ */
+export interface ImageSlideTypeDefinition extends BaseSlideTypeDefinition {
+  id: 'image';
+  defaultContent: ImageContent;
+}
+
+/**
+ * Teleprompter slide type definition with typed default content.
+ */
+export interface TeleprompterSlideTypeDefinition extends BaseSlideTypeDefinition {
+  id: 'teleprompter';
+  defaultContent: TeleprompterContent;
+}
+
+/**
+ * Poll slide type definition with typed default content.
+ */
+export interface PollSlideTypeDefinition extends BaseSlideTypeDefinition {
+  id: 'poll';
+  defaultContent: PollContent;
+}
+
+/**
+ * Widget chart slide type definition with typed default content.
+ */
+export interface WidgetSlideTypeDefinition extends BaseSlideTypeDefinition {
+  id: 'widget-chart';
+  defaultContent: WidgetContent;
 }
 
 /**

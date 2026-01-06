@@ -1,14 +1,15 @@
 /**
  * Visual Story Builder - Zustand Store
- * 
+ *
  * Global state management for the story builder interface.
  * Handles slide management, auto-save, template loading, and URL generation.
- * 
+ *
  * @feature 013-visual-story-builder
  */
 
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'sonner';
 import type {
   BuilderSlide,
   BuilderSlideType,
@@ -19,16 +20,17 @@ import type {
 } from './types';
 import { DRAFT_STORAGE_KEY } from './types';
 import { encodeStoryForUrl } from '../story/utils/urlEncoder';
-
-// Maximum slides allowed (URL length constraint)
-const MAX_SLIDES = 20;
-
-// Auto-save interval in milliseconds
-const AUTO_SAVE_INTERVAL = 30000;
+import { MAX_SLIDES, AUTO_SAVE_INTERVAL, MAX_URL_LENGTH } from './constants';
 
 // ============================================================================
 // Store Interface
 // ============================================================================
+
+interface HistoryState {
+  slides: BuilderSlide[];
+  activeSlideIndex: number;
+  timestamp: number;
+}
 
 interface StoryBuilderStore extends StoryBuilderState {
   // Slide Management Actions
@@ -48,8 +50,17 @@ interface StoryBuilderStore extends StoryBuilderState {
   restoreDraft: () => void;
   handleStorageEvent: (event: StorageEvent) => void;
   
-  // Internal state for auto-save timer
+  // Undo/Redo Actions
+  undo: () => void;
+  redo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
+  
+  // Internal state
   _autoSaveTimer: ReturnType<typeof setInterval> | null;
+  _history: HistoryState[];
+  _historyIndex: number;
+  _maxHistorySize: number;
 }
 
 // ============================================================================
@@ -142,6 +153,43 @@ const createDefaultSlide = (type: BuilderSlideType): BuilderSlide => {
 // Store Implementation
 // ============================================================================
 
+/**
+ * Helper function to save current state to history before mutations.
+ * This should be called before any state-changing operation.
+ */
+const saveToHistory = (get: () => StoryBuilderStore) => {
+  const state = get();
+  
+  // Don't save if no changes
+  if (state.slides.length === 0) {
+    return;
+  }
+
+  // Create history entry
+  const historyEntry: HistoryState = {
+    slides: JSON.parse(JSON.stringify(state.slides)),
+    activeSlideIndex: state.activeSlideIndex,
+    timestamp: Date.now(),
+  };
+
+  // Remove any forward history (redo stack) when new action is performed
+  const newHistory = state._history.slice(0, state._historyIndex + 1);
+  
+  // Add new entry
+  newHistory.push(historyEntry);
+  
+  // Limit history size
+  if (newHistory.length > state._maxHistorySize) {
+    newHistory.shift();
+  }
+
+  // Update history state
+  useStoryBuilderStore.setState({
+    _history: newHistory,
+    _historyIndex: newHistory.length - 1,
+  });
+};
+
 export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
   // Initial State
   slides: [],
@@ -150,6 +198,9 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
   isTemplateModalOpen: false,
   lastModified: Date.now(),
   _autoSaveTimer: null,
+  _history: [],
+  _historyIndex: -1,
+  _maxHistorySize: 50,
 
   // ============================================================================
   // Slide Management Actions
@@ -164,9 +215,12 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
 
     // Validate slide count
     if (state.slides.length >= MAX_SLIDES) {
-      console.warn(`Cannot add slide: maximum of ${MAX_SLIDES} slides reached`);
+      toast.error(`Cannot add more slides. Maximum ${MAX_SLIDES} slides per story.`);
       return;
     }
+
+    // Save to history before mutation
+    saveToHistory(get);
 
     // Create new slide with default content
     const newSlide = createDefaultSlide(type);
@@ -196,9 +250,12 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
 
     // Validate index
     if (index < 0 || index >= state.slides.length) {
-      console.warn(`Cannot remove slide: index ${index} out of bounds`);
+      toast.error(`Cannot remove slide: index ${index} out of bounds`);
       return;
     }
+
+    // Save to history before mutation
+    saveToHistory(get);
 
     const updatedSlides = state.slides.filter((_, i) => i !== index);
     
@@ -231,13 +288,16 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
       toIndex < 0 ||
       toIndex >= state.slides.length
     ) {
-      console.warn('Cannot reorder slides: index out of bounds');
+      toast.error('Cannot reorder slides: index out of bounds');
       return;
     }
 
     if (fromIndex === toIndex) {
       return; // No change needed
     }
+
+    // Save to history before mutation
+    saveToHistory(get);
 
     const updatedSlides = [...state.slides];
     const [movedSlide] = updatedSlides.splice(fromIndex, 1);
@@ -260,9 +320,12 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
 
     // Validate index
     if (index < 0 || index >= state.slides.length) {
-      console.warn(`Cannot update slide: index ${index} out of bounds`);
+      toast.error(`Cannot update slide: index ${index} out of bounds`);
       return;
     }
+
+    // Save to history before mutation
+    saveToHistory(get);
 
     const updatedSlides = [...state.slides];
     const currentSlide = updatedSlides[index];
@@ -291,7 +354,7 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
 
     // Validate index
     if (index < 0 || index >= state.slides.length) {
-      console.warn(`Cannot set active slide: index ${index} out of bounds`);
+      toast.error(`Cannot set active slide: index ${index} out of bounds`);
       return;
     }
 
@@ -312,7 +375,7 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
     const state = get();
 
     if (state.slides.length === 0) {
-      console.warn('Cannot generate URL: no slides in story');
+      toast.error('Cannot generate URL: no slides in story');
       return '';
     }
 
@@ -334,14 +397,15 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
       const encoded = encodeStoryForUrl(storyScript);
       
       // Check URL length limit (32KB)
-      if (encoded.length > 32768) {
-        console.warn('Generated URL exceeds 32KB limit');
+      if (encoded.length > MAX_URL_LENGTH) {
+        toast.error('Story URL is too long. Try reducing slide count or content size.');
         return '';
       }
 
       return encoded;
     } catch (error) {
       console.error('Failed to generate URL:', error);
+      toast.error('Failed to generate URL. Please try again.');
       return '';
     }
   },
@@ -425,8 +489,10 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
       // Handle QuotaExceededError
       if (error instanceof Error && error.name === 'QuotaExceededError') {
         console.error('localStorage quota exceeded:', error);
+        toast.error('Storage quota exceeded. Please clear some data.');
       } else {
         console.error('Failed to auto-save:', error);
+        toast.error('Failed to auto-save. Please check your browser settings.');
       }
       set({ saveStatus: 'error' });
     }
@@ -466,6 +532,7 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
       });
     } catch (error) {
       console.error('Failed to restore draft:', error);
+      toast.error('Failed to restore draft from storage.');
     }
   },
 
@@ -480,6 +547,68 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
       // In a full implementation, this would show a toast warning
       get().restoreDraft();
     }
+  },
+
+  // ============================================================================
+  // Undo/Redo Actions
+  // ============================================================================
+
+  /**
+   * Undo the last action by reverting to the previous history state.
+   */
+  undo: () => {
+    const state = get();
+    
+    if (state._historyIndex < 0) {
+      return; // Nothing to undo
+    }
+
+    const previousState = state._history[state._historyIndex];
+    
+    set({
+      slides: previousState.slides,
+      activeSlideIndex: previousState.activeSlideIndex,
+      saveStatus: 'unsaved',
+      lastModified: Date.now(),
+      _historyIndex: state._historyIndex - 1,
+    });
+  },
+
+  /**
+   * Redo the next action by moving forward in history.
+   */
+  redo: () => {
+    const state = get();
+    
+    if (state._historyIndex >= state._history.length - 1) {
+      return; // Nothing to redo
+    }
+
+    const nextStateIndex = state._historyIndex + 1;
+    const nextState = state._history[nextStateIndex];
+    
+    set({
+      slides: nextState.slides,
+      activeSlideIndex: nextState.activeSlideIndex,
+      saveStatus: 'unsaved',
+      lastModified: Date.now(),
+      _historyIndex: nextStateIndex,
+    });
+  },
+
+  /**
+   * Check if undo is available (has history to revert to).
+   */
+  canUndo: () => {
+    return get()._historyIndex >= 0;
+  },
+
+  /**
+   * Check if redo is available (has forward history).
+   */
+  canRedo: () => {
+    const state = get();
+    return state._historyIndex < state._history.length - 1;
   },
 }));
 
@@ -502,7 +631,7 @@ export const initAutoSave = () => {
   // Set up new timer
   const timer = setInterval(() => {
     useStoryBuilderStore.getState().autoSave();
-  }, AUTO_SAVE_INTERVAL);
+  }, AUTO_SAVE_INTERVAL as number);
 
   // Update store with timer reference
   useStoryBuilderStore.setState({ _autoSaveTimer: timer });

@@ -40,8 +40,12 @@ import { toast } from 'sonner';
 export function StoryBuilder() {
   const [activeDrag, setActiveDrag] = useState<{ type: BuilderSlideType; source: string } | null>(null);
   const [dropIndicator, setDropIndicator] = useState<{ index: number; position: 'before' | 'after' } | null>(null);
+  const [activeTab, setActiveTab] = useState<'library' | 'story' | 'preview'>('library');
   
-  const { slides, addSlide, reorderSlides } = useStoryBuilderStore();
+  // Use Zustand selectors to prevent re-renders on unrelated store changes
+  const slides = useStoryBuilderStore(state => state.slides);
+  const addSlide = useStoryBuilderStore(state => state.addSlide);
+  const reorderSlides = useStoryBuilderStore(state => state.reorderSlides);
   
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -137,19 +141,90 @@ export function StoryBuilder() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-4 p-4 overflow-hidden">
-          {/* Mobile: Stacked with tabs, Tablet: 2 columns, Desktop: 3 columns */}
-          <SlideLibrary />
-          
-          <div className="flex flex-col gap-4 overflow-hidden">
-            <StoryRail />
-            <div className="flex-1 bg-muted/30 rounded-lg p-4">
-              <SlideEditor />
-            </div>
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_320px] lg:grid-cols-[280px_1fr_320px] gap-4 p-4 overflow-hidden">
+          {/* Mobile-only tabs */}
+          <div className="md:hidden flex border-b mb-4" role="tablist">
+            <button
+              onClick={() => setActiveTab('library')}
+              role="tab"
+              aria-selected={activeTab === 'library'}
+              aria-controls="library-panel"
+              className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'library'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground'
+              }`}
+            >
+              Library
+            </button>
+            <button
+              onClick={() => setActiveTab('story')}
+              role="tab"
+              aria-selected={activeTab === 'story'}
+              aria-controls="story-panel"
+              className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'story'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground'
+              }`}
+            >
+              Story
+            </button>
+            <button
+              onClick={() => setActiveTab('preview')}
+              role="tab"
+              aria-selected={activeTab === 'preview'}
+              aria-controls="preview-panel"
+              className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'preview'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground'
+              }`}
+            >
+              Preview
+            </button>
           </div>
-          
-          {/* Preview panel */}
-          <PreviewPanel />
+
+          {/* Mobile content based on active tab */}
+          <div className="md:hidden" id="library-panel" role="tabpanel" aria-labelledby="library-tab">
+            {activeTab === 'library' && <SlideLibrary />}
+          </div>
+          <div className="md:hidden" id="story-panel" role="tabpanel" aria-labelledby="story-tab">
+            {activeTab === 'story' && (
+              <div className="flex flex-col gap-4 overflow-hidden">
+                <StoryRail />
+                <div className="flex-1 bg-muted/30 rounded-lg p-4">
+                  <SlideEditor />
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="md:hidden" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
+            {activeTab === 'preview' && <PreviewPanel />}
+          </div>
+
+          {/* Tablet: Show editor + preview, library accessible via mobile tabs */}
+          <div className="hidden md:grid lg:hidden md:grid-cols-[1fr_320px] gap-4 overflow-hidden">
+            <div className="flex flex-col gap-4 overflow-hidden">
+              <StoryRail />
+              <div className="flex-1 bg-muted/30 rounded-lg p-4">
+                <SlideEditor />
+              </div>
+            </div>
+            <PreviewPanel />
+          </div>
+
+          {/* Desktop: Show all three columns */}
+          <div className="hidden lg:grid lg:grid-cols-[280px_1fr_320px] gap-4 overflow-hidden">
+            <SlideLibrary />
+            <div className="flex flex-col gap-4 overflow-hidden">
+              <StoryRail />
+              <div className="flex-1 bg-muted/30 rounded-lg p-4">
+                <SlideEditor />
+              </div>
+            </div>
+            <PreviewPanel />
+          </div>
         </div>
         
         <DragOverlay>

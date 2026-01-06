@@ -28,9 +28,10 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
 
   useEffect(() => {
     // Shallow comparison to detect changes in slides or active index
-    // Using JSON.stringify for deep comparison of slide arrays
+    // Compare length and slide IDs for efficient change detection
     const hasChanged =
-      JSON.stringify(previousSlidesRef.current) !== JSON.stringify(slides) ||
+      slides.length !== previousSlidesRef.current.length ||
+      slides.some((slide, index) => slide.id !== previousSlidesRef.current[index]?.id) ||
       previousActiveIndexRef.current !== activeSlideIndex;
 
     if (!hasChanged) return;
@@ -50,8 +51,8 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
           payload: { slides, activeSlideIndex },
         };
         // Send update to preview iframe via postMessage
-        // Using '*' as targetOrigin since preview is same-origin
-        iframe.contentWindow.postMessage(message, '*');
+        // Use specific origin for security (must match story-preview page)
+        iframe.contentWindow.postMessage(message, window.location.origin);
         
         // Mark performance measurement point
         // Used by performance monitoring below to detect slow updates
@@ -60,9 +61,11 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
         }
       }
 
-      // Update refs to prevent duplicate updates
-      previousSlidesRef.current = slides;
-      previousActiveIndexRef.current = activeSlideIndex;
+      // Update refs to prevent duplicate updates (only if changed)
+      if (hasChanged) {
+        previousSlidesRef.current = slides;
+        previousActiveIndexRef.current = activeSlideIndex;
+      }
     }, 100);
 
     return () => {

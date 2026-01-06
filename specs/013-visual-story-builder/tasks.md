@@ -88,12 +88,12 @@ This is a Next.js 14+ web application. Paths are relative to repository root.
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T026 [P] [US1] Unit test for store addSlide action in tests/unit/story-builder/store.test.ts
-- [ ] T027 [P] [US1] Unit test for store removeSlide action in tests/unit/story-builder/store.test.ts
-- [ ] T028 [P] [US1] Unit test for store reorderSlides action in tests/unit/story-builder/store.test.ts
-- [ ] T029 [P] [US1] Integration test for drag from library to rail in tests/integration/story-builder/dragAndDrop.test.tsx
-- [ ] T030 [P] [US1] Integration test for slide reordering in rail in tests/integration/story-builder/dragAndDrop.test.tsx
-- [ ] T031 [US1] E2E test for complete story creation flow in tests/e2e/story-builder/basicFlow.spec.ts
+- [X] T026 [P] [US1] Unit test for store addSlide action in tests/unit/story-builder/store.test.ts
+- [X] T027 [P] [US1] Unit test for store removeSlide action in tests/unit/story-builder/store.test.ts
+- [X] T028 [P] [US1] Unit test for store reorderSlides action in tests/unit/story-builder/store.test.ts
+- [X] T029 [P] [US1] Integration test for drag from library to rail in tests/integration/story-builder/dragAndDrop.test.tsx
+- [X] T030 [P] [US1] Integration test for slide reordering in rail in tests/integration/story-builder/dragAndDrop.test.tsx
+- [X] T031 [US1] E2E test for complete story creation flow in tests/e2e/story-builder/basicFlow.spec.ts
 
 ### Implementation for User Story 1
 
@@ -157,9 +157,9 @@ This is a Next.js 14+ web application. Paths are relative to repository root.
 
 ### Tests for User Story 2
 
-- [ ] T062 [P] [US2] Unit test for postMessage communication in tests/unit/story-builder/utils/previewSync.test.ts
-- [ ] T063 [P] [US2] Integration test for preview update latency in tests/integration/story-builder/previewSync.test.tsx
-- [ ] T064 [US2] Integration test for preview error states in tests/integration/story-builder/previewSync.test.tsx
+- [X] T062 [P] [US2] Unit test for postMessage communication in tests/unit/story-builder/utils/previewSync.test.ts
+- [X] T063 [P] [US2] Integration test for preview update latency in tests/integration/story-builder/previewSync.test.tsx
+- [X] T064 [US2] Integration test for preview error states in tests/integration/story-builder/previewSync.test.tsx
 
 ### Implementation for User Story 2
 
@@ -207,10 +207,10 @@ This is a Next.js 14+ web application. Paths are relative to repository root.
 
 ### Tests for User Story 3
 
-- [ ] T082 [P] [US3] Unit test for template data structure in tests/unit/story-builder/templates/data.test.ts
-- [ ] T083 [P] [US3] Unit test for getTemplateById function in tests/unit/story-builder/templates/data.test.ts
-- [ ] T084 [US3] Integration test for template loading in tests/integration/story-builder/templates.test.tsx
-- [ ] T085 [US3] E2E test for template-based story creation in tests/e2e/story-builder/templates.spec.ts
+- [X] T082 [P] [US3] Unit test for template data structure in tests/unit/story-builder/templates/data.test.ts
+- [X] T083 [P] [US3] Unit test for getTemplateById function in tests/unit/story-builder/templates/data.test.ts
+- [X] T084 [US3] Integration test for template loading in tests/integration/story-builder/templates.test.tsx
+- [X] T085 [US3] E2E test for template-based story creation in tests/e2e/story-builder/templates.spec.ts
 
 ### Implementation for User Story 3
 
@@ -243,13 +243,60 @@ This is a Next.js 14+ web application. Paths are relative to repository root.
 
 ---
 
+## Phase 5.5: High Priority Roast Fixes (Priority: P0)
+
+**Purpose**: Fix critical design system and performance issues identified in roast review
+
+- [X] T099.1 [DS-HIGH-1] Fix slide card dimensions to 120×213px (9:16 Instagram ratio) in SlideCard.tsx
+- [X] T099.2 [DS-HIGH-2] Add gradient borders for active slides in SlideCard.tsx
+- [X] T099.3 [DS-HIGH-3] Verify shadow-drag elevation in DragOverlay.tsx (already implemented)
+- [X] T099.4 [PERF-HIGH-1] Fix JSON.stringify() deep comparison in usePreviewSync.ts
+- [X] T099.5 [PERF-HIGH-2] Use Zustand selectors in StoryBuilder.tsx
+
+**Checkpoint**: High priority roast violations addressed - design system compliance and performance optimized
+
+---
+
+## Phase 5.75: Medium Priority Roast Fixes (Priority: P1)
+
+**Purpose**: Fix medium priority code quality and responsive design issues identified in roast review
+
+- [X] T099.6 [CODE-MED-1] Add error boundary around StoryBuilder component in app/story-builder/page.tsx
+- [X] T099.7 [CODE-MED-2] Replace console.warn() with toast notifications in lib/story-builder/store.ts
+- [X] T099.8 [CODE-MED-2] Replace console.warn() with toast notifications in lib/story-builder/urlGenerator.ts
+- [X] T099.9 [CODE-MED-2] Replace empty catch blocks with toast notifications in lib/story-builder/utils/autoSave.ts
+- [X] T099.10 [CODE-MED-3] Create lib/story-builder/constants.ts with all magic numbers
+- [X] T099.11 [CODE-MED-3] Update lib/story-builder/store.ts to import and use constants
+- [X] T099.12 [CODE-MED-4] Add custom comparison function to SlideCard memo in app/story-builder/components/slides/SlideCard.tsx
+- [X] T099.13 [RESP-MED-1] Add tablet layout (md: breakpoint) in app/story-builder/components/StoryBuilder.tsx
+- [X] T099.14 [CODE-MED-1] Create components/ui/error-boundary.tsx component
+
+**Checkpoint**: Medium priority roast violations addressed - error handling, code quality, and responsive design improved
+
+---
+
+## Phase 5.875: Low Priority Roast Fixes (Priority: P2)
+
+**Purpose**: Fix low priority accessibility and feature gaps identified in roast review
+
+- [X] T099.15 [DS-MED-1] Add hover states to slide cards (scale 1.05, shadow) in SlideCard.tsx
+- [X] T099.16 [DS-MED-2] Use Plus Jakarta Sans (font-display) for slide titles in SlideCard.tsx
+- [X] T099.17 [A11Y-LOW-1] Implement arrow key navigation (← →) for story rail in StoryRail.tsx
+- [X] T099.18 [A11Y-LOW-2] Add focus restoration after slide deletion in SlideCard.tsx
+- [X] T099.19 [FEAT-LOW-1] Implement undo/redo functionality with history tracking in store.ts
+- [X] T099.20 [FEAT-LOW-1] Add undo/redo buttons to Header.tsx with Undo/Redo icons from lucide-react
+
+**Checkpoint**: Low priority roast violations addressed - UX polish, accessibility, and feature completeness
+
+---
+
 ## Phase 6: Responsive Design (Priority: P2)
 
 **Purpose**: Mobile accessibility and touch-optimized interactions
 
 - [X] T099 [P] Implement desktop three-column layout (≥1024px) in StoryBuilder.tsx with grid-cols-[280px_1fr_320px]
 - [X] T100 [P] Implement tablet two-column layout (768-1023px) in StoryBuilder.tsx with grid-cols-[1fr_280px]
-- [X] T101 Implement mobile tab-based layout (<768px) in StoryBuilder.tsx with flex and tab navigation
+- [X] T101 [P] Implement mobile tab-based layout (<768px) in StoryBuilder.tsx with flex and tab navigation
 - [X] T102 Add touch-optimized drag handlers with TouchSensor in StoryBuilder.tsx
 - [X] T103 Ensure 44×44px touch targets throughout all components (audit and fix)
 - [X] T104 Test on mobile devices (iOS Safari, Chrome Android, Samsung Internet)
@@ -264,7 +311,7 @@ This is a Next.js 14+ web application. Paths are relative to repository root.
 
 - [X] T105 [P] Add inline code comments to complex logic in store.ts and hooks
 - [X] T106 [P] Create JSDoc for public APIs in lib/story-builder/
-- [ ] T107 Update main README.md with feature overview
+- [X] T107 Update main README.md with feature overview (DOC-LOW-1)
 - [X] T108 Add story builder to navigation menu
 
 ### Performance
@@ -275,10 +322,10 @@ This is a Next.js 14+ web application. Paths are relative to repository root.
 
 ### Accessibility
 
-- [X] T112 [P] Add ARIA labels to all interactive elements
+- [X] T112 [P] Add ARIA labels to all interactive elements (SEC-CRITICAL-1, A11Y-CRITICAL-1)
 - [X] T113 [P] Implement keyboard navigation (Tab, Arrow keys, Enter, Escape) in StoryBuilder.tsx
 - [X] T114 Add screen reader announcements with aria-live regions
-- [ ] T115 Conduct accessibility audit with screen reader testing
+- [X] T115 Conduct accessibility audit with screen reader testing (A11Y-LOW-2)
 
 ### Error Handling
 
@@ -289,15 +336,15 @@ This is a Next.js 14+ web application. Paths are relative to repository root.
 
 ### Browser Compatibility
 
-- [ ] T120 [P] Test on Chrome, Firefox, Safari, Edge
-- [ ] T121 [P] Fix browser-specific issues discovered during testing
-- [ ] T122 Verify @dnd-kit performance across browsers
+- [X] T120 [P] Test on Chrome, Firefox, Safari, Edge
+- [X] T121 [P] Fix browser-specific issues discovered during testing
+- [X] T122 Verify @dnd-kit performance across browsers
 
 ### Security
 
-- [ ] T123 Integrate DOMPurify sanitization in all text content rendering
-- [ ] T124 Add origin validation for postMessage in preview page
-- [ ] T125 Verify no eval() or dangerous code execution
+- [X] T123 Integrate DOMPurify sanitization in all text content rendering (SEC-003)
+- [X] T124 Add origin validation for postMessage in preview page (SEC-CRITICAL-1)
+- [X] T125 Verify no eval() or dangerous code execution
 
 ### Final Testing
 
@@ -305,7 +352,7 @@ This is a Next.js 14+ web application. Paths are relative to repository root.
 - [X] T127 Run all integration tests with npm test
 - [X] T128 Run all E2E tests with Playwright
 - [X] T129 Run ESLint and fix issues with npm run lint
-- [ ] T130 Verify quickstart.md examples work correctly
+- [X] T130 Verify quickstart.md examples work correctly
 
 ---
 

@@ -1,12 +1,13 @@
 /**
  * Auto-Save Utilities
- * 
+ *
  * localStorage-based auto-save functionality for story builder drafts.
  * Handles save operations, draft restoration, and error management.
- * 
+ *
  * @feature 013-visual-story-builder
  */
 
+import { toast } from 'sonner';
 import type { AutoSaveDraft } from '../types';
 import { DRAFT_STORAGE_KEY } from '../types';
 
@@ -22,6 +23,7 @@ export async function saveDraft(draft: AutoSaveDraft): Promise<boolean> {
   try {
     if (typeof window === 'undefined' || !window.localStorage) {
       console.error('localStorage is not available');
+      toast.error('Local storage is not available. Please check your browser settings.');
       return false;
     }
 
@@ -32,8 +34,10 @@ export async function saveDraft(draft: AutoSaveDraft): Promise<boolean> {
     if (error instanceof Error) {
       if (error.name === 'QuotaExceededError') {
         console.error('localStorage quota exceeded. Cannot save draft.');
+        toast.error('Storage quota exceeded. Please clear some data and try again.');
       } else {
         console.error('Failed to save draft:', error.message);
+        toast.error('Failed to save draft. Please try again.');
       }
     }
     return false;
@@ -58,6 +62,7 @@ export function loadDraft(): AutoSaveDraft | null {
     return draft;
   } catch (error) {
     console.error('Failed to load draft:', error);
+    toast.error('Failed to load draft. Please check your browser settings.');
     return null;
   }
 }
@@ -75,6 +80,7 @@ export function clearDraft(): boolean {
     return true;
   } catch (error) {
     console.error('Failed to clear draft:', error);
+    toast.error('Failed to clear draft. Please try again.');
     return false;
   }
 }
@@ -92,6 +98,7 @@ export function hasDraft(): boolean {
     return serialized !== null;
   } catch (error) {
     console.error('Failed to check for draft:', error);
+    toast.error('Failed to check draft status. Please try again.');
     return false;
   }
 }

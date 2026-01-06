@@ -7,24 +7,16 @@
  * @feature 013-visual-story-builder
  */
 
+import { toast } from 'sonner';
 import type { BuilderSlide } from './types';
 import { encodeStoryForUrl } from '../story/utils/urlEncoder';
 import type { StoryScript } from '../story/types';
-
-// ============================================================================
-// Constants
-// ============================================================================
-
-/**
- * Maximum URL length in bytes (32KB).
- * Most browsers support up to 2MB, but we use 32KB for safety.
- */
-export const MAX_URL_LENGTH = 32 * 1024;
+import { MAX_URL_LENGTH, MAX_SLIDES } from './constants';
 
 /**
  * Maximum slides to avoid exceeding URL length limit.
  */
-export const MAX_SLIDES_FOR_URL = 20;
+export const MAX_SLIDES_FOR_URL = MAX_SLIDES;
 
 // ============================================================================
 // URL Generation
@@ -36,7 +28,9 @@ export const MAX_SLIDES_FOR_URL = 20;
  */
 export function generateStoryUrl(slides: BuilderSlide[], baseUrl: string = ''): string {
   if (slides.length === 0) {
-    throw new Error('Cannot generate URL: no slides in story');
+    const error = 'Cannot generate URL: no slides in story';
+    toast.error(error);
+    throw new Error(error);
   }
 
   // Convert BuilderSlide to AnySlide by removing builder-specific properties
@@ -57,9 +51,9 @@ export function generateStoryUrl(slides: BuilderSlide[], baseUrl: string = ''): 
 
   // Check URL length limit
   if (encoded.length > MAX_URL_LENGTH) {
-    throw new Error(
-      `Generated URL exceeds ${MAX_URL_LENGTH} bytes limit. Try reducing the number of slides or content.`
-    );
+    const error = `Generated URL exceeds ${MAX_URL_LENGTH} bytes limit. Try reducing the number of slides or content.`;
+    toast.error('Story URL is too long. Try reducing slide count or content size.');
+    throw new Error(error);
   }
 
   return encoded;
@@ -94,10 +88,12 @@ export function validateUrlLength(slides: BuilderSlide[]): { valid: boolean; est
       estimatedSize: size,
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    toast.error('Failed to validate story URL.');
     return {
       valid: false,
       estimatedSize: 0,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: errorMessage,
     };
   }
 }

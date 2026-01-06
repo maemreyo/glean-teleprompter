@@ -1,6 +1,6 @@
 'use client';
 
-import { Copy, Check, LayoutTemplate } from 'lucide-react';
+import { Copy, Check, LayoutTemplate, Undo, Redo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AutoSaveIndicator } from '@/components/story-builder/AutoSaveIndicator';
 import { useStoryBuilderStore } from '@/lib/story-builder/store';
@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 export function Header() {
-  const { generateUrl, saveStatus, slides, loadTemplate } = useStoryBuilderStore();
+  const { generateUrl, saveStatus, slides, loadTemplate, undo, redo, canUndo, canRedo } = useStoryBuilderStore();
   const [copied, setCopied] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
 
@@ -45,6 +45,30 @@ export function Header() {
       
       <div className="flex items-center gap-3">
         <AutoSaveIndicator status={saveStatus} />
+        
+        {/* Undo/Redo Buttons */}
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => undo()}
+            disabled={!canUndo()}
+            aria-label="Undo"
+            title="Undo last action"
+          >
+            <Undo className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => redo()}
+            disabled={!canRedo()}
+            aria-label="Redo"
+            title="Redo last action"
+          >
+            <Redo className="w-4 h-4" />
+          </Button>
+        </div>
         
         <Button
           variant="outline"
