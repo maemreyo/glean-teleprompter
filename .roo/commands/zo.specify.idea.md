@@ -21,10 +21,11 @@ $ARGUMENTS
 
 1.  Run the setup script to find the brainstorm file:
     ```bash
-    .specify/scripts/bash/setup-specify-idea.sh --json $ARGUMENTS
+    .zo/scripts/bash/setup-specify-idea.sh --json $ARGUMENTS
     ```
-2.  Parse JSON output to get `BRAINSTORM_FILE` and `SPEC_TEMPLATE`.
+2.  Parse JSON output to get `BRAINSTORM_FILE`, `SPEC_TEMPLATE`, and `DESIGN_FILE`.
 3.  **Read the content** of `BRAINSTORM_FILE` and `SPEC_TEMPLATE`.
+4.  **Read** `DESIGN_FILE` if it exists (to understand existing design patterns).
 
 ### 2. Idea Extraction & Synthesis
 
@@ -44,7 +45,7 @@ Given the synthesized feature description:
 1.  **Generate a concise short name** (2-4 words) for the branch (e.g., "idea-name", "feature-set").
 
 2.  **Create Branch**:
-    *   Run `.specify/scripts/bash/create-feature-from-idea.sh --json --short-name "short-name" "Synthesized Description"`
+    *   Run `.zo/scripts/bash/create-feature-from-idea.sh --json --short-name "short-name" "Synthesized Description"`
     *   Parse JSON output to get `BRANCH_NAME` and `SPEC_FILE`.
 
 ### 4. Specification Generation
