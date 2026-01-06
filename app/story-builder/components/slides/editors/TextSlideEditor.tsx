@@ -26,21 +26,21 @@ export function TextSlideEditor({ slide, index }: TextSlideEditorProps) {
   }, [text, backgroundColor, index, updateSlide]);
 
   return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="text">Text</Label>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <div className="space-y-2">
+        <Label htmlFor="text" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Heading Text</Label>
         <Input
           id="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Enter your text"
-          className="mt-1.5"
+          placeholder="Enter a catchy headline..."
+          className="rounded-xl h-11 shadow-sm border-muted transition-all focus:ring-2 focus:ring-primary/20"
         />
       </div>
       
-      <div>
-        <Label htmlFor="duration">Duration (seconds)</Label>
-        <div className="flex items-center gap-3 mt-1.5">
+      <div className="space-y-3">
+        <Label htmlFor="duration" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Display Time</Label>
+        <div className="p-4 bg-muted/30 rounded-2xl border border-muted-foreground/5 space-y-4">
           <Slider
             id="duration"
             min={1}
@@ -48,23 +48,33 @@ export function TextSlideEditor({ slide, index }: TextSlideEditorProps) {
             step={0.5}
             value={[typeof slide.duration === 'number' ? slide.duration : 5]}
             onValueChange={([value]) => updateSlide(index, { duration: value })}
-            className="flex-1"
           />
-          <span className="text-sm w-12 text-right">
-            {typeof slide.duration === 'number' ? slide.duration : 5}s
-          </span>
+          <div className="flex justify-between items-center text-[11px] font-bold text-muted-foreground">
+            <span>1s</span>
+            <div className="flex items-center gap-1.5 bg-background px-2 py-0.5 rounded-full border shadow-sm text-primary">
+              <span>{typeof slide.duration === 'number' ? slide.duration : 5}s</span>
+            </div>
+            <span>30s</span>
+          </div>
         </div>
       </div>
       
-      <div>
-        <Label htmlFor="bg-color">Background Color</Label>
-        <Input
-          id="bg-color"
-          type="color"
-          value={backgroundColor}
-          onChange={(e) => setBackgroundColor(e.target.value)}
-          className="mt-1.5 h-10"
-        />
+      <div className="space-y-3">
+        <Label htmlFor="bg-color" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Background Theme</Label>
+        <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl border border-muted-foreground/5">
+          <div 
+            className="w-10 h-10 rounded-lg shadow-inner shrink-0 border-2 border-background"
+            style={{ backgroundColor }}
+          />
+          <Input
+            id="bg-color"
+            type="color"
+            value={backgroundColor}
+            onChange={(e) => setBackgroundColor(e.target.value)}
+            className="flex-1 h-9 cursor-pointer border-0 bg-transparent"
+          />
+          <span className="text-[10px] font-mono text-muted-foreground uppercase">{backgroundColor}</span>
+        </div>
       </div>
     </div>
   );

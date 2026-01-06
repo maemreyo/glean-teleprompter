@@ -60,34 +60,42 @@ export function PollSlideEditor({ slide, index }: PollSlideEditorProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="question">Question</Label>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <div className="space-y-2">
+        <Label htmlFor="question" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Question</Label>
         <Input
           id="question"
           value={question}
           onChange={(e) => updateQuestion(e.target.value)}
-          placeholder="Your question here?"
-          className="mt-1.5"
+          placeholder="Ask your audience..."
+          className="rounded-xl border-muted shadow-sm h-11 transition-all focus:ring-2 focus:ring-primary/20"
         />
       </div>
 
-      <div>
-        <Label>Options (2-4)</Label>
-        <div className="space-y-2 mt-1.5">
+      <div className="space-y-3">
+        <div className="flex justify-between items-center">
+          <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Choices ({options.length}/4)</Label>
+        </div>
+        <div className="space-y-3 p-4 bg-muted/30 rounded-2xl border border-muted-foreground/5">
           {options.map((option, idx) => (
-            <div key={option.id} className="flex gap-2">
-              <Input
-                value={option.text}
-                onChange={(e) => updateOption(option.id, e.target.value)}
-                placeholder={`Option ${idx + 1}`}
-                className="flex-1"
-              />
+            <div key={option.id} className="flex gap-2 group">
+              <div className="flex-1 relative">
+                <Input
+                  value={option.text}
+                  onChange={(e) => updateOption(option.id, e.target.value)}
+                  placeholder={`Choice ${idx + 1}`}
+                  className="rounded-lg h-10 pr-10 shadow-sm border-muted transition-all focus:border-primary/50"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/30 group-focus-within:text-primary/30">
+                  {idx + 1}
+                </span>
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => removeOption(option.id)}
                 disabled={options.length <= 2}
+                className="h-10 w-10 text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded-lg shrink-0"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -97,17 +105,17 @@ export function PollSlideEditor({ slide, index }: PollSlideEditorProps) {
             variant="outline"
             onClick={addOption}
             disabled={options.length >= 4}
-            className="w-full"
+            className="w-full h-10 border-dashed border-2 hover:border-primary hover:text-primary bg-background/50 transition-all rounded-lg"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Option
+            Add Choice
           </Button>
         </div>
       </div>
       
-      <div>
-        <Label htmlFor="duration">Duration (seconds)</Label>
-        <div className="flex items-center gap-3 mt-1.5">
+      <div className="space-y-3">
+        <Label htmlFor="duration" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Duration</Label>
+        <div className="p-4 bg-muted/30 rounded-2xl border border-muted-foreground/5 space-y-4">
           <Slider
             id="duration"
             min={1}
@@ -115,11 +123,15 @@ export function PollSlideEditor({ slide, index }: PollSlideEditorProps) {
             step={0.5}
             value={[typeof slide.duration === 'number' ? slide.duration : 10]}
             onValueChange={([value]) => updateSlide(index, { duration: value })}
-            className="flex-1"
           />
-          <span className="text-sm w-12 text-right">
-            {typeof slide.duration === 'number' ? slide.duration : 10}s
-          </span>
+          <div className="flex justify-between items-center text-[11px] font-bold text-muted-foreground">
+            <span>0s</span>
+            <div className="flex items-center gap-1.5 bg-background px-2 py-0.5 rounded-full border shadow-sm">
+              <span className="text-primary">{typeof slide.duration === 'number' ? slide.duration : 10}</span>
+              <span>seconds</span>
+            </div>
+            <span>30s</span>
+          </div>
         </div>
       </div>
     </div>

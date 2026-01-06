@@ -85,15 +85,18 @@ export const SlideCard = memo(function SlideCard({ slide, index, isActive }: Sli
         aria-pressed={isActive}
         onClick={handleClick}
         className={cn(
-          'w-[120px] h-[213px] rounded-2xl cursor-grab active:cursor-grabbing transition-all relative overflow-hidden',
-          'hover:scale-105 hover:shadow-md',
-          isActive && 'border-2 border-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500',
-          isDragging && 'opacity-50 scale-95'
+          'w-[120px] h-[213px] rounded-2xl cursor-grab active:cursor-grabbing transition-all relative overflow-hidden border-2',
+          'hover:scale-105 hover:shadow-xl hover:border-primary/20',
+          isActive ? 'border-transparent bg-origin-border bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 p-[2px]' : 'border-muted',
+          isDragging && 'opacity-50 scale-95 shadow-2xl ring-4 ring-primary/20'
         )}
       >
-        <div className="absolute inset-0 p-2 flex flex-col">
-          <h3 className="font-display text-xs font-medium truncate">{getSlideTypeLabel(slide.type)}</h3>
-          <span className="text-[10px] text-muted-foreground mt-auto">
+        <div className={cn(
+          "w-full h-full rounded-[14px] p-3 flex flex-col",
+          isActive ? "bg-card/90 backdrop-blur-sm" : "bg-card"
+        )}>
+          <h3 className="font-display text-xs font-bold truncate tracking-tight">{getSlideTypeLabel(slide.type)}</h3>
+          <span className="text-[10px] text-muted-foreground mt-auto font-medium">
             {typeof slide.duration === 'number' ? `${slide.duration}s` : slide.duration}
           </span>
         </div>
