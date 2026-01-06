@@ -13,6 +13,18 @@ A visual, Instagram-inspired story builder that eliminates manual JSON encoding.
 
 ---
 
+## Clarifications
+
+### Session 2026-01-06
+
+- Q: What should the story builder display when the user first arrives with no slides? → A: Show an empty story rail with a centered onboarding card below it: "Start by adding slides from the library" + "Add Your First Slide" CTA button
+- Q: What happens when a user attempts to delete the last remaining slide in the story? → A: Allow deletion without confirmation and show empty state onboarding card (users clearing intentionally want to start fresh)
+- Q: What additional behavior should occur when localStorage is disabled or full? → A: Show persistent toast warning "Auto-save unavailable. Changes will be lost if you close this tab." and disable auto-save indicator
+- Q: Should we sanitize HTML in user input for XSS protection? → A: Yes, integrate DOMPurify library to sanitize all text content before display (defense-in-depth for URL-based sharing attack surface)
+- Q: How should we handle conflicting auto-saves when multiple browser tabs are open? → A: Use localStorage with tab synchronization via `storage` event; last write wins with warning toast "Changes were saved in another tab"
+
+---
+
 ## User Scenarios & Testing
 
 ### User Story 1 - Drag-and-Drop Slide Creation (Priority: P1)
@@ -67,6 +79,10 @@ Users can start with pre-built story templates to accelerate creation, providing
 
 ## Edge Cases
 
+- What happens when the story builder loads with zero slides?
+  - System shows empty story rail with centered onboarding card displaying "Start by adding slides from the library" and "Add Your First Slide" CTA button that adds the first slide
+- What happens when a user deletes the last remaining slide?
+  - System allows deletion without confirmation, removes the slide, and displays the empty state onboarding card (users intentionally clearing to start fresh)
 - What happens when the user drags a slide outside the browser window?
   - The slide returns to its original position with a spring animation
 - What happens when the generated URL exceeds browser length limits (~2MB)?
@@ -76,7 +92,7 @@ Users can start with pre-built story templates to accelerate creation, providing
 - How does the system handle rapid slide reordering (spamming drag operations)?
   - Drag operations are debounced with 100ms throttle; only the final drop position is applied
 - What happens when localStorage is disabled or full?
-  - System falls back to session-only storage and shows warning: "Auto-save unavailable. Your story will be lost if you close this tab."
+  - System falls back to session-only storage, shows persistent toast warning "Auto-save unavailable. Changes will be lost if you close this tab.", and disables auto-save indicator in header
 
 ---
 
@@ -90,6 +106,7 @@ Users can start with pre-built story templates to accelerate creation, providing
 - **FR-003**: System MUST allow users to reorder slides in the story rail via drag-and-drop
 - **FR-004**: System MUST remove slides from the story rail when a user clicks the delete button on a slide card
 - **FR-005**: System MUST limit stories to maximum 20 slides to prevent URL length overflow
+- **FR-005-1**: System MUST display empty state onboarding card when story contains zero slides
 
 **Visual Editing**
 - **FR-006**: System MUST provide a text editor for Text slides with formatting controls (bold, italic, color)
@@ -115,6 +132,7 @@ Users can start with pre-built story templates to accelerate creation, providing
 - **FR-020**: System MUST automatically save the current story to localStorage every 30 seconds
 - **FR-021**: System MUST restore the last auto-saved story when the user returns to the builder page
 - **FR-022**: System MUST show an indicator when auto-save occurs: "Saved just now"
+- **FR-022-1**: System MUST synchronize state across multiple browser tabs via `storage` event and show warning "Changes were saved in another tab" when external writes occur
 
 **Templates**
 - **FR-023**: System MUST provide a template gallery with at least 3 pre-built templates
@@ -175,6 +193,7 @@ Users can start with pre-built story templates to accelerate creation, providing
 - `@dnd-kit/core` - Drag-and-drop core functionality (may already exist)
 - `@dnd-kit/sortable` - Sortable list for slide reordering (may already exist)
 - `react-colorful` - Color picker for background customization (may already exist)
+- `dompurify` - XSS sanitization for user-generated text content (defense-in-depth protection)
 
 ### Technical Constraints
 - No backend changes required - all processing is client-side
@@ -186,8 +205,6 @@ Users can start with pre-built story templates to accelerate creation, providing
 ## Open Questions
 
 1. **Template Storage**: Should templates be stored in a separate file or hardcoded in the component?
-   - *Recommendation*: Start with hardcoded in `app/story-builder/templates.ts`, move to separate file if template count exceeds 10.
-2. **Auto-Save Conflict Handling**: If two browser tabs are open, how do we handle conflicting auto-saves?
-   - *Recommendation*: Use localStorage with tab synchronization via `storage` event; last write wins with a warning.
-3. **URL Shortener**: Should we integrate URL shortening (Idea #3 from brainstorm) or use full URLs?
-   - *Recommendation*: Start with full URLs. Shortener is a separate feature (Idea #3) and can be added later.
+    - *Recommendation*: Start with hardcoded in `app/story-builder/templates.ts`, move to separate file if template count exceeds 10.
+2. **URL Shortener**: Should we integrate URL shortening (Idea #3 from brainstorm) or use full URLs?
+    - *Recommendation*: Start with full URLs. Shortener is a separate feature (Idea #3) and can be added later.
