@@ -1,7 +1,18 @@
 'use client';
 
-import { StoryBuilder } from './components/StoryBuilder';
+import dynamic from 'next/dynamic';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+
+// Dynamically import StoryBuilder with SSR disabled to prevent hydration mismatches
+// caused by localStorage state differences between server and client
+const StoryBuilder = dynamic(() => import('./components/StoryBuilder').then(mod => ({ default: mod.StoryBuilder })), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-screen bg-background">
+      <div className="animate-pulse text-muted-foreground">Loading Story Builder...</div>
+    </div>
+  ),
+});
 
 function StoryBuilderFallback({ error, reset }: { error: Error; reset: () => void }) {
   return (

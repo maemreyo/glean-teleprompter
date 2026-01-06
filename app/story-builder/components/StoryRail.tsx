@@ -75,7 +75,7 @@ export function StoryRail({ className }: StoryRailProps) {
   }, [activeSlideIndex, slides.length, setActiveSlide]);
 
   return (
-    <div className={cn('flex flex-col bg-background border rounded-lg h-full', className)} role="region" aria-labelledby="story-rail-heading">
+    <div className={cn('flex flex-col bg-background border rounded-lg', className)} style={{ height: '240px' }} role="region" aria-labelledby="story-rail-heading">
       <div className="p-3 border-b shrink-0">
         <h2 id="story-rail-heading" className="text-sm font-medium">Story Rail</h2>
         <p className="text-xs text-muted-foreground">
@@ -101,7 +101,6 @@ export function StoryRail({ className }: StoryRailProps) {
       <div
         ref={setNodeRef}
         className="flex-1 overflow-hidden p-4"
-        style={{ minHeight: '140px' }} // Height buffer for cards
       >
         {slides.length === 0 ? (
           <EmptyState />

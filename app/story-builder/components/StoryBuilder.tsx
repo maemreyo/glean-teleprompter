@@ -34,6 +34,7 @@ import { SlideEditor } from './SlideEditor';
 import { Header } from './Header';
 import { PreviewPanel } from './preview/PreviewPanel';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { cn } from '@/lib/utils';
 import type { BuilderSlideType } from '@/lib/story-builder/types';
 import { toast } from 'sonner';
 
@@ -147,7 +148,7 @@ export function StoryBuilder() {
       >
         <main className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_320px] lg:grid-cols-[280px_1fr_320px] gap-4 p-4 overflow-hidden" role="main">
           {/* Mobile-only tabs */}
-          <div className="md:hidden flex border-b mb-4" role="tablist" aria-label="Story builder sections">
+          <div className="md:hidden flex border-b col-span-1" role="tablist" aria-label="Story builder sections">
             <button
               id="library-tab"
               onClick={() => setActiveTab('library')}
@@ -192,52 +193,50 @@ export function StoryBuilder() {
             </button>
           </div>
 
-          {/* Mobile content based on active tab */}
-          <section className="md:hidden" id="library-panel" role="tabpanel" aria-labelledby="library-tab">
-            {activeTab === 'library' && <SlideLibrary />}
-          </section>
-          <section className="md:hidden" id="story-panel" role="tabpanel" aria-labelledby="story-tab">
-            {activeTab === 'story' && (
-              <div className="flex flex-col gap-4 overflow-hidden">
-                <StoryRail />
-                <div className="flex-1 bg-muted/30 rounded-lg p-4">
-                  <SlideEditor />
-                </div>
-              </div>
+          {/* Desktop/Tablet/Mobile Responsive Content */}
+          
+          {/* Library Column */}
+          <aside 
+            id="library-panel" 
+            role="tabpanel" 
+            aria-labelledby="library-tab"
+            className={cn(
+              "lg:block", 
+              activeTab === 'library' ? "block" : "hidden lg:block",
+              "md:hidden lg:block" // Hidden on tablet (md), shown on desktop (lg)
             )}
-          </section>
-          <section className="md:hidden" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
-            {activeTab === 'preview' && <PreviewPanel />}
+          >
+            <SlideLibrary />
+          </aside>
+
+          {/* Story Rail + Editor Column */}
+          <section 
+            id="story-panel" 
+            role="tabpanel" 
+            aria-labelledby="story-tab"
+            className={cn(
+              "flex flex-col gap-4 overflow-hidden",
+              activeTab === 'story' ? "flex" : "hidden md:flex"
+            )}
+          >
+            <StoryRail />
+            <div className="flex-1 bg-muted/30 rounded-lg p-4 overflow-hidden">
+              <SlideEditor />
+            </div>
           </section>
 
-          {/* Tablet: Show editor + preview, library accessible via mobile tabs */}
-          <section className="hidden md:grid lg:hidden md:grid-cols-[1fr_320px] gap-4 overflow-hidden" aria-label="Tablet layout: editor and preview">
-            <section className="flex flex-col gap-4 overflow-hidden" aria-label="Story editor and rail">
-              <StoryRail />
-              <div className="flex-1 bg-muted/30 rounded-lg p-4">
-                <SlideEditor />
-              </div>
-            </section>
-            <aside aria-label="Preview panel">
-              <PreviewPanel />
-            </aside>
-          </section>
-
-          {/* Desktop: Show all three columns */}
-          <section className="hidden lg:grid lg:grid-cols-[280px_1fr_320px] gap-4 overflow-hidden" aria-label="Desktop layout: library, editor, and preview">
-            <aside aria-label="Slide library">
-              <SlideLibrary />
-            </aside>
-            <section className="flex flex-col gap-4 overflow-hidden" aria-label="Story editor and rail">
-              <StoryRail />
-              <div className="flex-1 bg-muted/30 rounded-lg p-4">
-                <SlideEditor />
-              </div>
-            </section>
-            <aside aria-label="Preview panel">
-              <PreviewPanel />
-            </aside>
-          </section>
+          {/* Preview Panel Column */}
+          <aside 
+            id="preview-panel" 
+            role="tabpanel" 
+            aria-labelledby="preview-tab"
+            className={cn(
+              "md:block",
+              activeTab === 'preview' ? "block" : "hidden md:block"
+            )}
+          >
+            <PreviewPanel />
+          </aside>
         </main>
         
         <DragOverlay>

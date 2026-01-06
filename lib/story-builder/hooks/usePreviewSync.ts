@@ -82,11 +82,14 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
     if (typeof performance === 'undefined') return;
 
     const measurePerformance = () => {
-      // Check if mark exists before measuring to avoid errors
-      const entries = performance.getEntriesByName('preview-update-sent', 'mark');
-      if (entries.length === 0) return;
-
       try {
+        // Check if mark exists before measuring to avoid errors
+        const entries = performance.getEntriesByName('preview-update-sent', 'mark');
+        if (entries.length === 0) return;
+
+        // Double-check mark exists right before measuring (in case it was cleared)
+        if (!performance.getEntriesByName('preview-update-sent', 'mark').length) return;
+
         // Measure time from 'preview-update-sent' mark to now
         performance.measure('preview-update-latency', 'preview-update-sent');
         const measures = performance.getEntriesByName('preview-update-latency');
@@ -100,8 +103,9 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
         // Clear marks and measures to prevent memory leaks
         performance.clearMarks();
         performance.clearMeasures();
-      } catch {
-        // Ignore if mark doesn't exist or other performance API errors
+      } catch (error) {
+        // Ignore performance API errors (DOMException, etc.)
+        console.debug('Performance measurement failed:', error);
       }
     };
 
