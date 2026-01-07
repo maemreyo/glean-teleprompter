@@ -93,7 +93,7 @@ export function TeleprompterSlideEditor({ slide, index }: TeleprompterSlideEdito
   }, [teleprompterSettings.content]);
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="space-y-6 overflow-y-auto h-full animate-in fade-in slide-in-from-bottom-2 duration-500">
       {/* Content Text Area */}
       <div className="space-y-2">
         <Label htmlFor="text" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Story Text</Label>

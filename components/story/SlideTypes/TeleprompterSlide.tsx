@@ -114,6 +114,7 @@ export function TeleprompterSlide({
         backgroundColor={slide.backgroundColor}
         backgroundOpacity={slide.backgroundOpacity}
         safeAreaPadding={slide.safeAreaPadding}
+        scrollContainerRef={containerRef}
       />
 
       {/* Floating control panel */}

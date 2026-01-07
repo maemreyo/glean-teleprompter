@@ -53,6 +53,8 @@ interface TeleprompterContentProps {
     bottom?: number;
     left?: number;
   };
+  /** Optional ref to receive the scroll container element */
+  scrollContainerRef?: React.RefObject<HTMLElement | null>;
 }
 
 export interface TeleprompterContentHandle {
@@ -78,7 +80,8 @@ function TeleprompterContentFunction(
     mirrorVertical = false,
     backgroundColor = '#000000',
     backgroundOpacity = 100,
-    safeAreaPadding = { top: 0, right: 0, bottom: 0, left: 0 }
+    safeAreaPadding = { top: 0, right: 0, bottom: 0, left: 0 },
+    scrollContainerRef
   }: TeleprompterContentProps,
   ref: React.Ref<TeleprompterContentHandle>
 ) {
@@ -138,7 +141,19 @@ function TeleprompterContentFunction(
   const { top: padTop = 0, right: padRight = 0, bottom: padBottom = 0, left: padLeft = 0 } = safeAreaPadding;
 
   /**
-   * Expose the scroll container to parent
+   * Expose the scroll container to parent via ref callback
+   */
+  useEffect(() => {
+    if (scrollContainerRef && containerRef.current) {
+      const scrollContainer = containerRef.current.querySelector('[data-scroll-container]') as HTMLElement;
+      if (scrollContainer) {
+        scrollContainerRef.current = scrollContainer;
+      }
+    }
+  }, [scrollContainerRef]);
+
+  /**
+   * Expose the scroll container to parent via imperitive handle
    */
   useImperativeHandle(ref, () => ({
     getScrollContainer: () => containerRef.current?.querySelector('[data-scroll-container]') || null,
