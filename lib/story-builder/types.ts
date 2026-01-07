@@ -451,3 +451,110 @@ export interface ClearStoryAction {
   type: 'clearStory';
   payload: Record<string, never>;
 }
+
+// ============================================================================
+// Multi-Device Preview Types
+// ============================================================================
+
+/**
+ * Grid layout configuration for multi-device preview.
+ * Each configuration defines the maximum number of device slots.
+ */
+export type GridConfig = '1x' | '2x' | '2x2' | '3x2';
+
+/**
+ * Number of slots available for each grid configuration.
+ */
+export const GRID_SLOT_COUNTS: Readonly<Record<GridConfig, number>> = {
+  '1x': 1,
+  '2x': 2,
+  '2x2': 4,
+  '3x2': 6,
+} as const;
+
+/**
+ * State for multi-device preview mode.
+ */
+export interface MultiDevicePreviewState {
+  /** Toggle state for multi-device mode */
+  enabled: boolean;
+  /** Grid layout configuration */
+  gridConfig: GridConfig;
+  /** Array of enabled device type IDs */
+  enabledDeviceTypes: string[];
+  /** Priority order for device display */
+  deviceOrder: string[];
+  /** Drag-and-drop state */
+  isDragging: boolean;
+  /** Currently dragged device ID */
+  draggedDeviceId: string | null;
+}
+
+/**
+ * Actions for multi-device preview state.
+ */
+export interface MultiDevicePreviewActions {
+  /** Enable/disable multi-device mode */
+  setEnabled: (enabled: boolean) => void;
+  /** Update grid configuration */
+  setGridConfig: (config: GridConfig) => void;
+  /** Toggle a device type on/off */
+  toggleDeviceType: (deviceTypeId: string) => void;
+  /** Reorder devices by moving from one index to another */
+  reorderDevices: (fromIndex: number, toIndex: number) => void;
+  /** Reset all settings to defaults */
+  resetToDefaults: () => void;
+  /** Set drag-and-drop state */
+  setDraggingState: (isDragging: boolean, deviceId: string | null) => void;
+}
+
+/**
+ * Combined state and actions type for Zustand store.
+ */
+export type MultiDevicePreviewStore = MultiDevicePreviewState & MultiDevicePreviewActions;
+
+/**
+ * Preferences schema for localStorage persistence.
+ */
+export interface MultiDevicePreviewPreferences {
+  /** Multi-device mode toggle state */
+  enabled: boolean;
+  /** Grid layout configuration */
+  gridConfig: GridConfig;
+  /** Array of enabled device type IDs */
+  enabledDeviceTypes: string[];
+  /** Priority order for device display */
+  deviceOrder: string[];
+  /** Timestamp for migration */
+  lastUpdated: number;
+}
+
+/**
+ * Default preferences for multi-device preview.
+ */
+export const DEFAULT_MULTI_DEVICE_PREFERENCES: MultiDevicePreviewPreferences = {
+  enabled: false,
+  gridConfig: '2x',
+  enabledDeviceTypes: ['iphone-se', 'iphone-14-pro'],
+  deviceOrder: ['iphone-se', 'iphone-14-pro', 'ipad-air', 'desktop'],
+  lastUpdated: Date.now(),
+} as const;
+
+/**
+ * Storage key for multi-device preview preferences.
+ */
+export const MULTI_DEVICE_STORAGE_KEY = 'teleprompter-multi-device-preview';
+
+/**
+ * Memory thresholds for multi-device preview (in MB).
+ */
+export const MEMORY_THRESHOLDS = {
+  /** Warning threshold - show toast notification */
+  WARNING: 250,
+  /** Hard limit - prevent enabling more devices */
+  HARD_LIMIT: 350,
+  /** Base memory per iframe */
+  BASE_PER_IFRAME: 50,
+  /** Memory per 1000 characters of content */
+  CONTENT_PER_1000_CHARS: 5,
+} as const;
