@@ -11,7 +11,7 @@ export function Hero() {
   return (
     <section className="relative py-20 px-4 overflow-hidden">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-pink-500/10 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-b from-pink-500/10 via-transparent to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(236,72,153,0.1),transparent_50%)]" />
 
       <div className="container mx-auto text-center relative z-10">
@@ -28,7 +28,7 @@ export function Hero() {
 
           {/* Main heading */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent">
               {t('title')}
             </span>
           </h1>
@@ -45,7 +45,7 @@ export function Hero() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/quickstart"
-              className="group px-8 py-4 bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold rounded-full hover:shadow-lg hover:shadow-pink-500/25 transition-all flex items-center gap-2"
+              className="group px-8 py-4 bg-linear-to-r from-pink-500 to-violet-500 text-white font-bold rounded-full hover:shadow-lg hover:shadow-pink-500/25 transition-all flex items-center gap-2"
             >
               <Play className="w-5 h-5 fill-current" />
               {t('startWriting')}

@@ -195,12 +195,12 @@ export function SpectrumWidget({
         onClick={onPlayPause}
         className={cn(
           // T038: Touch target minimum 44px (this is 56px)
-          'flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center',
+          'shrink-0 w-14 h-14 rounded-full flex items-center justify-center',
           'transition-all duration-200',
           'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black',
           isPlaying
             ? 'bg-white text-black hover:bg-white/90'
-            : 'bg-gradient-to-r from-pink-500 to-violet-600 text-white hover:from-pink-600 hover:to-violet-700'
+            : 'bg-linear-to-r from-pink-500 to-violet-600 text-white hover:from-pink-600 hover:to-violet-700'
         )}
         aria-label={isPlaying ? 'Pause music' : 'Play music'}
         aria-checked={isPlaying}
@@ -226,7 +226,7 @@ export function SpectrumWidget({
               key={index}
               className={cn(
                 'flex-1 max-w-[12px] min-w-[4px] rounded-t-sm',
-                'bg-gradient-to-t from-pink-600 via-violet-600 to-cyan-500'
+                'bg-linear-to-t from-pink-600 via-violet-600 to-cyan-500'
               )}
               aria-hidden="true"
               initial={{ height: '20%' }}
@@ -245,7 +245,7 @@ export function SpectrumWidget({
 
       {/* T037: Source Indicator and Music Icon (right side) with accessibility */}
       <div
-        className="flex-shrink-0 flex flex-col items-center gap-2"
+        className="shrink-0 flex flex-col items-center gap-2"
         role="img"
         aria-label={`Music source: ${sourceType === 'youtube' ? 'YouTube' : 'uploaded file'}, status: ${isPlaying ? 'playing' : 'paused'}`}
       >
@@ -282,7 +282,7 @@ export function SpectrumWidget({
       <motion.div
         className={cn(
           'absolute bottom-0 left-0 right-0 h-0.5 rounded-b-2xl',
-          'bg-gradient-to-r from-pink-500 via-violet-600 to-cyan-500'
+          'bg-linear-to-r from-pink-500 via-violet-600 to-cyan-500'
         )}
         animate={{
           opacity: isPlaying ? 1 : 0.3,

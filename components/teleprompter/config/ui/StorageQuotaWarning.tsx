@@ -65,7 +65,7 @@ export function StorageQuotaWarning({
     >
       <div className="flex items-start gap-3">
         {/* Warning Icon */}
-        <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+        <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
         
         {/* Message */}
         <div className="flex-1 min-w-0">
@@ -81,7 +81,7 @@ export function StorageQuotaWarning({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <Button
             variant="outline"
             size="sm"

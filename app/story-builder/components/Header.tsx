@@ -38,7 +38,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 h-14 border-b flex items-center justify-between px-4 bg-background/80 backdrop-blur-md">
       <div className="flex flex-col">
-        <h1 className="text-sm md:text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+        <h1 className="text-sm md:text-lg font-bold bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/70">
           Story Builder
         </h1>
         <p className="hidden md:block text-[10px] text-muted-foreground">
@@ -90,7 +90,7 @@ export function Header() {
           disabled={slides.length === 0}
           className={cn(
             "h-9 px-3 md:px-4 font-medium transition-all duration-300",
-            !copied && "bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 hover:opacity-90 border-0"
+            !copied && "bg-linear-to-r from-purple-600 via-pink-600 to-orange-600 hover:opacity-90 border-0"
           )}
         >
           {copied ? (

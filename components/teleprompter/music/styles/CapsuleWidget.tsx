@@ -57,12 +57,12 @@ export function CapsuleWidget({
         onClick={onPlayPause}
         className={cn(
           // T038: Touch target minimum 44px (this is 56px)
-          'flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center',
+          'shrink-0 w-14 h-14 rounded-full flex items-center justify-center',
           'transition-all duration-200',
           'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black',
           isPlaying
             ? 'bg-white text-black hover:bg-white/90'
-            : 'bg-gradient-to-r from-pink-500 to-violet-600 text-white hover:from-pink-600 hover:to-violet-700'
+            : 'bg-linear-to-r from-pink-500 to-violet-600 text-white hover:from-pink-600 hover:to-violet-700'
         )}
         aria-label={isPlaying ? 'Pause music' : 'Play music'}
         aria-checked={isPlaying}
@@ -92,7 +92,7 @@ export function CapsuleWidget({
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="w-1 bg-gradient-to-t from-pink-500 to-violet-600 rounded-full"
+                  className="w-1 bg-linear-to-t from-pink-500 to-violet-600 rounded-full"
                   style={{
                     height: `${8 + Math.random() * 8}px`,
                     animation: `pulse 0.5s ease-in-out ${i * 0.1}s infinite`,
@@ -106,7 +106,7 @@ export function CapsuleWidget({
 
       {/* T037: Source Type Indicator (right side) with descriptive labels */}
       <div
-        className="flex-shrink-0 flex items-center justify-center"
+        className="shrink-0 flex items-center justify-center"
         role="img"
         aria-label={`Music source: ${sourceType === 'youtube' ? 'YouTube' : 'uploaded file'}`}
       >

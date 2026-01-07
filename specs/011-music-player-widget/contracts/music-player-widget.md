@@ -514,7 +514,7 @@ export function MusicPlayerWidget({
           <>
             {/* Vinyl record */}
             <motion.div
-              className="w-full h-full rounded-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-4 border-gray-700"
+              className="w-full h-full rounded-full bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 border-4 border-gray-700"
               animate={isPlaying && !prefersReducedMotion ? {
                 rotate: 360,
               } : {}}
@@ -552,7 +552,7 @@ export function MusicPlayerWidget({
               {Array.from({ length: 16 }).map((_, i) => (
                 <motion.div
                   key={i}
-                  className="w-2 bg-gradient-to-t from-purple-500 to-pink-500 rounded-full"
+                  className="w-2 bg-linear-to-t from-purple-500 to-pink-500 rounded-full"
                   animate={isPlaying && !prefersReducedMotion ? {
                     height: [20, 40 + Math.random() * 40, 20],
                   } : { height: 20 }}

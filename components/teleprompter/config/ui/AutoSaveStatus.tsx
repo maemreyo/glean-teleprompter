@@ -91,7 +91,7 @@ export function AutoSaveStatus({
       role="status"
       aria-live="polite"
     >
-      <div className="flex-shrink-0 transition-all duration-300">
+      <div className="shrink-0 transition-all duration-300">
         {getStatusIcon()}
       </div>
       
@@ -102,7 +102,7 @@ export function AutoSaveStatus({
       {status === 'error' && onRetry && (
         <button
           onClick={onRetry}
-          className="flex-shrink-0 p-1 hover:bg-red-500/10 rounded transition-colors"
+          className="shrink-0 p-1 hover:bg-red-500/10 rounded transition-colors"
           aria-label={t('retry')}
           title={t('retry')}
         >

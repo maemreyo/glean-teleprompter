@@ -57,7 +57,7 @@ export function ConfigPanelSkeleton() {
       {/* Tab Bar Skeleton */}
       <div className="flex border-b border-border overflow-x-auto">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex-shrink-0 px-4 py-3">
+          <div key={i} className="shrink-0 px-4 py-3">
             <Skeleton className="h-4 w-16" />
           </div>
         ))}

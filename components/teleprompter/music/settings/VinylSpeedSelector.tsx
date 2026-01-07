@@ -93,7 +93,7 @@ export function VinylSpeedSelector({ className }: VinylSpeedSelectorProps) {
           const isCustom = option.value === 'custom';
 
           return (
-            <div key={option.value} className={cn('flex-1 min-w-[70px]', isCustom && 'flex-[2]')}>
+            <div key={option.value} className={cn('flex-1 min-w-[70px]', isCustom && 'flex-2')}>
               <button
                 onClick={() => handleSpeedChange(option.value)}
                 className={cn(

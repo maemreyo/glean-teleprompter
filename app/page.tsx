@@ -41,7 +41,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-secondary/50 to-background">
+    <div className="min-h-screen bg-linear-to-b from-background via-secondary/50 to-background">
       <PublicNavbar />
       <main>
         <Hero />

@@ -142,7 +142,7 @@ export function ContentPanel({ className = '' }: ContentPanelProps) {
     >
       {/* Header */}
       <div className="p-6 border-b border-border flex justify-between items-center gap-2">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+        <h1 className="text-xl font-bold bg-linear-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
           {t('title')}
         </h1>
         

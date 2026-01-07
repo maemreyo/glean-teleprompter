@@ -31,10 +31,10 @@ export function PreviewPanel() {
   return (
     <div className="flex flex-col h-full bg-background border rounded-2xl overflow-hidden shadow-sm">
       <div className="p-3 border-b bg-background/50 backdrop-blur-md">
-        <h3 className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/60">Live Preview</h3>
+        <h3 className="text-sm font-bold bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">Live Preview</h3>
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-6 bg-gradient-to-b from-muted/50 to-muted/20 relative overflow-hidden">
+      <div className="flex-1 flex items-center justify-center p-6 bg-linear-to-b from-muted/50 to-muted/20 relative overflow-hidden">
         {isLoading && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/40 backdrop-blur-[2px] rounded-b-2xl">
             <div className="relative w-12 h-12">
@@ -53,8 +53,8 @@ export function PreviewPanel() {
 
         {/* Device Frame Wrapper */}
         <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
-          <div className="relative w-full max-w-[320px] aspect-[9/16] pointer-events-auto">
-            <div className="absolute inset-0 rounded-[3rem] ring-[12px] ring-[#1a1a1a] ring-inset z-10 pointer-events-none" />
+          <div className="relative w-full max-w-[320px] aspect-9/16 pointer-events-auto">
+            <div className="absolute inset-0 rounded-[3rem] ring-12 ring-[#1a1a1a] ring-inset z-10 pointer-events-none" />
             <div className="absolute inset-0 rounded-[3rem] ring-[1px] ring-[#333] ring-offset-2 ring-offset-[#1a1a1a] z-10 pointer-events-none" />
             <iframe
               ref={iframeRef}

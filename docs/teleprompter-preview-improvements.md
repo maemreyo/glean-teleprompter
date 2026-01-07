@@ -21,7 +21,7 @@ This document outlines the current issues with the Teleprompter Live Preview and
 To support multiple screen formats (9:16 vertical, 16:9 widescreen, 1:1 square), the following changes are recommended:
 
 1. **Responsive Container**:
-   - Replace fixed `aspect-[9/16]` with a configurable aspect ratio property in the `StoryScript`.
+   - Replace fixed `aspect-9/16` with a configurable aspect ratio property in the `StoryScript`.
    - Use CSS variables to define safe areas and focal points relative to the viewport height, ensuring the teleprompter remains usable regardless of width.
 
 2. **Adaptive Typography**:

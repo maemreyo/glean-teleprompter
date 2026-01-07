@@ -97,7 +97,7 @@ export function StorageQuota({ className }: StorageQuotaProps) {
       className={`${className} ${styles.bg} backdrop-blur rounded-xl p-4 border ${styles.border}`}
     >
       <div className="flex items-start gap-3">
-        <HardDrive className={`${styles.icon} flex-shrink-0 mt-0.5`} size={20} />
+        <HardDrive className={`${styles.icon} shrink-0 mt-0.5`} size={20} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-semibold text-white">{t('title')}</h3>

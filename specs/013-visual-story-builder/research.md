@@ -291,7 +291,7 @@ const dragStyles = {
 // Drop indicator
 const DropIndicator = ({ position }: { position: number }) => (
   <div
-    className="absolute w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-full animate-pulse"
+    className="absolute w-full h-1 bg-linear-to-r from-purple-500 via-pink-500 to-orange-500 rounded-full animate-pulse"
     style={{ top: `${position * 227}px` }} // 213px + 12px gap + 2px indicator
   />
 );

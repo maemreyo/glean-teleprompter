@@ -25,7 +25,7 @@ export default function QuickStartPage() {
   }, [selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
+    <div className="min-h-screen bg-linear-to-b from-gray-950 via-gray-900 to-gray-950">
       {/* Header */}
       <div className="border-b border-gray-800 bg-gray-950/80 backdrop-blur">
         <div className="container mx-auto px-4 py-4">
@@ -38,7 +38,7 @@ export default function QuickStartPage() {
               <span>{t("back")}</span>
             </Link>
             <ThemeSwitcher />
-            <h1 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold bg-linear-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
               {t("brand")}
             </h1>
             <div className="w-16" /> {/* Spacer for balance */}

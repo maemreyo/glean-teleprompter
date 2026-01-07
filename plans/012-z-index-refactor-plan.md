@@ -14,11 +14,11 @@ This plan addresses 7 identified z-index management issues in the Runner compone
 |----------|-------|--------|
 | **CRITICAL** | QuickSettingsPanel uses Radix UI Dialog (z-50) conflicts with control bars (z-50) | UI elements overlap unpredictably |
 | **HIGH** | Music widget uses BASE_Z_INDEX=1000, MAX_Z_INDEX=9999 - unnecessarily high | Wastes z-index space, limits future layers |
-| **HIGH** | Draggable camera at z-[100] always below music at 1000+ | Camera cannot be raised above music |
+| **HIGH** | Draggable camera at z-100 always below music at 1000+ | Camera cannot be raised above music |
 | **MEDIUM** | No centralized z-index constants | Maintenance burden, inconsistent values |
 | **MEDIUM** | Music reconfigure button uses both z-50 class AND inline zIndex+1 | Redundant/inconsistent pattern |
 | **LOW** | Missing z-index documentation | Onboarding difficulty |
-| **LOW** | Drag handle indicator has z-30 within parent z-[100] | No actual effect (nested z-index) |
+| **LOW** | Drag handle indicator has z-30 within parent z-100 | No actual effect (nested z-index) |
 
 ---
 
@@ -305,11 +305,11 @@ import { ZIndex } from '@/lib/constants/z-index';
   {/* content */}
 </div>
 
-// Replace z-[1] with constant
+// Replace z-1 with constant
 <div className="absolute inset-0 bg-black/30 transition-opacity"
      style={{ 
        opacity: effects.overlayOpacity ?? undefined,
-       zIndex: ZIndex.Overlay  // or use Tailwind: z-[1] with comment
+       zIndex: ZIndex.Overlay  // or use Tailwind: z-1 with comment
      }}
 />
 
@@ -404,7 +404,7 @@ const handleFocus = useCallback(() => {
 
 **Changes:**
 1. Add z-index constant import
-2. Replace z-[100] with constant
+2. Replace z-100 with constant
 3. Add dynamic z-index capability for widget interaction
 4. Document the nested z-30 drag handle (keep for clarity but note it has no effect)
 
@@ -426,7 +426,7 @@ const handleDragStart = useCallback(() => {
   handleFocus(); // Bring to front when dragging
 }, [handleFocus]);
 
-// Replace z-[100] with dynamic value:
+// Replace z-100 with dynamic value:
 <motion.div
   drag
   dragControls={dragControls}
@@ -453,7 +453,7 @@ const handleDragStart = useCallback(() => {
   {/* ... */}
   {/* Drag handle - document that nested z-index has no effect */}
   <div 
-    className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/20 to-transparent cursor-move flex items-center justify-center group"
+    className="absolute top-0 left-0 right-0 h-8 bg-linear-to-b from-black/20 to-transparent cursor-move flex items-center justify-center group"
     // NOTE: z-30 has no effect here because it's nested within parent stacking context
     // Keeping for documentation purposes only
     style={{ zIndex: ZIndex.WidgetHandle }}
@@ -759,12 +759,12 @@ If issues arise:
 | Component | Current Value | Issue |
 |-----------|---------------|-------|
 | Background | `z-0` | ✅ Good |
-| Overlay | `z-[1]` | ✅ Good |
+| Overlay | `z-1` | ✅ Good |
 | Content | `z-10` | ✅ Good |
 | Top Controls | `z-50` | ⚠️ Conflicts with QuickSettings |
 | Bottom Controls | `z-50` | ⚠️ Conflicts with QuickSettings |
 | QuickSettings Dialog | `z-50` (Radix default) | ❌ **CRITICAL CONFLICT** |
-| Camera Widget | `z-[100]` | ⚠️ Can't go above music |
+| Camera Widget | `z-100` | ⚠️ Can't go above music |
 | Music Widget Base | `1000` | ❌ Unnecessarily high |
 | Music Widget Max | `9999` | ❌ Wastes range |
 | Music Configure | `z-50` + `zIndex+1` | ⚠️ Redundant pattern |

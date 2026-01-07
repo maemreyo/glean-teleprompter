@@ -31,7 +31,7 @@ But hey, at least it compiles. Congratulations on meeting the absolute minimum b
   - **ALMOST**: Drag overlay has border and background (line 232-234) but missing shadow-drag with purple glow. Not full spec compliance.
 
 - [x] **DS-004** 🔴 → ✅ **No Gradient Borders (SlideCard.tsx:65)**: Active slides use `ring-2 ring-primary` instead of gradient border. Design system clearly specifies 2px gradient border for active states. Where's the Instagram gradient? Did you forget to read the design doc?
-  - **VERIFIED**: Line 90 now has `bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500` - Instagram gradient implemented!
+  - **VERIFIED**: Line 90 now has `bg-linear-to-r from-purple-500 via-pink-500 to-orange-500` - Instagram gradient implemented!
 
 - [x] **DS-005** 🔴 → ✅ **Wrong Aspect Ratio (PreviewPanel.tsx:60)**: Preview uses `aspectRatio: '9/16'` but no explicit dimensions. Design system requires exact 120×213px thumbnails. CSS aspect ratio doesn't guarantee pixel-perfect rendering.
   - **VERIFIED**: Uses explicit `w-[120px] h-[213px]` dimensions - Pixel-perfect rendering!

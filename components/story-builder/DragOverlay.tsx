@@ -111,9 +111,9 @@ export function DragOverlay({
         <div className="
           w-10 h-10
           rounded-lg
-          bg-gradient-to-br from-purple-500 to-pink-500
+          bg-linear-to-br from-purple-500 to-pink-500
           flex items-center justify-center
-          flex-shrink-0
+          shrink-0
         ">
           <div className="w-5 h-5 text-white">
             {icon}

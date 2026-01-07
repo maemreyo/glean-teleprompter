@@ -171,7 +171,7 @@ export function CameraWidget({
 
       {/* Controls Overlay - Visible on Hover */}
       <div className={cn(
-          "absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent transition-opacity duration-200 flex items-center justify-center gap-3 z-20",
+          "absolute bottom-0 left-0 right-0 p-4 bg-linear-to-t from-black/90 via-black/50 to-transparent transition-opacity duration-200 flex items-center justify-center gap-3 z-20",
           isHovered || !isVideoEnabled ? "opacity-100" : "opacity-0"
       )}>
         

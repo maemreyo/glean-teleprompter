@@ -83,7 +83,7 @@ Horizontal scrollable thumbnail strip showing all story slides.
   min-h-[320px]
 ">
   {/* Add slide button */}
-  <button className="flex-shrink-0 w-[120px] h-[213px] rounded-2xl 
+  <button className="shrink-0 w-[120px] h-[213px] rounded-2xl 
     border-2 border-dashed border-gray-300 dark:border-gray-600
     flex items-center justify-center
     hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20
@@ -95,7 +95,7 @@ Horizontal scrollable thumbnail strip showing all story slides.
   {/* Slide thumbnails */}
   {slides.map(slide => (
     <div className="
-      flex-shrink-0
+      shrink-0
       w-[120px] h-[213px]
       rounded-2xl
       bg-gray-100 dark:bg-gray-800
@@ -158,9 +158,9 @@ Each card represents a draggable slide type with icon, name, and description.
   <div className="
     w-10 h-10
     rounded-lg
-    bg-gradient-to-br from-purple-500 to-pink-500
+    bg-linear-to-br from-purple-500 to-pink-500
     flex items-center justify-center
-    flex-shrink-0
+    shrink-0
   ">
     <Icon className="w-5 h-5 text-white" />
   </div>
@@ -228,7 +228,7 @@ All slide types share these common controls:
       [&::-webkit-slider-thumb]:w-12
       [&::-webkit-slider-thumb]:h-12
       [&::-webkit-slider-thumb]:rounded-full
-      [&::-webkit-slider-thumb]:bg-gradient-to-r
+      [&::-webkit-slider-thumb]:bg-linear-to-r
       [&::-webkit-slider-thumb]:from-purple-500
       [&::-webkit-slider-thumb]:to-pink-500
       [&::-webkit-slider-thumb]:shadow-md
@@ -452,7 +452,7 @@ Right sidebar showing real-time mobile preview of the story.
   rounded-2xl
   shadow-2xl
   overflow-hidden
-  aspect-[9/16]
+  aspect-9/16
   relative
 ">
   {/* Story iframe */}
@@ -495,7 +495,7 @@ Right sidebar showing real-time mobile preview of the story.
 <div className="
   w-[320px]
   mx-auto
-  aspect-[9/16]
+  aspect-9/16
   bg-gray-100 dark:bg-gray-800
   rounded-2xl
   flex items-center justify-center
@@ -561,7 +561,7 @@ Top bar containing global actions (save, share, templates).
   <button className="
     inline-flex items-center justify-center
     min-h-[44px] px-6
-    bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500
+    bg-linear-to-r from-purple-500 via-pink-500 to-orange-500
     text-white font-medium rounded-lg
     hover:opacity-90 active:scale-[0.98]
     transition-all duration-100
@@ -629,7 +629,7 @@ Modal dialog for selecting pre-built story templates.
         />
         <div className="
           absolute inset-0
-          bg-gradient-to-t from-black/50 to-transparent
+          bg-linear-to-t from-black/50 to-transparent
           opacity-0 group-hover:opacity-100
           transition-opacity duration-200
           flex items-end p-2
@@ -813,7 +813,7 @@ All colors reference global design system tokens.
 <div className="
   w-10 h-10
   rounded-lg
-  bg-gradient-to-br
+  bg-linear-to-br
   from-purple-500
   to-pink-500
   flex items-center justify-center

@@ -101,7 +101,7 @@ const bars = Array.from({ length: 16 }, (_, i) => i);
       delay: i * 0.05,
       ease: "easeInOut"
     }}
-    className="w-2 bg-gradient-to-t from-purple-500 to-pink-500 rounded-full"
+    className="w-2 bg-linear-to-t from-purple-500 to-pink-500 rounded-full"
   />
 ))}
 ```

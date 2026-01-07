@@ -193,7 +193,7 @@ For developers updating legacy code:
 ### Before (Hardcoded)
 ```tsx
 <div className="absolute inset-0 z-0"> {/* Background */}</div>
-<div className="absolute inset-0 z-[1]"> {/* Overlay */}</div>
+<div className="absolute inset-0 z-1"> {/* Overlay */}</div>
 <div className="relative z-10"> {/* Content */}</div>
 <div className="absolute top-6 left-6 z-50"> {/* Controls */}</div>
 ```

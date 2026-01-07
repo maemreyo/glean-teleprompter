@@ -121,7 +121,7 @@ const TeleprompterSlide = ({
       {/* ========== 1. FOCAL POINT OVERLAY ========== */}
       <div className="absolute inset-0 pointer-events-none z-30">
         {/* Gradient trên - Mờ chữ chưa đến */}
-        <div className="absolute top-0 left-0 w-full h-[35vh] bg-gradient-to-b from-black via-black/50 to-transparent" />
+        <div className="absolute top-0 left-0 w-full h-[35vh] bg-linear-to-b from-black via-black/50 to-transparent" />
         
         {/* Focal line - Vị trí mắt tập trung (1/3 từ trên) */}
         <div className="absolute top-[33vh] left-0 w-full flex items-center">
@@ -134,7 +134,7 @@ const TeleprompterSlide = ({
         </div>
 
         {/* Gradient dưới - Mờ chữ đã qua */}
-        <div className="absolute bottom-0 left-0 w-full h-[35vh] bg-gradient-to-t from-black via-black/50 to-transparent" />
+        <div className="absolute bottom-0 left-0 w-full h-[35vh] bg-linear-to-t from-black via-black/50 to-transparent" />
       </div>
 
       {/* ========== 2. SCROLLABLE CONTENT ========== */}
@@ -211,7 +211,7 @@ const TeleprompterSlide = ({
               {/* Play/Pause */}
               <button 
                 onClick={() => setIsScrolling(!isScrolling)}
-                className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-xl font-bold shadow-lg active:scale-95 transition"
+                className="w-full bg-linear-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-xl font-bold shadow-lg active:scale-95 transition"
               >
                 {isScrolling ? "⏸ Pause" : "▶ Start Reading"}
               </button>

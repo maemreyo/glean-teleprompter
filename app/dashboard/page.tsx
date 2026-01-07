@@ -153,7 +153,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Getting Started */}
-      <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 rounded-lg p-6">
+      <div className="bg-linear-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 rounded-lg p-6">
         <h2 className="text-card-foreground text-lg font-semibold mb-2">{t("gettingStarted")}</h2>
         <p className="text-muted-foreground text-sm mb-4">
           {t("gettingStartedDesc")}

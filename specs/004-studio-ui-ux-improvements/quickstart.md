@@ -475,8 +475,8 @@ return (
     {/* Scroll indicators */}
     {showScrollIndicator && (
       <>
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-card to-transparent pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent pointer-events-none flex items-center justify-center">
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-linear-to-r from-card to-transparent pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-linear-to-l from-card to-transparent pointer-events-none flex items-center justify-center">
           <ChevronRight size={16} />
         </div>
       </>

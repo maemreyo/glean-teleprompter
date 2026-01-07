@@ -88,7 +88,7 @@ export function TeleprompterControls({
 
   return (
     <div
-      className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/90 to-transparent p-6 transition-opacity duration-300 ${
+      className={`absolute bottom-0 left-0 right-0 bg-linear-to-t from-black via-black/90 to-transparent p-6 transition-opacity duration-300 ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       } ${className}`}
       onClick={handleTap}

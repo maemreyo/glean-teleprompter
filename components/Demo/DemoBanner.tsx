@@ -20,7 +20,7 @@ export function DemoBanner() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="bg-gradient-to-r from-pink-500/20 to-violet-500/20 border-b border-pink-500/30 backdrop-blur-sm"
+        className="bg-linear-to-r from-pink-500/20 to-violet-500/20 border-b border-pink-500/30 backdrop-blur-sm"
       >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">

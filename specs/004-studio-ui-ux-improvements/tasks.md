@@ -185,7 +185,7 @@
 ### Implementation for User Story 7
 
 - [ ] T057 [P] [US7] Add scroll detection logic to ConfigTabs to show/hide scroll indicators
-- [ ] T058 [P] [US7] Create gradient fade overlay on right edge of tab bar using bg-gradient-to-l from-card
+- [ ] T058 [P] [US7] Create gradient fade overlay on right edge of tab bar using bg-linear-to-l from-card
 - [ ] T059 [P] [US7] Add chevron icon indicator when tabs overflow viewport
 - [ ] T060 [US7] Implement horizontal swipe gesture for tab navigation using touch events
 - [ ] T061 [US7] Create "More" button in tab bar that opens bottom sheet

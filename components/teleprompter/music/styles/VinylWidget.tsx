@@ -126,7 +126,7 @@ export function VinylWidget({
       <motion.div
         className={cn(
           'absolute inset-0 rounded-full',
-          'bg-gradient-to-br from-gray-900 via-gray-800 to-black',
+          'bg-linear-to-br from-gray-900 via-gray-800 to-black',
           'border-4 border-gray-700 shadow-2xl',
           'overflow-hidden'
         )}
@@ -176,7 +176,7 @@ export function VinylWidget({
       <div
         className={cn(
           'relative z-10 rounded-full',
-          'bg-gradient-to-br from-red-600 to-red-800',
+          'bg-linear-to-br from-red-600 to-red-800',
           'border-4 border-gray-900',
           'flex flex-col items-center justify-center',
           'shadow-inner'
@@ -196,7 +196,7 @@ export function VinylWidget({
             'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-red-700',
             isPlaying
               ? 'bg-white text-red-700 hover:bg-white/90'
-              : 'bg-gradient-to-r from-pink-500 to-violet-600 text-white hover:from-pink-600 hover:to-violet-700'
+              : 'bg-linear-to-r from-pink-500 to-violet-600 text-white hover:from-pink-600 hover:to-violet-700'
           )}
           aria-label={isPlaying ? 'Pause music' : 'Play music'}
           aria-checked={isPlaying}

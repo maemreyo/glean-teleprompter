@@ -76,7 +76,7 @@ export function PrivateBrowsingWarning({
     >
       <div className="flex items-start gap-3">
         {/* Warning Icon */}
-        <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+        <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
         
         {/* Message */}
         <div className="flex-1 min-w-0">
@@ -100,7 +100,7 @@ export function PrivateBrowsingWarning({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <Button
             variant="outline"
             size="sm"
@@ -112,7 +112,7 @@ export function PrivateBrowsingWarning({
           
           <button
             onClick={handleDismiss}
-            className="flex-shrink-0 p-1 rounded-md hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors"
+            className="shrink-0 p-1 rounded-md hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors"
             aria-label="Dismiss warning"
           >
             <X className="h-4 w-4 text-amber-600 dark:text-amber-400" />

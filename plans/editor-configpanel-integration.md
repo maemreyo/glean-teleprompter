@@ -235,7 +235,7 @@ sequenceDiagram
 // New button to add to Editor.tsx
 <button
   onClick={() => useConfigStore.getState().togglePanel()}
-  className="w-full py-3 bg-gradient-to-r from-pink-500 to-violet-500 
+  className="w-full py-3 bg-linear-to-r from-pink-500 to-violet-500 
              text-white font-bold rounded-lg hover:from-pink-600 
              hover:to-violet-600 transition-all flex items-center 
              justify-center gap-2 shadow-lg"
@@ -547,7 +547,7 @@ const textStyle = {
 </div>
 
 // Option 3: Use CSS-in-JS with highest specificity
-<div className="[&>p]:!text-current [&>p]:!font-current">
+<div className="[&>p]:text-current! [&>p]:!font-current">
   <p style={textStyle}>{text}</p>
 </div>
 ```

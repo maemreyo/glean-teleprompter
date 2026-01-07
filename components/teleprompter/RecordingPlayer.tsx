@@ -130,7 +130,7 @@ export function RecordingPlayer({ recording, onClose, className }: RecordingPlay
             />
 
             {/* Custom Controls Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+            <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-4">
               {/* Progress Bar */}
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-sm text-white/80">{formatTime(currentTime)}</span>
@@ -155,7 +155,7 @@ export function RecordingPlayer({ recording, onClose, className }: RecordingPlay
                     {isPlaying ? (
                       <span className="block w-4 h-4 bg-white rounded-sm" />
                     ) : (
-                      <div className="w-0 h-0 border-l-[10px] border-l-white border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent ml-1" />
+                      <div className="w-0 h-0 border-l-10 border-l-white border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent ml-1" />
                     )}
                   </button>
                   <button
@@ -184,7 +184,7 @@ export function RecordingPlayer({ recording, onClose, className }: RecordingPlay
                 onClick={togglePlayPause}
               >
                 <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-                  <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1" />
+                  <div className="w-0 h-0 border-l-12 border-l-white border-t-8 border-t-transparent border-b-8 border-b-transparent ml-1" />
                 </div>
               </div>
             )}

@@ -194,13 +194,13 @@ function TeleprompterContentFunction(
     >
       {/* Top gradient overlay */}
       <div
-        className="absolute top-0 left-0 right-0 h-[35vh] bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none z-10"
+        className="absolute top-0 left-0 right-0 h-[35vh] bg-linear-to-b from-black via-black/80 to-transparent pointer-events-none z-10"
         aria-hidden="true"
       />
 
       {/* Bottom gradient overlay */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-[35vh] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none z-10"
+        className="absolute bottom-0 left-0 right-0 h-[35vh] bg-linear-to-t from-black via-black/80 to-transparent pointer-events-none z-10"
         aria-hidden="true"
       />
 

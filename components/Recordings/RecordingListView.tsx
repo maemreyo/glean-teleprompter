@@ -74,7 +74,7 @@ export function RecordingListView({
                 )}
 
                 {/* Thumbnail / Preview */}
-                <div className="flex-shrink-0 w-40 h-24 bg-black rounded-lg overflow-hidden relative group">
+                <div className="shrink-0 w-40 h-24 bg-black rounded-lg overflow-hidden relative group">
                   <video
                     src={recording.video_url}
                     className="w-full h-full object-cover"

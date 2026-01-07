@@ -186,7 +186,7 @@ export function DraggableCamera({
         {/* 012-z-index-refactor: Z_INDEX_WIDGET_HANDLE (530) - Drag handle */}
         {/* NOTE: Nested z-index has no effect on stacking - only affects children within this parent */}
         <div
-          className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/20 to-transparent cursor-move flex items-center justify-center group"
+          className="absolute top-0 left-0 right-0 h-8 bg-linear-to-b from-black/20 to-transparent cursor-move flex items-center justify-center group"
           style={{ zIndex: ZIndex.WidgetHandle }}
         >
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

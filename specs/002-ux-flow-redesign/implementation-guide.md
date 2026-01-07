@@ -385,7 +385,7 @@ export function PublicNavbar() {
   return (
     <nav className="border-b border-gray-800 bg-gray-950/80 backdrop-blur">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+        <Link href="/" className="text-xl font-bold bg-linear-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
           Glean Teleprompter
         </Link>
         
@@ -431,7 +431,7 @@ export function DashboardSidebar() {
   return (
     <aside className="w-64 border-r border-gray-800 bg-gray-950 p-6 flex flex-col">
       <div className="mb-8">
-        <Link href="/dashboard" className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+        <Link href="/dashboard" className="text-xl font-bold bg-linear-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
           Glean
         </Link>
       </div>
@@ -989,7 +989,7 @@ export function LandingPage() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-24 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-linear-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
             Glean Teleprompter
           </h1>
           <p className="text-xl text-gray-400 mb-12">

@@ -203,7 +203,7 @@ export function Runner() {
              {/* 007-unified-state-architecture: Use effects.overlayOpacity from config */}
              {/* Fixed: Use bg-black/30 (30% opacity) as fallback when overlayOpacity is undefined */}
              <div
-               className="absolute inset-0 bg-black/30 transition-opacity z-[1]"
+               className="absolute inset-0 bg-black/30 transition-opacity z-1"
                style={{ opacity: effects.overlayOpacity ?? undefined }}
              />
 
@@ -295,7 +295,7 @@ export function Runner() {
                     onClick={togglePlaying}
                     className={cn(
                       "w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black",
-                      isPlaying ? "bg-white text-black hover:bg-white/90" : "bg-gradient-to-r from-pink-500 to-violet-600 text-white hover:from-pink-600 hover:to-violet-700"
+                      isPlaying ? "bg-white text-black hover:bg-white/90" : "bg-linear-to-r from-pink-500 to-violet-600 text-white hover:from-pink-600 hover:to-violet-700"
                     )}
                     aria-label={isPlaying ? "Pause scrolling" : "Start scrolling"}
                     aria-pressed={isPlaying}

@@ -16,7 +16,7 @@ export function PublicNavbar() {
   return (
     <nav className="border-b border-border bg-background/80 backdrop-blur sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+        <Link href="/" className="text-xl font-bold bg-linear-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
           {t('brand')}
         </Link>
 
@@ -43,7 +43,7 @@ export function PublicNavbar() {
             </Link>
             <Link
               href="/auth/sign-up"
-              className="px-4 py-2 text-sm bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold rounded-full hover:shadow-lg hover:shadow-pink-500/25 transition-all"
+              className="px-4 py-2 text-sm bg-linear-to-r from-pink-500 to-violet-500 text-white font-bold rounded-full hover:shadow-lg hover:shadow-pink-500/25 transition-all"
             >
               {t('signUp')}
             </Link>

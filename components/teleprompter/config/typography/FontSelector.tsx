@@ -200,7 +200,7 @@ export function FontSelector({ className }: FontSelectorProps) {
                             </div>
                           </div>
                           {typography.fontFamily === font.name && (
-                            <Check className="w-5 h-5 text-blue-500 flex-shrink-0 ml-2" />
+                            <Check className="w-5 h-5 text-blue-500 shrink-0 ml-2" />
                           )}
                         </button>
                       ))}

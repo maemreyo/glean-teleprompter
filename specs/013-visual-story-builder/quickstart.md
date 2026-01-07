@@ -380,7 +380,7 @@ Use global design system tokens from [`.zo/design-system.md`](../../.zo/design-s
 
 ```tsx
 // Colors
-className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500"
+className="bg-linear-to-r from-purple-500 via-pink-500 to-orange-500"
 className="text-text-primary"
 className="border-border"
 

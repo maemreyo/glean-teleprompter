@@ -587,7 +587,7 @@ Gradient background, white text, 8px radius.
 <button className="
   inline-flex items-center justify-center
   min-h-[44px] px-6
-  bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500
+  bg-linear-to-r from-purple-500 via-pink-500 to-orange-500
   text-white font-medium rounded-lg
   hover:opacity-90 active:scale-[0.98]
   transition-all duration-100 ease-out
@@ -721,7 +721,7 @@ Horizontal scrollable thumbnail strip.
 ">
   {/* Slide thumbnail - 120×213px (9:16 ratio) */}
   <div className="
-    flex-shrink-0
+    shrink-0
     w-[120px] h-[213px]
     rounded-2xl
     bg-gray-100 dark:bg-gray-800
@@ -820,7 +820,7 @@ Horizontal scrollable thumbnail strip.
     [&::-webkit-slider-thumb]:w-12
     [&::-webkit-slider-thumb]:h-12
     [&::-webkit-slider-thumb]:rounded-full
-    [&::-webkit-slider-thumb]:bg-gradient-to-r
+    [&::-webkit-slider-thumb]:bg-linear-to-r
     [&::-webkit-slider-thumb]:from-purple-500
     [&::-webkit-slider-thumb]:to-pink-500
   "
@@ -1545,7 +1545,7 @@ export function StoryRail({ slides }: { slides: Slide[] }) {
       {/* Add slide button */}
       <button
         className="
-          flex-shrink-0
+          shrink-0
           w-[120px] h-[213px]
           rounded-2xl
           border-2 border-dashed border-gray-300 dark:border-gray-600
@@ -1564,7 +1564,7 @@ export function StoryRail({ slides }: { slides: Slide[] }) {
         <div
           key={slide.id}
           className="
-            flex-shrink-0
+            shrink-0
             w-[120px] h-[213px]
             rounded-2xl
             bg-gray-100 dark:bg-gray-800
@@ -1645,7 +1645,7 @@ import { cn } from '@/lib/utils';
 
 ```tsx
 // Color usage
-<button className="bg-gradient-to-r from-primary-from via-primary-via to-primary-to">
+<button className="bg-linear-to-r from-primary-from via-primary-via to-primary-to">
   Gradient Button
 </button>
 
@@ -1693,7 +1693,7 @@ import { cn } from '@/lib/utils';
   className="
     inline-flex items-center justify-center
     min-h-[44px] px-6
-    bg-gradient-to-r from-primary-from via-primary-via to-primary-to
+    bg-linear-to-r from-primary-from via-primary-via to-primary-to
     text-white font-medium rounded-lg
     hover:opacity-90 active:scale-[0.98]
     transition-all duration-100 ease-out

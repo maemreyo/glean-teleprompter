@@ -293,7 +293,7 @@ export function ConfigTabs() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent pointer-events-none flex items-center justify-end pr-2"
+              className="absolute right-0 top-0 bottom-0 w-8 bg-linear-to-l from-card to-transparent pointer-events-none flex items-center justify-end pr-2"
             >
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </motion.div>

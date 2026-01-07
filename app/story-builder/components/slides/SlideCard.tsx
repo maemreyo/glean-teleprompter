@@ -89,7 +89,7 @@ export const SlideCard = memo(function SlideCard({ slide, index, isActive }: Sli
         className={cn(
           'w-[120px] h-[180px] rounded-2xl cursor-grab active:cursor-grabbing transition-all relative overflow-hidden border-2',
           'hover:scale-105 hover:shadow-xl hover:border-primary/20',
-          isActive ? 'border-transparent bg-origin-border bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 p-[2px]' : 'border-muted',
+          isActive ? 'border-transparent bg-origin-border bg-linear-to-br from-purple-500 via-pink-500 to-orange-500 p-[2px]' : 'border-muted',
           isDragging && 'opacity-50 scale-95 shadow-2xl ring-4 ring-primary/20'
         )}
       >
@@ -100,7 +100,7 @@ export const SlideCard = memo(function SlideCard({ slide, index, isActive }: Sli
           <div className="flex items-center gap-2">
             <div className={cn(
               "w-6 h-6 rounded-md flex items-center justify-center shrink-0",
-              "bg-gradient-to-br from-purple-500/10 to-pink-500/10 text-primary"
+              "bg-linear-to-br from-purple-500/10 to-pink-500/10 text-primary"
             )}>
               {slide.type === 'teleprompter' || slide.type === 'text-highlight' ? <FileText className="w-3.5 h-3.5" /> :
                slide.type === 'image' ? <ImageIcon className="w-3.5 h-3.5" /> :
@@ -123,7 +123,7 @@ export const SlideCard = memo(function SlideCard({ slide, index, isActive }: Sli
               </div>
             ) : (
               <div className="w-full h-full rounded-lg bg-muted/30 p-2 border border-muted-foreground/5 overflow-hidden">
-                <p className="text-[10px] leading-relaxed text-muted-foreground line-clamp-6 break-words">
+                <p className="text-[10px] leading-relaxed text-muted-foreground line-clamp-6 wrap-break-word">
                   {slide.type === 'poll' ? (slide as any).question || 'No question set' :
                    slide.type === 'widget-chart' ? (slide as any).data?.title || 'Chart slide' :
                    (slide as any).content || 'Empty slide'}

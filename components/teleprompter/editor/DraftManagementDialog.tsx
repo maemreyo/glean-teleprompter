@@ -285,7 +285,7 @@ export function DraftManagementDialog({
                           e.stopPropagation();
                           handleRestore(draft._id);
                         }}
-                        className="flex-shrink-0 h-8"
+                        className="shrink-0 h-8"
                         aria-label={ARIA_LABELS.restoreDraft(draft._timestamp)}
                       >
                         <RotateCcw className="h-4 w-4 mr-1" />

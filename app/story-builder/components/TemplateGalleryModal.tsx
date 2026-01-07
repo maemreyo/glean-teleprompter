@@ -78,7 +78,7 @@ function TemplateCard({ template, onSelect }: TemplateCardProps) {
         className="cursor-pointer overflow-hidden transition-all hover:shadow-lg"
         onClick={onSelect}
       >
-        <div className="relative aspect-[9/16] bg-muted">
+        <div className="relative aspect-9/16 bg-muted">
           <img
             src={thumbnail}
             alt={template.name}
