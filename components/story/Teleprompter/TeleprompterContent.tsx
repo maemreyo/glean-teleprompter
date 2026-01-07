@@ -118,7 +118,7 @@ function TeleprompterContentFunction(
         onScroll={handleScroll}
       >
         <div
-          className="px-8 py-12"
+          className="px-8 py-12 text-white"
           style={{
             fontSize: `${fontSize}px`,
             lineHeight: '1.6',
