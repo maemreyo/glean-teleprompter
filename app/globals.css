@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@config "../tailwind.config.ts";
+
+/*
+  Custom theme extensions that are not in tailwind.config.ts
+*/
 @layer base {
   :root {
       --background: 0 0% 100%;

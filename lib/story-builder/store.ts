@@ -21,6 +21,9 @@ import type {
 import { DRAFT_STORAGE_KEY } from './types';
 import { encodeStoryForUrl } from '../story/utils/urlEncoder';
 import { MAX_SLIDES, AUTO_SAVE_INTERVAL, MAX_URL_LENGTH } from './constants';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('StoryBuilderStore');
 
 // ============================================================================
 // Store Interface
@@ -367,7 +370,7 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
   setActiveSlide: (index: number) => {
     const state = get();
 
-    console.log('[Store] setActiveSlide called:', {
+    logger.debug('setActiveSlide called:', {
       newIndex: index,
       currentIndex: state.activeSlideIndex,
       slidesCount: state.slides.length,
@@ -376,12 +379,12 @@ export const useStoryBuilderStore = create<StoryBuilderStore>((set, get) => ({
 
     // Validate index
     if (index < 0 || index >= state.slides.length) {
-      console.error('[Store] setActiveSlide validation failed:', { index, slidesCount: state.slides.length });
+      logger.error('setActiveSlide validation failed:', { index, slidesCount: state.slides.length });
       toast.error(`Cannot set active slide: index ${index} out of bounds`);
       return;
     }
 
-    console.log('[Store] Updating activeSlideIndex to:', index);
+    logger.debug('Updating activeSlideIndex to:', index);
     set({
       activeSlideIndex: index,
     });

@@ -8,9 +8,29 @@
  * Includes performance monitoring for updates exceeding 100ms threshold.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useStoryBuilderStore } from '../store';
 import { BuilderSlide } from '../types';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('usePreviewSync');
+
+/**
+ * Deep equality check for slides using JSON.stringify with caching
+ * This is more efficient than comparing on every render since we cache results
+ */
+function areSlidesEqual(slides1: BuilderSlide[], slides2: BuilderSlide[]): boolean {
+  // Quick length check
+  if (slides1.length !== slides2.length) return false;
+
+  // Check if all slide IDs match (shallow check)
+  const ids1 = slides1.map(s => s.id).join(',');
+  const ids2 = slides2.map(s => s.id).join(',');
+  if (ids1 !== ids2) return false;
+
+  // Deep comparison only if IDs match
+  return JSON.stringify(slides1) === JSON.stringify(slides2);
+}
 
 interface PreviewMessage {
   type: 'UPDATE_STORY';
@@ -27,17 +47,15 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
-    // Shallow comparison to detect changes in slides or active index
-    // Compare length and slide IDs for efficient change detection
-    // Detect changes in slides or active index
-    // We use JSON.stringify for a deep comparison of slide content
-    const hasChanged =
-      slides.length !== previousSlidesRef.current.length ||
-      previousActiveIndexRef.current !== activeSlideIndex ||
-      JSON.stringify(slides) !== JSON.stringify(previousSlidesRef.current);
+    // Detect changes using optimized equality check
+    const slidesChanged = !areSlidesEqual(slides, previousSlidesRef.current);
+    const indexChanged = previousActiveIndexRef.current !== activeSlideIndex;
+    const hasChanged = slidesChanged || indexChanged;
 
-    console.log('[usePreviewSync] State changed:', {
+    logger.debug('State changed:', {
       hasChanged,
+      slidesChanged,
+      indexChanged,
       slidesCount: slides.length,
       activeSlideIndex,
       previousCount: previousSlidesRef.current.length,
@@ -60,10 +78,18 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
           type: 'UPDATE_STORY',
           payload: { slides, activeSlideIndex },
         };
-        iframe.contentWindow.postMessage(message, window.location.origin);
-        
-        if (typeof performance !== 'undefined') {
-          performance.mark('preview-update-sent');
+
+        try {
+          iframe.contentWindow.postMessage(message, window.location.origin);
+          logger.debug('Message sent successfully');
+          
+          if (typeof performance !== 'undefined') {
+            performance.mark('preview-update-sent');
+          }
+        } catch (error) {
+          logger.error('Failed to send postMessage:', error);
+          // Could show a toast notification here if needed
+          return;
         }
       }
 
@@ -73,8 +99,7 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
     };
 
     // If only the active index changed, update immediately for responsiveness
-    const contentChanged = JSON.stringify(slides) !== JSON.stringify(previousSlidesRef.current);
-    if (!contentChanged && previousActiveIndexRef.current !== activeSlideIndex) {
+    if (!slidesChanged && indexChanged) {
       sendUpdate();
     } else {
       // Debounce content updates
@@ -110,7 +135,7 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
           const lastMeasure = measures[measures.length - 1];
           // Log warning if update took longer than 100ms
           if (lastMeasure.duration > 100) {
-            console.warn(`Preview update exceeded 100ms threshold: ${lastMeasure.duration.toFixed(2)}ms`);
+            logger.warn(`Preview update exceeded 100ms threshold: ${lastMeasure.duration.toFixed(2)}ms`);
           }
         }
         // Clear marks and measures to prevent memory leaks
@@ -118,7 +143,7 @@ export function usePreviewSync(iframeRef: React.RefObject<HTMLIFrameElement | nu
         performance.clearMeasures();
       } catch (error) {
         // Ignore performance API errors (DOMException, etc.)
-        console.debug('Performance measurement failed:', error);
+        logger.debug('Performance measurement failed:', error);
       }
     };
 

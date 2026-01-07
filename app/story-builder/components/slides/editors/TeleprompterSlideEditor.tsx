@@ -8,9 +8,27 @@ import { TypographyControls } from './controls/TypographyControls';
 import { DisplayControls } from './controls/DisplayControls';
 import { StylingControls } from './controls/StylingControls';
 import { LayoutControls } from './controls/LayoutControls';
-import type { BuilderSlide } from '@/lib/story-builder/types';
+import type { BuilderSlide, BuilderTeleprompterSlide } from '@/lib/story-builder/types';
 import { useStoryBuilderStore } from '@/lib/story-builder/store';
 import { useState, useEffect, useMemo } from 'react';
+import {
+  clampFocalPoint,
+  clampFontSize,
+  clampLineHeight,
+  clampLetterSpacing,
+  clampBackgroundOpacity,
+  clampSafeAreaPadding,
+  isValidHexColor,
+} from '@/lib/story/validation';
+import {
+  FOCAL_POINT_MIN,
+  FOCAL_POINT_MAX,
+  FOCAL_POINT_STEP,
+  FONT_SIZE_MIN,
+  FONT_SIZE_MAX,
+  FONT_SIZE_STEP,
+  getFocalPointRegionLabel,
+} from '@/lib/story-builder/teleprompterConstants';
 
 // Help icon component
 const HelpIcon = () => (
@@ -39,63 +57,40 @@ interface TeleprompterSlideEditorProps {
 export function TeleprompterSlideEditor({ slide, index }: TeleprompterSlideEditorProps) {
   const { updateSlide } = useStoryBuilderStore();
   
-  // Extract all teleprompter settings with defaults
-  const content = (slide as any).content || '';
-  const slideFocalPoint = (slide as any).focalPoint ?? 50;
-  const slideFontSize = (slide as any).fontSize ?? 24;
-  const slideTextAlign = (slide as any).textAlign ?? 'left';
-  const slideLineHeight = (slide as any).lineHeight ?? 1.4;
-  const slideLetterSpacing = (slide as any).letterSpacing ?? 0;
-  const slideScrollSpeed = (slide as any).scrollSpeed ?? 'medium';
-  const slideMirrorHorizontal = (slide as any).mirrorHorizontal ?? false;
-  const slideMirrorVertical = (slide as any).mirrorVertical ?? false;
-  const slideBackgroundColor = (slide as any).backgroundColor ?? '#000000';
-  const slideBackgroundOpacity = (slide as any).backgroundOpacity ?? 100;
-  const slideSafeAreaPadding = useMemo(() => (slide as any).safeAreaPadding ?? { top: 0, right: 0, bottom: 0, left: 0 }, [slide]);
+  // Type guard to narrow BuilderSlide to BuilderTeleprompterSlide
+  const isTeleprompterSlide = slide.type === 'teleprompter';
+  if (!isTeleprompterSlide) {
+    throw new Error(`TeleprompterSlideEditor received invalid slide type: ${slide.type}`);
+  }
   
-  // State for all settings
-  const [text, setText] = useState(content);
-  const [focalPoint, setFocalPoint] = useState(slideFocalPoint);
-  const [fontSize, setFontSize] = useState(slideFontSize);
-  const [textAlign, setTextAlign] = useState(slideTextAlign);
-  const [lineHeight, setLineHeight] = useState(slideLineHeight);
-  const [letterSpacing, setLetterSpacing] = useState(slideLetterSpacing);
-  const [scrollSpeed, setScrollSpeed] = useState(slideScrollSpeed);
-  const [mirrorHorizontal, setMirrorHorizontal] = useState(slideMirrorHorizontal);
-  const [mirrorVertical, setMirrorVertical] = useState(slideMirrorVertical);
-  const [backgroundColor, setBackgroundColor] = useState(slideBackgroundColor);
-  const [backgroundOpacity, setBackgroundOpacity] = useState(slideBackgroundOpacity);
-  const [safeAreaPadding, setSafeAreaPadding] = useState(slideSafeAreaPadding);
+  const teleprompterSlide = slide as BuilderTeleprompterSlide;
+  
+  // Use useMemo for derived values from slide props
+  // This avoids re-computing defaults on every render
+  const teleprompterSettings = useMemo(() => ({
+    content: teleprompterSlide.content || '',
+    focalPoint: teleprompterSlide.focalPoint ?? 50,
+    fontSize: teleprompterSlide.fontSize ?? 24,
+    textAlign: teleprompterSlide.textAlign ?? 'left',
+    lineHeight: teleprompterSlide.lineHeight ?? 1.4,
+    letterSpacing: teleprompterSlide.letterSpacing ?? 0,
+    scrollSpeed: teleprompterSlide.scrollSpeed ?? 'medium',
+    mirrorHorizontal: teleprompterSlide.mirrorHorizontal ?? false,
+    mirrorVertical: teleprompterSlide.mirrorVertical ?? false,
+    backgroundColor: teleprompterSlide.backgroundColor ?? '#000000',
+    backgroundOpacity: teleprompterSlide.backgroundOpacity ?? 100,
+    safeAreaPadding: teleprompterSlide.safeAreaPadding ?? { top: 0, right: 0, bottom: 0, left: 0 },
+  }), [teleprompterSlide]);
+  
+  // Only use local state for the text content to maintain cursor position during typing
+  // All other settings are controlled directly from the slide props
+  const [text, setText] = useState(teleprompterSettings.content);
 
-  // Update editor state when slide changes (navigation between slides)
+  // Update local text state when slide changes (navigation between slides)
+  // This is the only state we need to sync since it's the only input with focus management
   useEffect(() => {
-    setText(content);
-    setFocalPoint(slideFocalPoint);
-    setFontSize(slideFontSize);
-    setTextAlign(slideTextAlign);
-    setLineHeight(slideLineHeight);
-    setLetterSpacing(slideLetterSpacing);
-    setScrollSpeed(slideScrollSpeed);
-    setMirrorHorizontal(slideMirrorHorizontal);
-    setMirrorVertical(slideMirrorVertical);
-    setBackgroundColor(slideBackgroundColor);
-    setBackgroundOpacity(slideBackgroundOpacity);
-    setSafeAreaPadding(slideSafeAreaPadding);
-  }, [
-    slide,
-    content,
-    slideFocalPoint,
-    slideFontSize,
-    slideTextAlign,
-    slideLineHeight,
-    slideLetterSpacing,
-    slideScrollSpeed,
-    slideMirrorHorizontal,
-    slideMirrorVertical,
-    slideBackgroundColor,
-    slideBackgroundOpacity,
-    slideSafeAreaPadding,
-  ]);
+    setText(teleprompterSettings.content);
+  }, [teleprompterSettings.content]);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -106,8 +101,9 @@ export function TeleprompterSlideEditor({ slide, index }: TeleprompterSlideEdito
           id="text"
           value={text}
           onChange={(e) => {
-            setText(e.target.value);
-            updateSlide(index, { content: e.target.value });
+            const newValue = e.target.value;
+            setText(newValue);
+            updateSlide(index, { content: newValue });
           }}
           placeholder="Compose your story narrative..."
           className="w-full min-h-[120px] rounded-xl border bg-background px-3 py-2 text-sm shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary resize-none"
@@ -160,21 +156,26 @@ export function TeleprompterSlideEditor({ slide, index }: TeleprompterSlideEdito
           <div className="p-3 bg-muted/30 rounded-xl space-y-3">
             <Slider
               id="focal-point"
-              min={0}
-              max={100}
-              step={5}
-              value={[focalPoint]}
+              min={FOCAL_POINT_MIN}
+              max={FOCAL_POINT_MAX}
+              step={FOCAL_POINT_STEP}
+              value={[teleprompterSettings.focalPoint]}
               onValueChange={([value]) => {
-                setFocalPoint(value);
-                updateSlide(index, { focalPoint: value } as any);
+                const clampedValue = clampFocalPoint(value);
+                updateSlide(index, { focalPoint: clampedValue });
               }}
               className="py-2"
+              aria-label="Focal Point"
+              aria-valuemin={FOCAL_POINT_MIN}
+              aria-valuemax={FOCAL_POINT_MAX}
+              aria-valuenow={teleprompterSettings.focalPoint}
+              aria-valuetext={`${getFocalPointRegionLabel(teleprompterSettings.focalPoint)} section (${teleprompterSettings.focalPoint}%)`}
             />
             <div className="flex justify-between items-center px-1">
               <span className="text-[10px] uppercase font-bold text-muted-foreground">
-                {focalPoint < 33 ? 'Top' : focalPoint < 66 ? 'Center' : 'Bottom'}
+                {getFocalPointRegionLabel(teleprompterSettings.focalPoint)}
               </span>
-              <span className="text-[10px] font-mono bg-background px-1.5 py-0.5 rounded border">{focalPoint}%</span>
+              <span className="text-[10px] font-mono bg-background px-1.5 py-0.5 rounded border">{teleprompterSettings.focalPoint}%</span>
             </div>
           </div>
         </div>
@@ -184,19 +185,24 @@ export function TeleprompterSlideEditor({ slide, index }: TeleprompterSlideEdito
           <div className="p-3 bg-muted/30 rounded-xl space-y-3">
             <Slider
               id="font-size"
-              min={16}
-              max={48}
-              step={2}
-              value={[fontSize]}
+              min={FONT_SIZE_MIN}
+              max={FONT_SIZE_MAX}
+              step={FONT_SIZE_STEP}
+              value={[teleprompterSettings.fontSize]}
               onValueChange={([value]) => {
-                setFontSize(value);
-                updateSlide(index, { fontSize: value } as any);
+                const clampedValue = clampFontSize(value);
+                updateSlide(index, { fontSize: clampedValue });
               }}
               className="py-2"
+              aria-label="Font Size"
+              aria-valuemin={FONT_SIZE_MIN}
+              aria-valuemax={FONT_SIZE_MAX}
+              aria-valuenow={teleprompterSettings.fontSize}
+              aria-valuetext={`${teleprompterSettings.fontSize} pixels`}
             />
             <div className="flex justify-between items-center px-1">
               <span className="text-[10px] uppercase font-bold text-muted-foreground">Scale</span>
-              <span className="text-[10px] font-mono bg-background px-1.5 py-0.5 rounded border">{fontSize}px</span>
+              <span className="text-[10px] font-mono bg-background px-1.5 py-0.5 rounded border">{teleprompterSettings.fontSize}px</span>
             </div>
           </div>
         </div>
@@ -206,56 +212,62 @@ export function TeleprompterSlideEditor({ slide, index }: TeleprompterSlideEdito
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Typography Controls */}
         <TypographyControls
-          textAlign={textAlign}
-          lineHeight={lineHeight}
-          letterSpacing={letterSpacing}
-          onTextAlignChange={setTextAlign}
-          onLineHeightChange={setLineHeight}
+          textAlign={teleprompterSettings.textAlign}
+          lineHeight={teleprompterSettings.lineHeight}
+          letterSpacing={teleprompterSettings.letterSpacing}
+          onTextAlignChange={(value) => {
+            updateSlide(index, { textAlign: value });
+          }}
+          onLineHeightChange={(value) => {
+            const clampedValue = clampLineHeight(value);
+            updateSlide(index, { lineHeight: clampedValue });
+          }}
           onLetterSpacingChange={(value) => {
-            setLetterSpacing(value);
-            updateSlide(index, { letterSpacing: value } as any);
+            const clampedValue = clampLetterSpacing(value);
+            updateSlide(index, { letterSpacing: clampedValue });
           }}
         />
 
         {/* Display Controls */}
         <DisplayControls
-          scrollSpeed={scrollSpeed}
-          mirrorHorizontal={mirrorHorizontal}
-          mirrorVertical={mirrorVertical}
+          scrollSpeed={teleprompterSettings.scrollSpeed}
+          mirrorHorizontal={teleprompterSettings.mirrorHorizontal}
+          mirrorVertical={teleprompterSettings.mirrorVertical}
           onScrollSpeedChange={(value) => {
-            setScrollSpeed(value);
-            updateSlide(index, { scrollSpeed: value } as any);
+            updateSlide(index, { scrollSpeed: value });
           }}
           onMirrorHorizontalChange={(value) => {
-            setMirrorHorizontal(value);
-            updateSlide(index, { mirrorHorizontal: value } as any);
+            updateSlide(index, { mirrorHorizontal: value });
           }}
           onMirrorVerticalChange={(value) => {
-            setMirrorVertical(value);
-            updateSlide(index, { mirrorVertical: value } as any);
+            updateSlide(index, { mirrorVertical: value });
           }}
         />
 
         {/* Styling Controls */}
         <StylingControls
-          backgroundColor={backgroundColor}
-          backgroundOpacity={backgroundOpacity}
+          backgroundColor={teleprompterSettings.backgroundColor}
+          backgroundOpacity={teleprompterSettings.backgroundOpacity}
           onBackgroundColorChange={(value) => {
-            setBackgroundColor(value);
-            updateSlide(index, { backgroundColor: value } as any);
+            // Validate hex color before saving
+            if (!isValidHexColor(value)) {
+              // Silently reject invalid colors - the UI should prevent this
+              return;
+            }
+            updateSlide(index, { backgroundColor: value });
           }}
           onBackgroundOpacityChange={(value) => {
-            setBackgroundOpacity(value);
-            updateSlide(index, { backgroundOpacity: value } as any);
+            const clampedValue = clampBackgroundOpacity(value);
+            updateSlide(index, { backgroundOpacity: clampedValue });
           }}
         />
 
         {/* Layout Controls */}
         <LayoutControls
-          safeAreaPadding={safeAreaPadding}
+          safeAreaPadding={teleprompterSettings.safeAreaPadding}
           onSafeAreaPaddingChange={(value) => {
-            setSafeAreaPadding(value);
-            updateSlide(index, { safeAreaPadding: value } as any);
+            const clampedValue = clampSafeAreaPadding(value);
+            updateSlide(index, { safeAreaPadding: clampedValue });
           }}
         />
       </div>

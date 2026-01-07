@@ -16,6 +16,10 @@
 import { useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { useTeleprompterStore } from '@/lib/stores/useTeleprompterStore';
 import { FocalPointIndicator } from './FocalPointIndicator';
+import { isValidHexColor } from '@/lib/story/validation';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('TeleprompterContent');
 
 interface TeleprompterContentProps {
   content: string;
@@ -91,12 +95,32 @@ function TeleprompterContentFunction(
   const bgColor = backgroundColor || '#000000';
   const bgOpacity = Math.max(0, Math.min(100, backgroundOpacity)) / 100;
   
+  // Validate hex color before applying
+  // If invalid, fall back to default black color
+  if (!isValidHexColor(bgColor)) {
+    logger.warn('Invalid hex color provided:', bgColor, '- falling back to #000000');
+  }
+  
   // Parse hex color and apply opacity
   const applyOpacity = (hex: string, opacity: number) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    // Ensure we have a valid hex color
+    const validHex = isValidHexColor(hex) ? hex : '#000000';
+    
+    // Expand 3-character hex to 6 characters if needed
+    const expandedHex = validHex.length === 4
+      ? `#${validHex[1]}${validHex[1]}${validHex[2]}${validHex[2]}${validHex[3]}${validHex[3]}`
+      : validHex;
+    
+    const r = parseInt(expandedHex.slice(1, 3), 16);
+    const g = parseInt(expandedHex.slice(3, 5), 16);
+    const b = parseInt(expandedHex.slice(5, 7), 16);
+    
+    // Handle NaN from invalid colors (shouldn't happen due to validation above)
+    const safeR = isNaN(r) ? 0 : r;
+    const safeG = isNaN(g) ? 0 : g;
+    const safeB = isNaN(b) ? 0 : b;
+    
+    return `rgba(${safeR}, ${safeG}, ${safeB}, ${opacity})`;
   };
 
   const finalBackgroundColor = applyOpacity(bgColor, bgOpacity);

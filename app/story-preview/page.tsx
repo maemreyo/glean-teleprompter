@@ -2,10 +2,13 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { StoryViewer } from '@/components/story/StoryViewer';
-import { BuilderSlide } from '@/lib/story-builder/types';
-import type { AnySlide, StoryScript } from '@/lib/story/types';
+import { BuilderSlide, BuilderTeleprompterSlide } from '@/lib/story-builder/types';
+import type { AnySlide, StoryScript, TeleprompterSlide } from '@/lib/story/types';
 import { useStoryStore } from '@/lib/stores/useStoryStore';
 import { sanitizeText, sanitizeUrl } from '@/lib/story-builder/utils/xssProtection';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('StoryPreview');
 
 type PreviewMessage = {
   type: 'UPDATE_STORY';
@@ -29,61 +32,64 @@ export function convertBuilderSlideToStorySlide(slide: BuilderSlide): AnySlide {
       return {
         ...baseSlide,
         type: 'text-highlight',
-        content: sanitizeText((slide as any).content || ''),
-        highlights: (slide as any).highlights || [],
+        content: sanitizeText(slide.content || ''),
+        highlights: slide.highlights || [],
       };
 
     case 'widget-chart':
       return {
         ...baseSlide,
         type: 'widget-chart',
-        data: (slide as any).data || {},
+        data: slide.data || {},
       };
 
     case 'image':
       return {
         ...baseSlide,
         type: 'image',
-        content: sanitizeUrl((slide as any).content || ''),
-        alt: sanitizeText((slide as any).alt || ''),
+        content: sanitizeUrl(slide.content || ''),
+        alt: sanitizeText(slide.alt || ''),
       };
 
     case 'poll':
       return {
         ...baseSlide,
         type: 'poll',
-        question: sanitizeText((slide as any).question || ''),
-        options: ((slide as any).options || []).map((opt: any) => ({
+        question: sanitizeText(slide.question || ''),
+        options: (slide.options || []).map((opt) => ({
           id: typeof opt === 'string' ? opt : opt.id,
           text: sanitizeText(typeof opt === 'string' ? opt : opt.text),
           votes: typeof opt === 'string' ? 0 : opt.votes || 0,
         })),
       };
 
-    case 'teleprompter':
-      return {
+    case 'teleprompter': {
+      const teleprompterSlide = slide as BuilderTeleprompterSlide;
+      const result: TeleprompterSlide = {
         ...baseSlide,
         type: 'teleprompter',
-        content: sanitizeText((slide as any).content || ''),
+        content: sanitizeText(teleprompterSlide.content || ''),
         duration: 'manual' as const,
         // Preserve all teleprompter settings with fallbacks for backward compatibility
-        focalPoint: (slide as any).focalPoint ?? 50,           // Default to center
-        fontSize: (slide as any).fontSize ?? 24,              // Default to 24px
-        textAlign: (slide as any).textAlign ?? 'left',        // Default to left
-        lineHeight: (slide as any).lineHeight ?? 1.4,         // Default to 1.4
-        letterSpacing: (slide as any).letterSpacing ?? 0,      // Default to 0
-        scrollSpeed: (slide as any).scrollSpeed ?? 'medium',  // Default to medium
-        mirrorHorizontal: (slide as any).mirrorHorizontal ?? false,  // Default to false
-        mirrorVertical: (slide as any).mirrorVertical ?? false,      // Default to false
-        backgroundColor: (slide as any).backgroundColor ?? '#000000', // Default to black
-        backgroundOpacity: (slide as any).backgroundOpacity ?? 100,   // Default to 100%
-        safeAreaPadding: (slide as any).safeAreaPadding ?? {         // Default to no padding
+        focalPoint: teleprompterSlide.focalPoint ?? 50,           // Default to center
+        fontSize: teleprompterSlide.fontSize ?? 24,              // Default to 24px
+        textAlign: teleprompterSlide.textAlign ?? 'left',        // Default to left
+        lineHeight: teleprompterSlide.lineHeight ?? 1.4,         // Default to 1.4
+        letterSpacing: teleprompterSlide.letterSpacing ?? 0,      // Default to 0
+        scrollSpeed: teleprompterSlide.scrollSpeed ?? 'medium',  // Default to medium
+        mirrorHorizontal: teleprompterSlide.mirrorHorizontal ?? false,  // Default to false
+        mirrorVertical: teleprompterSlide.mirrorVertical ?? false,      // Default to false
+        backgroundColor: teleprompterSlide.backgroundColor ?? '#000000', // Default to black
+        backgroundOpacity: teleprompterSlide.backgroundOpacity ?? 100,   // Default to 100%
+        safeAreaPadding: teleprompterSlide.safeAreaPadding ?? {         // Default to no padding
           top: 0,
           right: 0,
           bottom: 0,
           left: 0,
         },
       };
+      return result;
+    }
 
     default:
       const exhaustiveCheck: never = slide;
@@ -98,14 +104,14 @@ export default function StoryPreviewPage() {
   const goToSlide = useStoryStore(state => state.goToSlide);
 
   useEffect(() => {
-    console.log('[Preview] Page mounted');
+    logger.debug('Page mounted');
   }, []);
 
   useEffect(() => {
-      console.log('[Preview] Setting up message listener');
+      logger.debug('Setting up message listener');
       
       const handleMessage = (event: MessageEvent<PreviewMessage>) => {
-        console.log('[Preview] Received message:', {
+        logger.debug('Received message:', {
           type: event.data?.type,
           origin: event.origin,
           currentOrigin: window.location.origin,
@@ -114,12 +120,12 @@ export default function StoryPreviewPage() {
 
         // Validate origin for security (relaxed for development)
         if (process.env.NODE_ENV === 'production' && event.origin !== window.location.origin) {
-          console.warn('[Preview] Message rejected - origin mismatch');
+          logger.warn('Message rejected - origin mismatch');
           return;
         }
 
       if (event.data?.type === 'UPDATE_STORY') {
-        console.log('[Preview] Processing UPDATE_STORY:', event.data.payload);
+        logger.debug('Processing UPDATE_STORY:', event.data.payload);
         try {
           const { slides, activeSlideIndex } = event.data.payload;
           
@@ -132,20 +138,20 @@ export default function StoryPreviewPage() {
             throw new Error('Story cannot exceed 20 slides');
           }
 
-          console.log('[Preview] Setting story state:', { slidesCount: slides.length, activeSlideIndex });
+          logger.debug('Setting story state:', { slidesCount: slides.length, activeSlideIndex });
           setStory({ slides, activeSlideIndex });
           setError(null);
         } catch (err) {
-          console.error('Failed to process story update:', err);
+          logger.error('Failed to process story update:', err);
           setError('Invalid story data received');
         }
       }
     };
 
     window.addEventListener('message', handleMessage);
-    console.log('[Preview] Message listener attached successfully');
+    logger.debug('Message listener attached successfully');
     return () => {
-      console.log('[Preview] Cleaning up message listener');
+      logger.debug('Cleaning up message listener');
       window.removeEventListener('message', handleMessage);
     };
   }, []);
@@ -153,7 +159,7 @@ export default function StoryPreviewPage() {
   // Navigate to the active slide when story updates
   useEffect(() => {
     if (story && story.activeSlideIndex !== null) {
-      console.log('[Preview] Navigating to slide:', story.activeSlideIndex);
+      logger.debug('Navigating to slide:', story.activeSlideIndex);
       goToSlide(story.activeSlideIndex);
     }
   }, [story, goToSlide]);

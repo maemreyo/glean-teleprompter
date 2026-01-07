@@ -138,6 +138,20 @@ export interface TeleprompterContent {
   // Builder-specific
   focalPoint: number;              // Vertical position (0-100%)
   fontSize?: number;               // Pixel size (16-48)
+  textAlign?: 'left' | 'center' | 'right';  // Text alignment
+  lineHeight?: number;             // Line height multiplier (default: 1.4)
+  letterSpacing?: number;          // Letter spacing in pixels (default: 0)
+  scrollSpeed?: 'slow' | 'medium' | 'fast';  // Scroll speed preset
+  mirrorHorizontal?: boolean;      // Horizontal mirror mode
+  mirrorVertical?: boolean;        // Vertical mirror mode
+  backgroundColor?: string;        // Background color hex
+  backgroundOpacity?: number;      // Background opacity (0-100)
+  safeAreaPadding?: {              // Safe area padding in pixels
+    top?: number;
+    right?: number;
+    bottom?: number;
+    left?: number;
+  };
 }
 
 /**
