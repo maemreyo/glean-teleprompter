@@ -23,9 +23,9 @@ This is a Next.js 14+ project with TypeScript. Component paths follow the app di
 
 **Purpose**: Project initialization and dependency setup
 
-- [ ] T001 Install @dnd-kit/core package for drag-and-drop functionality
-- [ ] T002 [P] Verify framer-motion is installed (should already exist per project guidelines)
-- [ ] T003 [P] Verify sonner is installed for toast notifications (should already exist per project guidelines)
+- [x] T001 Install @dnd-kit/core package for drag-and-drop functionality
+- [x] T002 [P] Verify framer-motion is installed (should already exist per project guidelines)
+- [x] T003 [P] Verify sonner is installed for toast notifications (should already exist per project guidelines)
 
 ---
 
@@ -35,13 +35,13 @@ This is a Next.js 14+ project with TypeScript. Component paths follow the app di
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Create device registry constant in lib/story-builder/multi-device/deviceRegistry.ts
-- [ ] T005 [P] Create MultiDevicePreviewState type in lib/story-builder/types.ts
-- [ ] T006 [P] Create MultiDevicePreviewPreferences type in lib/story-builder/types.ts
-- [ ] T007 [P] Create localStorage helper utilities in lib/story-builder/multi-device/storage.ts
-- [ ] T008 Create memory calculation utility in lib/story-builder/multi-device/memory.ts
-- [ ] T009 Create useMultiDeviceStore Zustand slice in lib/stores/useMultiDeviceStore.ts
-- [ ] T010 Extend usePreviewSync hook for multi-iframe broadcast in lib/story-builder/hooks/useMultiDevicePreviewSync.ts
+- [x] T004 Create device registry constant in lib/story-builder/multi-device/deviceRegistry.ts
+- [x] T005 [P] Create MultiDevicePreviewState type in lib/story-builder/types.ts
+- [x] T006 [P] Create MultiDevicePreviewPreferences type in lib/story-builder/types.ts
+- [x] T007 [P] Create localStorage helper utilities in lib/story-builder/multi-device/storage.ts
+- [x] T008 Create memory calculation utility in lib/story-builder/multi-device/memory.ts
+- [x] T009 Create useMultiDeviceStore Zustand slice in lib/stores/useMultiDeviceStore.ts
+- [x] T010 Extend usePreviewSync hook for multi-iframe broadcast in lib/story-builder/hooks/useMultiDevicePreviewSync.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -62,29 +62,29 @@ This is a Next.js 14+ project with TypeScript. Component paths follow the app di
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T011 [P] [US1] Unit test for device registry in __tests__/unit/story-builder/multi-device/deviceRegistry.test.ts
-- [ ] T012 [P] [US1] Unit test for localStorage utilities in __tests__/unit/story-builder/multi-device/storage.test.ts
-- [ ] T013 [P] [US1] Unit test for memory calculation in __tests__/unit/story-builder/multi-device/memory.test.ts
-- [ ] T014 [P] [US1] Unit test for useMultiDeviceStore in __tests__/unit/story-builder/multi-device/store.test.ts
-- [ ] T015 [P] [US1] Unit test for useMultiDevicePreviewSync in __tests__/unit/story-builder/multi-device/previewSync.test.ts
-- [ ] T016 [P] [US1] Integration test for multi-device preview sync in __tests__/integration/story-builder/multi-device-preview-sync.test.tsx
-- [ ] T017 [P] [US1] E2E test for multi-device toggle functionality in __tests__/e2e/playwright/015-multi-device-matrix/toggle.spec.ts
-- [ ] T018 [P] [US1] E2E test for responsive grid layout in __tests__/e2e/playwright/015-multi-device-matrix/responsive-layout.spec.ts
+- [x] T011 [P] [US1] Unit test for device registry in __tests__/unit/story-builder/multi-device/deviceRegistry.test.ts
+- [x] T012 [P] [US1] Unit test for localStorage utilities in __tests__/unit/story-builder/multi-device/storage.test.ts
+- [x] T013 [P] [US1] Unit test for memory calculation in __tests__/unit/story-builder/multi-device/memory.test.ts
+- [x] T014 [P] [US1] Unit test for useMultiDeviceStore in __tests__/unit/story-builder/multi-device/store.test.ts
+- [x] T015 [P] [US1] Unit test for useMultiDevicePreviewSync in __tests__/unit/story-builder/multi-device/previewSync.test.ts
+- [x] T016 [P] [US1] Integration test for multi-device preview sync in __tests__/integration/story-builder/multi-device-preview-sync.test.tsx
+- [x] T017 [P] [US1] E2E test for multi-device toggle functionality in __tests__/e2e/playwright/015-multi-device-matrix/toggle.spec.ts
+- [x] T018 [P] [US1] E2E test for responsive grid layout in __tests__/e2e/playwright/015-multi-device-matrix/responsive-layout.spec.ts
 
 ### Implementation for User Story 1
 
-- [ ] T019 [P] [US1] Create DeviceChrome component in components/story-builder/preview/multi-device/DeviceChrome.tsx
-- [ ] T020 [P] [US1] Create LoadingIndicator component in components/story-builder/preview/multi-device/LoadingIndicator.tsx
-- [ ] T021 [P] [US1] Create ErrorState component in components/story-builder/preview/multi-device/ErrorState.tsx
-- [ ] T022 [US1] Create DeviceFrame component in components/story-builder/preview/multi-device/DeviceFrame.tsx (depends on T019, T020, T021)
-- [ ] T023 [US1] Create DeviceGrid CSS Grid container in components/story-builder/preview/multi-device/DeviceGrid.tsx (depends on T022)
-- [ ] T024 [US1] Create ViewportWarning component in components/story-builder/preview/multi-device/ViewportWarning.tsx
-- [ ] T025 [US1] Create DeviceMatrix container in components/story-builder/preview/multi-device/DeviceMatrix.tsx (depends on T023, T024)
-- [ ] T026 [US1] Create MultiDeviceToggle button in components/story-builder/preview/multi-device/MultiDeviceToggle.tsx
-- [ ] T027 [US1] Modify PreviewPanel to integrate multi-device mode in app/story-builder/components/preview/PreviewPanel.tsx (depends on T025, T026)
-- [ ] T028 [US1] Add CSS grid styles for responsive layout in app/story-builder/components/preview/multi-device/multi-device.css
-- [ ] T029 [US1] Implement viewport size detection hook in lib/story-builder/hooks/useViewportSize.ts
-- [ ] T030 [US1] Connect useMultiDevicePreviewSync to DeviceMatrix components (depends on T010, T025)
+- [x] T019 [P] [US1] Create DeviceChrome component in components/story-builder/preview/multi-device/DeviceChrome.tsx
+- [x] T020 [P] [US1] Create LoadingIndicator component in components/story-builder/preview/multi-device/LoadingIndicator.tsx
+- [x] T021 [P] [US1] Create ErrorState component in components/story-builder/preview/multi-device/ErrorState.tsx
+- [x] T022 [US1] Create DeviceFrame component in components/story-builder/preview/multi-device/DeviceFrame.tsx (depends on T019, T020, T021)
+- [x] T023 [US1] Create DeviceGrid CSS Grid container in components/story-builder/preview/multi-device/DeviceGrid.tsx (depends on T022)
+- [x] T024 [US1] Create ViewportWarning component in components/story-builder/preview/multi-device/ViewportWarning.tsx
+- [x] T025 [US1] Create DeviceMatrix container in components/story-builder/preview/multi-device/DeviceMatrix.tsx (depends on T023, T024)
+- [x] T026 [US1] Create MultiDeviceToggle button in components/story-builder/preview/multi-device/MultiDeviceToggle.tsx
+- [x] T027 [US1] Modify PreviewPanel to integrate multi-device mode in app/story-builder/components/preview/PreviewPanel.tsx (depends on T025, T026)
+- [x] T028 [US1] Add CSS grid styles for responsive layout in app/story-builder/components/preview/multi-device/multi-device.css
+- [x] T029 [US1] Implement viewport size detection hook in lib/story-builder/hooks/useViewportSize.ts
+- [x] T030 [US1] Connect useMultiDevicePreviewSync to DeviceMatrix components (depends on T010, T025)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -103,24 +103,24 @@ This is a Next.js 14+ project with TypeScript. Component paths follow the app di
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T031 [P] [US2] Integration test for localStorage persistence in __tests__/integration/story-builder/multi-device-persistence.test.tsx
-- [ ] T032 [P] [US2] Integration test for grid configuration in __tests__/integration/story-builder/grid-configuration.test.tsx
-- [ ] T033 [P] [US2] Integration test for memory management in __tests__/integration/story-builder/memory-management.test.tsx
-- [ ] T034 [P] [US2] E2E test for grid layout selection in __tests__/e2e/playwright/015-multi-device-matrix/grid-configuration.spec.ts
-- [ ] T035 [P] [US2] E2E test for device type selection in __tests__/e2e/playwright/015-multi-device-matrix/device-selection.spec.ts
+- [x] T031 [P] [US2] Integration test for localStorage persistence in __tests__/integration/story-builder/multi-device-persistence.test.tsx
+- [x] T032 [P] [US2] Integration test for grid configuration in __tests__/integration/story-builder/grid-configuration.test.tsx
+- [x] T033 [P] [US2] Integration test for memory management in __tests__/integration/story-builder/memory-management.test.tsx
+- [x] T034 [P] [US2] E2E test for grid layout selection in __tests__/e2e/playwright/015-multi-device-matrix/grid-configuration.spec.ts
+- [x] T035 [P] [US2] E2E test for device type selection in __tests__/e2e/playwright/015-multi-device-matrix/device-selection.spec.ts
 
 ### Implementation for User Story 2
 
-- [ ] T036 [P] [US2] Create GridConfigSelector component in components/story-builder/preview/multi-device/GridConfigSelector.tsx
-- [ ] T037 [P] [US2] Create DeviceTypeChecklist component in components/story-builder/preview/multi-device/DeviceTypeChecklist.tsx
-- [ ] T038 [P] [US2] Create MemoryUsageDisplay component in components/story-builder/preview/multi-device/MemoryUsageDisplay.tsx
-- [ ] T039 [US2] Create GridConfiguration toolbar in components/story-builder/preview/multi-device/GridConfiguration.tsx (depends on T036, T037, T038)
-- [ ] T040 [US2] Create EmptySlot placeholder component in components/story-builder/preview/multi-device/EmptySlot.tsx
-- [ ] T041 [US2] Integrate GridConfiguration into DeviceMatrix in components/story-builder/preview/multi-device/DeviceMatrix.tsx (depends on T039, T025)
-- [ ] T042 [US2] Add memory limit logic to device type selection in components/story-builder/preview/multi-device/DeviceTypeChecklist.tsx
-- [ ] T043 [US2] Handle grid slot vs enabled device mismatch in components/story-builder/preview/multi-device/DeviceGrid.tsx (depends on T040)
-- [ ] T044 [US2] Connect localStorage persistence to useMultiDeviceStore in lib/stores/useMultiDeviceStore.ts (depends on T007, T009)
-- [ ] T045 [US2] Add memory warning toast notifications in components/story-builder/preview/multi-device/GridConfiguration.tsx
+- [x] T036 [P] [US2] Create GridConfigSelector component in components/story-builder/preview/multi-device/GridConfigSelector.tsx
+- [x] T037 [P] [US2] Create DeviceTypeChecklist component in components/story-builder/preview/multi-device/DeviceTypeChecklist.tsx
+- [x] T038 [P] [US2] Create MemoryUsageDisplay component in components/story-builder/preview/multi-device/MemoryUsageDisplay.tsx
+- [x] T039 [US2] Create GridConfiguration toolbar in components/story-builder/preview/multi-device/GridConfiguration.tsx (depends on T036, T037, T038)
+- [x] T040 [US2] Create EmptySlot placeholder component in components/story-builder/preview/multi-device/EmptySlot.tsx
+- [x] T041 [US2] Integrate GridConfiguration into DeviceMatrix in components/story-builder/preview/multi-device/DeviceMatrix.tsx (depends on T039, T025)
+- [x] T042 [US2] Add memory limit logic to device type selection in components/story-builder/preview/multi-device/DeviceTypeChecklist.tsx
+- [x] T043 [US2] Handle grid slot vs enabled device mismatch in components/story-builder/preview/multi-device/DeviceGrid.tsx (depends on T040)
+- [x] T044 [US2] Connect localStorage persistence to useMultiDeviceStore in lib/stores/useMultiDeviceStore.ts (depends on T007, T009)
+- [x] T045 [US2] Add memory warning toast notifications in components/story-builder/preview/multi-device/GridConfiguration.tsx
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -138,19 +138,19 @@ This is a Next.js 14+ project with TypeScript. Component paths follow the app di
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T046 [P] [US3] Integration test for drag-and-drop reordering in __tests__/integration/story-builder/drag-drop-reorder.test.tsx
-- [ ] T047 [P] [US3] E2E test for drag-and-drop workflow in __tests__/e2e/playwright/015-multi-device-matrix/drag-drop.spec.ts
-- [ ] T048 [P] [US3] Performance test for drag-and-drop latency in __tests__/performance/story-builder/drag-drop-performance.test.ts
+- [x] T046 [P] [US3] Integration test for drag-and-drop reordering in __tests__/integration/story-builder/drag-drop-reorder.test.tsx
+- [x] T047 [P] [US3] E2E test for drag-and-drop workflow in __tests__/e2e/playwright/015-multi-device-matrix/drag-drop.spec.ts
+- [x] T048 [P] [US3] Performance test for drag-and-drop latency in __tests__/performance/story-builder/drag-drop-performance.test.ts
 
 ### Implementation for User Story 3
 
-- [ ] T049 [US3] Setup @dnd-kit providers in components/story-builder/preview/multi-device/DndProvider.tsx
-- [ ] T050 [US3] Add draggable indicators to DeviceFrame in components/story-builder/preview/multi-device/DeviceFrame.tsx (depends on T022)
-- [ ] T051 [US3] Implement drop zone logic in DeviceGrid in components/story-builder/preview/multi-device/DeviceGrid.tsx (depends on T023, T049)
-- [ ] T052 [US3] Update device order state on drop in lib/stores/useMultiDeviceStore.ts (depends on T009, T051)
-- [ ] T053 [US3] Persist device order to localStorage in lib/story-builder/multi-device/storage.ts (depends on T007, T052)
-- [ ] T054 [US3] Add animation transitions using framer-motion in components/story-builder/preview/multi-device/DeviceGrid.tsx
-- [ ] T055 [US3] Add keyboard alternative for drag-and-drop in components/story-builder/preview/multi-device/DeviceGrid.tsx
+- [x] T049 [US3] Setup @dnd-kit providers in components/story-builder/preview/multi-device/DndProvider.tsx
+- [x] T050 [US3] Add draggable indicators to DeviceFrame in components/story-builder/preview/multi-device/DeviceFrame.tsx (depends on T022)
+- [x] T051 [US3] Implement drop zone logic in DeviceGrid in components/story-builder/preview/multi-device/DeviceGrid.tsx (depends on T023, T049)
+- [x] T052 [US3] Update device order state on drop in lib/stores/useMultiDeviceStore.ts (depends on T009, T051)
+- [x] T053 [US3] Persist device order to localStorage in lib/story-builder/multi-device/storage.ts (depends on T007, T052)
+- [x] T054 [US3] Add animation transitions using framer-motion in components/story-builder/preview/multi-device/DeviceGrid.tsx
+- [x] T055 [US3] Add keyboard alternative for drag-and-drop in components/story-builder/preview/multi-device/DeviceGrid.tsx
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -160,15 +160,15 @@ This is a Next.js 14+ project with TypeScript. Component paths follow the app di
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T056 [P] Add accessibility labels and ARIA attributes to all multi-device components
-- [ ] T057 [P] Visual regression tests for device frame chrome styling in __tests__/visual/story-builder/device-frame-chrome.test.tsx
-- [ ] T058 [P] Performance optimization for iframe sync in lib/story-builder/hooks/useMultiDevicePreviewSync.ts
-- [ ] T059 Add error boundary for multi-device preview in components/story-builder/preview/multi-device/ErrorBoundary.tsx
-- [ ] T060 Update feature documentation in docs/features/multi-device-matrix-preview.md
-- [ ] T061 [P] Add TypeScript type exports to lib/story-builder/multi-device/index.ts
-- [ ] T062 Code cleanup and refactoring for multi-device components
-- [ ] T063 Run ESLint and fix any linting issues in multi-device files
-- [ ] T064 Validate all success criteria from spec.md
+- [x] T056 [P] Add accessibility labels and ARIA attributes to all multi-device components
+- [x] T057 [P] Visual regression tests for device frame chrome styling in __tests__/visual/story-builder/device-frame-chrome.test.tsx
+- [x] T058 [P] Performance optimization for iframe sync in lib/story-builder/hooks/useMultiDevicePreviewSync.ts
+- [x] T059 Add error boundary for multi-device preview in components/story-builder/preview/multi-device/ErrorBoundary.tsx
+- [x] T060 Update feature documentation in docs/features/multi-device-matrix-preview.md
+- [x] T061 [P] Add TypeScript type exports to lib/story-builder/multi-device/index.ts
+- [x] T062 Code cleanup and refactoring for multi-device components
+- [x] T063 Run ESLint and fix any linting issues in multi-device files
+- [x] T064 Validate all success criteria from spec.md
 
 ---
 
