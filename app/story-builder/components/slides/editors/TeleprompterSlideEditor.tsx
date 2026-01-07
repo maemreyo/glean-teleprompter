@@ -3,13 +3,33 @@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TypographyControls } from './controls/TypographyControls';
 import { DisplayControls } from './controls/DisplayControls';
 import { StylingControls } from './controls/StylingControls';
 import { LayoutControls } from './controls/LayoutControls';
 import type { BuilderSlide } from '@/lib/story-builder/types';
 import { useStoryBuilderStore } from '@/lib/story-builder/store';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+
+// Help icon component
+const HelpIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <line x1="12" x2="12.01" y1="17" y2="17" />
+  </svg>
+);
 
 interface TeleprompterSlideEditorProps {
   slide: BuilderSlide;
@@ -31,7 +51,7 @@ export function TeleprompterSlideEditor({ slide, index }: TeleprompterSlideEdito
   const slideMirrorVertical = (slide as any).mirrorVertical ?? false;
   const slideBackgroundColor = (slide as any).backgroundColor ?? '#000000';
   const slideBackgroundOpacity = (slide as any).backgroundOpacity ?? 100;
-  const slideSafeAreaPadding = (slide as any).safeAreaPadding ?? { top: 0, right: 0, bottom: 0, left: 0 };
+  const slideSafeAreaPadding = useMemo(() => (slide as any).safeAreaPadding ?? { top: 0, right: 0, bottom: 0, left: 0 }, [slide]);
   
   // State for all settings
   const [text, setText] = useState(content);
@@ -42,7 +62,7 @@ export function TeleprompterSlideEditor({ slide, index }: TeleprompterSlideEdito
   const [letterSpacing, setLetterSpacing] = useState(slideLetterSpacing);
   const [scrollSpeed, setScrollSpeed] = useState(slideScrollSpeed);
   const [mirrorHorizontal, setMirrorHorizontal] = useState(slideMirrorHorizontal);
-  const const [mirrorVertical, setMirrorVertical] = useState(slideMirrorVertical);
+  const [mirrorVertical, setMirrorVertical] = useState(slideMirrorVertical);
   const [backgroundColor, setBackgroundColor] = useState(slideBackgroundColor);
   const [backgroundOpacity, setBackgroundOpacity] = useState(slideBackgroundOpacity);
   const [safeAreaPadding, setSafeAreaPadding] = useState(slideSafeAreaPadding);
@@ -97,7 +117,46 @@ export function TeleprompterSlideEditor({ slide, index }: TeleprompterSlideEdito
       {/* Basic Controls - Focal Point & Font Size */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-3">
-          <Label htmlFor="focal-point" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Focal Point</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="focal-point" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Focal Point</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground transition-colors inline-flex"
+                  aria-label="Learn more about focal point"
+                >
+                  <HelpIcon />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-4" side="top">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm">What is Focal Point?</h4>
+                  <p className="text-xs text-muted-foreground">
+                    The focal point is the optimal reading position on screen during recording.
+                    Position your text so the most important content appears at this line.
+                  </p>
+                  <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                    <div className="text-xs font-medium">Quick Guide:</div>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• <strong>0-33%:</strong> Top section</li>
+                      <li>• <strong>34-66%:</strong> Center (recommended)</li>
+                      <li>• <strong>67-100%:</strong> Bottom section</li>
+                    </ul>
+                    <div className="mt-3 pt-2 border-t">
+                      <div className="text-xs text-center text-muted-foreground mb-1">Preview</div>
+                      <div className="relative h-16 bg-background border rounded overflow-hidden">
+                        <div className="absolute left-0 right-0 h-0.5 bg-yellow-400 opacity-80 top-1/2" />
+                        <div className="text-[8px] text-center text-muted-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                          Yellow line = Focal Point
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
           <div className="p-3 bg-muted/30 rounded-xl space-y-3">
             <Slider
               id="focal-point"

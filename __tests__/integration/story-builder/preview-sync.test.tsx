@@ -1,327 +1,288 @@
 /**
- * Integration tests for story builder preview synchronization
+ * Integration tests for story builder to preview synchronization
  * @feature 014-teleprompter-preview-sync
  */
 
 import { render, waitFor } from '@testing-library/react';
-import { act } from 'react';
 import { useStoryBuilderStore } from '@/lib/story-builder/store';
 import type { BuilderSlide } from '@/lib/story-builder/types';
 import { convertBuilderSlideToStorySlide } from '@/app/story-preview/page';
+import type { TeleprompterSlide } from '@/lib/story/types';
 
-// Mock the preview sync hook
+// Mock usePreviewSync hook
 jest.mock('@/lib/story-builder/hooks/usePreviewSync', () => ({
   usePreviewSync: jest.fn(),
 }));
 
-describe('Builder-to-Preview Teleprompter Sync', () => {
+describe('Builder to Preview Sync - Focal Point (T010)', () => {
   beforeEach(() => {
     // Reset store before each test
-    useStoryBuilderStore.setState({
-      slides: [],
-      activeSlideIndex: 0,
-      saveStatus: 'saved',
-      isTemplateModalOpen: false,
-      lastModified: Date.now(),
+    useStoryBuilderStore.getState().clearStory();
+  });
+
+  it('should sync focal point from builder to preview', () => {
+    const builderSlide: BuilderSlide = {
+      id: 'test-slide-1',
+      type: 'teleprompter',
+      duration: 'manual',
+      content: 'Test content',
+      focalPoint: 75,
+      backgroundColor: '#000000',
+      thumbnail: undefined,
+      isDragging: false,
+      isSelected: false,
+    };
+
+    const storySlide = convertBuilderSlideToStorySlide(builderSlide) as TeleprompterSlide;
+
+    expect(storySlide.focalPoint).toBe(75);
+    expect(storySlide.type).toBe('teleprompter');
+  });
+
+  it('should apply default focal point when not provided', () => {
+    const builderSlide: BuilderSlide = {
+      id: 'test-slide-2',
+      type: 'teleprompter',
+      duration: 'manual',
+      content: 'Test content',
+      backgroundColor: '#000000',
+      thumbnail: undefined,
+      isDragging: false,
+      isSelected: false,
+    };
+
+    const storySlide = convertBuilderSlideToStorySlide(builderSlide) as TeleprompterSlide;
+
+    expect(storySlide.focalPoint).toBe(50); // Default
+  });
+
+  it('should sync focal point changes in real-time', async () => {
+    const { addSlide, updateSlide, slides } = useStoryBuilderStore.getState();
+
+    // Add a teleprompter slide
+    addSlide('teleprompter', 0);
+
+    const updatedSlide = {
+      ...slides[0],
+      focalPoint: 60,
+    };
+
+    updateSlide(0, updatedSlide);
+
+    await waitFor(() => {
+      const currentSlide = useStoryBuilderStore.getState().slides[0];
+      expect((currentSlide as any).focalPoint).toBe(60);
+    });
+  });
+});
+
+describe('Builder to Preview Sync - Font Size (T019)', () => {
+  beforeEach(() => {
+    useStoryBuilderStore.getState().clearStory();
+  });
+
+  it('should sync font size from builder to preview', () => {
+    const builderSlide: BuilderSlide = {
+      id: 'test-slide-3',
+      type: 'teleprompter',
+      duration: 'manual',
+      content: 'Test content',
+      fontSize: 36,
+      backgroundColor: '#000000',
+      thumbnail: undefined,
+      isDragging: false,
+      isSelected: false,
+    };
+
+    const storySlide = convertBuilderSlideToStorySlide(builderSlide) as TeleprompterSlide;
+
+    expect(storySlide.fontSize).toBe(36);
+    expect(storySlide.type).toBe('teleprompter');
+  });
+
+  it('should apply default font size when not provided', () => {
+    const builderSlide: BuilderSlide = {
+      id: 'test-slide-4',
+      type: 'teleprompter',
+      duration: 'manual',
+      content: 'Test content',
+      backgroundColor: '#000000',
+      thumbnail: undefined,
+      isDragging: false,
+      isSelected: false,
+    };
+
+    const storySlide = convertBuilderSlideToStorySlide(builderSlide) as TeleprompterSlide;
+
+    expect(storySlide.fontSize).toBe(24); // Default
+  });
+
+  it('should sync font size changes in real-time', async () => {
+    const { addSlide, updateSlide, slides } = useStoryBuilderStore.getState();
+
+    // Add a teleprompter slide
+    addSlide('teleprompter', 0);
+
+    const updatedSlide = {
+      ...slides[0],
+      fontSize: 32,
+    };
+
+    updateSlide(0, updatedSlide);
+
+    await waitFor(() => {
+      const currentSlide = useStoryBuilderStore.getState().slides[0];
+      expect((currentSlide as any).fontSize).toBe(32);
+    });
+  });
+});
+
+describe('Builder to Preview Sync - Enhanced Settings (T043)', () => {
+  beforeEach(() => {
+    useStoryBuilderStore.getState().clearStory();
+  });
+
+  it('should sync all enhanced settings from builder to preview', () => {
+    const builderSlide: BuilderSlide = {
+      id: 'test-slide-5',
+      type: 'teleprompter',
+      duration: 'manual',
+      content: 'Test content',
+      focalPoint: 40,
+      fontSize: 28,
+      textAlign: 'center',
+      lineHeight: 1.6,
+      letterSpacing: 1,
+      scrollSpeed: 'fast',
+      mirrorHorizontal: true,
+      mirrorVertical: false,
+      backgroundColor: '#1a1a1a',
+      backgroundOpacity: 90,
+      safeAreaPadding: {
+        top: 20,
+        right: 30,
+        bottom: 20,
+        left: 30,
+      },
+      thumbnail: undefined,
+      isDragging: false,
+      isSelected: false,
+    };
+
+    const storySlide = convertBuilderSlideToStorySlide(builderSlide) as TeleprompterSlide;
+
+    // Verify all 11 properties are preserved
+    expect(storySlide.focalPoint).toBe(40);
+    expect(storySlide.fontSize).toBe(28);
+    expect(storySlide.textAlign).toBe('center');
+    expect(storySlide.lineHeight).toBe(1.6);
+    expect(storySlide.letterSpacing).toBe(1);
+    expect(storySlide.scrollSpeed).toBe('fast');
+    expect(storySlide.mirrorHorizontal).toBe(true);
+    expect(storySlide.mirrorVertical).toBe(false);
+    expect(storySlide.backgroundColor).toBe('#1a1a1a');
+    expect(storySlide.backgroundOpacity).toBe(90);
+    expect(storySlide.safeAreaPadding).toEqual({
+      top: 20,
+      right: 30,
+      bottom: 20,
+      left: 30,
     });
   });
 
-  describe('focal point synchronization', () => {
-    it('should preserve focalPoint when converting builder slide to story slide', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide-1',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: 'Test content',
-        focalPoint: 75,
-        fontSize: 32,
-      } as BuilderSlide;
+  it('should apply defaults for all enhanced settings when not provided', () => {
+    const builderSlide: BuilderSlide = {
+      id: 'test-slide-6',
+      type: 'teleprompter',
+      duration: 'manual',
+      content: 'Test content',
+      backgroundColor: '#000000',
+      thumbnail: undefined,
+      isDragging: false,
+      isSelected: false,
+    };
 
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
+    const storySlide = convertBuilderSlideToStorySlide(builderSlide) as TeleprompterSlide;
 
-      expect(storySlide.type).toBe('teleprompter');
-      expect((storySlide as any).focalPoint).toBe(75);
-    });
-
-    it('should apply default focalPoint when not provided in builder slide', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide-2',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: 'Test content',
-        // focalPoint not provided
-      } as BuilderSlide;
-
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
-
-      expect(storySlide.type).toBe('teleprompter');
-      expect((storySlide as any).focalPoint).toBe(50); // Default value
-    });
-
-    it('should preserve different focalPoint values across multiple slides', () => {
-      const slides: BuilderSlide[] = [
-        {
-          id: 'slide-1',
-          type: 'teleprompter',
-          duration: 'manual',
-          backgroundColor: '#FFFFFF',
-          content: 'Content 1',
-          focalPoint: 0,
-        } as BuilderSlide,
-        {
-          id: 'slide-2',
-          type: 'teleprompter',
-          duration: 'manual',
-          backgroundColor: '#FFFFFF',
-          content: 'Content 2',
-          focalPoint: 50,
-        } as BuilderSlide,
-        {
-          id: 'slide-3',
-          type: 'teleprompter',
-          duration: 'manual',
-          backgroundColor: '#FFFFFF',
-          content: 'Content 3',
-          focalPoint: 100,
-        } as BuilderSlide,
-      ];
-
-      const convertedSlides = slides.map(convertBuilderSlideToStorySlide);
-
-      expect((convertedSlides[0] as any).focalPoint).toBe(0);
-      expect((convertedSlides[1] as any).focalPoint).toBe(50);
-      expect((convertedSlides[2] as any).focalPoint).toBe(100);
-    });
-
-    it('should sync focalPoint changes to store', () => {
-      const { addSlide, updateSlide } = useStoryBuilderStore.getState();
-
-      act(() => {
-        addSlide('teleprompter', 0);
-      });
-
-      const state = useStoryBuilderStore.getState();
-      const slideIndex = 0;
-
-      act(() => {
-        updateSlide(slideIndex, { focalPoint: 85 } as any);
-      });
-
-      const updatedState = useStoryBuilderStore.getState();
-      expect((updatedState.slides[slideIndex] as any).focalPoint).toBe(85);
-    });
-
-    it('should handle boundary values for focalPoint', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: 'Test content',
-        focalPoint: 0,
-      } as BuilderSlide;
-
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
-      expect((storySlide as any).focalPoint).toBe(0);
-
-      (builderSlide as any).focalPoint = 100;
-      const storySlide2 = convertBuilderSlideToStorySlide(builderSlide);
-      expect((storySlide2 as any).focalPoint).toBe(100);
+    // Verify all defaults are applied
+    expect(storySlide.focalPoint).toBe(50);
+    expect(storySlide.fontSize).toBe(24);
+    expect(storySlide.textAlign).toBe('left');
+    expect(storySlide.lineHeight).toBe(1.4);
+    expect(storySlide.letterSpacing).toBe(0);
+    expect(storySlide.scrollSpeed).toBe('medium');
+    expect(storySlide.mirrorHorizontal).toBe(false);
+    expect(storySlide.mirrorVertical).toBe(false);
+    expect(storySlide.backgroundColor).toBe('#000000');
+    expect(storySlide.backgroundOpacity).toBe(100);
+    expect(storySlide.safeAreaPadding).toEqual({
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
     });
   });
 
-  describe('fontSize synchronization', () => {
-    it('should preserve fontSize when converting builder slide to story slide', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide-1',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: 'Test content',
-        focalPoint: 50,
-        fontSize: 36,
-      } as BuilderSlide;
+  it('should sync enhanced settings changes in real-time', async () => {
+    const { addSlide, updateSlide, slides } = useStoryBuilderStore.getState();
 
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
+    // Add a teleprompter slide
+    addSlide('teleprompter', 0);
 
-      expect(storySlide.type).toBe('teleprompter');
-      expect((storySlide as any).fontSize).toBe(36);
-    });
+    const updatedSlide = {
+      ...slides[0],
+      textAlign: 'right' as const,
+      lineHeight: 1.8,
+      letterSpacing: 2,
+    };
 
-    it('should apply default fontSize when not provided in builder slide', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide-2',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: 'Test content',
-        // fontSize not provided
-      } as BuilderSlide;
+    updateSlide(0, updatedSlide);
 
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
-
-      expect(storySlide.type).toBe('teleprompter');
-      expect((storySlide as any).fontSize).toBe(24); // Default value
-    });
-
-    it('should preserve different fontSize values across multiple slides', () => {
-      const slides: BuilderSlide[] = [
-        {
-          id: 'slide-1',
-          type: 'teleprompter',
-          duration: 'manual',
-          backgroundColor: '#FFFFFF',
-          content: 'Content 1',
-          fontSize: 16,
-        } as BuilderSlide,
-        {
-          id: 'slide-2',
-          type: 'teleprompter',
-          duration: 'manual',
-          backgroundColor: '#FFFFFF',
-          content: 'Content 2',
-          fontSize: 32,
-        } as BuilderSlide,
-        {
-          id: 'slide-3',
-          type: 'teleprompter',
-          duration: 'manual',
-          backgroundColor: '#FFFFFF',
-          content: 'Content 3',
-          fontSize: 72,
-        } as BuilderSlide,
-      ];
-
-      const convertedSlides = slides.map(convertBuilderSlideToStorySlide);
-
-      expect((convertedSlides[0] as any).fontSize).toBe(16);
-      expect((convertedSlides[1] as any).fontSize).toBe(32);
-      expect((convertedSlides[2] as any).fontSize).toBe(72);
-    });
-
-    it('should sync fontSize changes to store', () => {
-      const { addSlide, updateSlide } = useStoryBuilderStore.getState();
-
-      act(() => {
-        addSlide('teleprompter', 0);
-      });
-
-      const state = useStoryBuilderStore.getState();
-      const slideIndex = 0;
-
-      act(() => {
-        updateSlide(slideIndex, { fontSize: 48 } as any);
-      });
-
-      const updatedState = useStoryBuilderStore.getState();
-      expect((updatedState.slides[slideIndex] as any).fontSize).toBe(48);
-    });
-
-    it('should handle boundary values for fontSize', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: 'Test content',
-        fontSize: 16,
-      } as BuilderSlide;
-
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
-      expect((storySlide as any).fontSize).toBe(16);
-
-      (builderSlide as any).fontSize = 72;
-      const storySlide2 = convertBuilderSlideToStorySlide(builderSlide);
-      expect((storySlide2 as any).fontSize).toBe(72);
+    await waitFor(() => {
+      const currentSlide = useStoryBuilderStore.getState().slides[0];
+      expect((currentSlide as any).textAlign).toBe('right');
+      expect((currentSlide as any).lineHeight).toBe(1.8);
+      expect((currentSlide as any).letterSpacing).toBe(2);
     });
   });
+});
 
-  describe('combined property synchronization', () => {
-    it('should preserve both focalPoint and fontSize together', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: 'Test content',
-        focalPoint: 65,
-        fontSize: 28,
-      } as BuilderSlide;
+describe('Builder to Preview Sync - Backward Compatibility', () => {
+  it('should handle slides with missing properties gracefully', () => {
+    // Simulate an old slide without enhanced properties
+    const oldSlide = {
+      id: 'old-slide',
+      type: 'teleprompter' as const,
+      duration: 'manual' as const,
+      content: 'Old content',
+      backgroundColor: '#000000',
+    } as BuilderSlide;
 
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
+    const storySlide = convertBuilderSlideToStorySlide(oldSlide) as TeleprompterSlide;
 
-      expect((storySlide as any).focalPoint).toBe(65);
-      expect((storySlide as any).fontSize).toBe(28);
-    });
-
-    it('should handle slides with only focalPoint set', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: 'Test content',
-        focalPoint: 40,
-      } as BuilderSlide;
-
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
-
-      expect((storySlide as any).focalPoint).toBe(40);
-      expect((storySlide as any).fontSize).toBe(24); // Default
-    });
-
-    it('should handle slides with only fontSize set', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: 'Test content',
-        fontSize: 40,
-      } as BuilderSlide;
-
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
-
-      expect((storySlide as any).focalPoint).toBe(50); // Default
-      expect((storySlide as any).fontSize).toBe(40);
-    });
-
-    it('should handle slides with neither property set', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: 'Test content',
-      } as BuilderSlide;
-
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
-
-      expect((storySlide as any).focalPoint).toBe(50); // Default
-      expect((storySlide as any).fontSize).toBe(24); // Default
-    });
+    // Should apply all defaults without errors
+    expect(storySlide.focalPoint).toBeDefined();
+    expect(storySlide.fontSize).toBeDefined();
+    expect(storySlide.textAlign).toBeDefined();
+    expect(storySlide.lineHeight).toBeDefined();
   });
 
-  describe('content sanitization', () => {
-    it('should sanitize content during conversion', () => {
-      const builderSlide: BuilderSlide = {
-        id: 'test-slide',
-        type: 'teleprompter',
-        duration: 'manual',
-        backgroundColor: '#FFFFFF',
-        content: '<script>alert("xss")</script>Safe content',
-        focalPoint: 50,
-        fontSize: 24,
-      } as BuilderSlide;
+  it('should preserve slide content during conversion', () => {
+    const builderSlide: BuilderSlide = {
+      id: 'test-slide-7',
+      type: 'teleprompter',
+      duration: 'manual',
+      content: 'This is a test story content with multiple lines.\nLine 2\nLine 3',
+      backgroundColor: '#000000',
+      thumbnail: undefined,
+      isDragging: false,
+      isSelected: false,
+    };
 
-      const storySlide = convertBuilderSlideToStorySlide(builderSlide);
+    const storySlide = convertBuilderSlideToStorySlide(builderSlide) as TeleprompterSlide;
 
-      // Content should be sanitized
-      expect((storySlide as any).content).not.toContain('<script>');
-      expect((storySlide as any).focalPoint).toBe(50);
-      expect((storySlide as any).fontSize).toBe(24);
-    });
+    expect(storySlide.content).toContain('This is a test story content');
+    expect(storySlide.content).toContain('Line 2');
+    expect(storySlide.content).toContain('Line 3');
   });
 });

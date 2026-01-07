@@ -61,10 +61,10 @@ This is a Next.js 14+ application with TypeScript:
 
 ### Tests for User Story 1
 
-- [ ] T008 [P] [US1] Unit test for focalPoint type compilation in __tests__/unit/story/types.test.ts
-- [ ] T009 [P] [US1] Unit test for clampFocalPoint boundary validation in __tests__/unit/story/validation.test.ts
-- [ ] T010 [P] [US1] Integration test for builder-to-preview focal point sync in __tests__/integration/story-builder/preview-sync.test.tsx
-- [ ] T011 [P] [US1] E2E test for focal point real-time preview in __tests__/e2e/playwright/014-teleprompter-preview-sync/focal-point-sync.spec.ts
+- [x] T008 [P] [US1] Unit test for focalPoint type compilation in __tests__/unit/story/types.test.ts
+- [x] T009 [P] [US1] Unit test for clampFocalPoint boundary validation in __tests__/unit/story/validation.test.ts
+- [x] T010 [P] [US1] Integration test for builder-to-preview focal point sync in __tests__/integration/story-builder/preview-sync.test.tsx
+- [x] T011 [P] [US1] E2E test for focal point real-time preview in __tests__/e2e/playwright/014-teleprompter-preview-sync/focal-point-sync.spec.ts
 
 ### Implementation for User Story 1
 
@@ -86,18 +86,18 @@ This is a Next.js 14+ application with TypeScript:
 
 ### Tests for User Story 2
 
-- [ ] T017 [P] [US2] Unit test for fontSize type compilation in __tests__/unit/story/types.test.ts
-- [ ] T018 [P] [US2] Unit test for clampFontSize boundary validation in __tests__/unit/story/validation.test.ts
-- [ ] T019 [P] [US2] Integration test for font size preview sync in __tests__/integration/story-builder/preview-sync.test.tsx
-- [ ] T020 [P] [US2] E2E test for font size preview synchronization in __tests__/e2e/playwright/014-teleprompter-preview-sync/font-size-sync.spec.ts
+- [x] T017 [P] [US2] Unit test for fontSize type compilation in __tests__/unit/story/types.test.ts
+- [x] T018 [P] [US2] Unit test for clampFontSize boundary validation in __tests__/unit/story/validation.test.ts
+- [x] T019 [P] [US2] Integration test for font size preview sync in __tests__/integration/story-builder/preview-sync.test.tsx
+- [x] T020 [P] [US2] E2E test for font size preview synchronization in __tests__/e2e/playwright/014-teleprompter-preview-sync/font-size-sync.spec.ts
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Verify usePreviewSync hook includes fontSize in postMessage payload in lib/story-builder/hooks/usePreviewSync.ts
-- [ ] T022 [US2] Initialize TeleprompterSlideEditor with fontSize from slide prop in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
-- [ ] T023 [US2] Add optional fontSize prop to TeleprompterContent component in components/story/Teleprompter/TeleprompterContent.tsx
-- [ ] T024 [US2] Pass fontSize from slide data to TeleprompterContent in app/story-preview/page.tsx
-- [ ] T025 [US2] Apply fontSize to text styling in TeleprompterContent component in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T021 [US2] Verify usePreviewSync hook includes fontSize in postMessage payload in lib/story-builder/hooks/usePreviewSync.ts
+- [x] T022 [US2] Initialize TeleprompterSlideEditor with fontSize from slide prop in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
+- [x] T023 [US2] Add optional fontSize prop to TeleprompterContent component in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T024 [US2] Pass fontSize from slide data to TeleprompterContent in app/story-preview/page.tsx
+- [x] T025 [US2] Apply fontSize to text styling in TeleprompterContent component in components/story/Teleprompter/TeleprompterContent.tsx
 
 **Checkpoint**: Font size changes sync to preview in <100ms - User Story 2 fully functional
 
@@ -111,9 +111,9 @@ This is a Next.js 14+ application with TypeScript:
 
 ### Tests for User Story 3
 
-- [ ] T026 [P] [US3] Unit test for store defaults applied on new slide creation in __tests__/unit/story-builder/store.test.ts
-- [ ] T027 [P] [US3] Integration test for slide navigation persistence in __tests__/integration/story-builder/slide-navigation.test.tsx
-- [ ] T028 [P] [US3] E2E test for settings persistence across navigation in __tests__/e2e/playwright/014-teleprompter-preview-sync/settings-persistence.spec.ts
+- [x] T026 [P] [US3] Unit test for store defaults applied on new slide creation in __tests__/unit/story-builder/store.test.ts
+- [x] T027 [P] [US3] Integration test for slide navigation persistence in __tests__/integration/story-builder/slide-navigation.test.tsx
+- [x] T028 [P] [US3] E2E test for settings persistence across navigation in __tests__/e2e/playwright/014-teleprompter-preview-sync/settings-persistence.spec.ts
 
 ### Implementation for User Story 3
 
@@ -134,17 +134,17 @@ This is a Next.js 14+ application with TypeScript:
 
 ### Tests for User Story 4
 
-- [ ] T033 [P] [US4] Unit test for FocalPointIndicator tooltip in __tests__/unit/story/Teleprompter/FocalPointIndicator.test.tsx
-- [ ] T034 [P] [US4] Accessibility test for tooltip keyboard navigation in __tests__/a11y/story/focal-point-indicator-a11y.test.tsx
-- [ ] T035 [P] [US4] Visual test for tooltip appearance in __tests__/visual/story/focal-point-indicator-tooltip.test.tsx
+- [x] T033 [P] [US4] Unit test for FocalPointIndicator tooltip in __tests__/unit/story/Teleprompter/FocalPointIndicator.test.tsx
+- [x] T034 [P] [US4] Accessibility test for tooltip keyboard navigation in __tests__/a11y/story/focal-point-indicator-a11y.test.tsx
+- [x] T035 [P] [US4] Visual test for tooltip appearance in __tests__/visual/story/focal-point-indicator-tooltip.test.tsx
 
 ### Implementation for User Story 4
 
-- [ ] T036 [US4] Add shadcn/ui Tooltip component to FocalPointIndicator in components/story/Teleprompter/FocalPointIndicator.tsx
-- [ ] T037 [US4] Add label prop for dynamic tooltip text in components/story/Teleprompter/FocalPointIndicator.tsx
-- [ ] T038 [US4] Show "Focal Point - Optimal reading area during recording" on hover in components/story/Teleprompter/FocalPointIndicator.tsx
-- [ ] T039 [US4] Show percentage value when adjusting in components/story/Teleprompter/FocalPointIndicator.tsx
-- [ ] T040 [US4] Hide tooltip during playback in components/story/Teleprompter/FocalPointIndicator.tsx
+- [x] T036 [US4] Add shadcn/ui Tooltip component to FocalPointIndicator in components/story/Teleprompter/FocalPointIndicator.tsx
+- [x] T037 [US4] Add label prop for dynamic tooltip text in components/story/Teleprompter/FocalPointIndicator.tsx
+- [x] T038 [US4] Show "Focal Point - Optimal reading area during recording" on hover in components/story/Teleprompter/FocalPointIndicator.tsx
+- [x] T039 [US4] Show percentage value when adjusting in components/story/Teleprompter/FocalPointIndicator.tsx
+- [x] T040 [US4] Hide tooltip during playback in components/story/Teleprompter/FocalPointIndicator.tsx
 
 **Checkpoint**: Tooltip provides clear explanation of focal point indicator - User Story 4 fully functional
 
@@ -158,74 +158,74 @@ This is a Next.js 14+ application with TypeScript:
 
 ### Tests for User Story 5
 
-- [ ] T041 [P] [US5] Unit test for enhanced type definitions in __tests__/unit/story/types.test.ts
-- [ ] T042 [P] [US5] Unit test for enhanced validation functions in __tests__/unit/story/validation.test.ts
-- [ ] T043 [P] [US5] Integration test for enhanced settings sync in __tests__/integration/story-builder/enhanced-settings-sync.test.tsx
-- [ ] T044 [P] [US5] E2E test for enhanced teleprompter settings in __tests__/e2e/playwright/014-teleprompter-preview-sync/enhanced-settings.spec.ts
+- [x] T041 [P] [US5] Unit test for enhanced type definitions in __tests__/unit/story/types.test.ts
+- [x] T042 [P] [US5] Unit test for enhanced validation functions in __tests__/unit/story/validation.test.ts
+- [x] T043 [P] [US5] Integration test for enhanced settings sync in __tests__/integration/story-builder/enhanced-settings-sync.test.tsx
+- [x] T044 [P] [US5] E2E test for enhanced teleprompter settings in __tests__/e2e/playwright/014-teleprompter-preview-sync/enhanced-settings.spec.ts
 
 ### Implementation for User Story 5 - Type Definitions
 
-- [ ] T045 [US5] Add textAlign property to TeleprompterSlide in lib/story/types.ts
-- [ ] T046 [US5] Add lineHeight property to TeleprompterSlide in lib/story/types.ts
-- [ ] T047 [US5] Add letterSpacing property to TeleprompterSlide in lib/story/types.ts
-- [ ] T048 [US5] Add scrollSpeed property to TeleprompterSlide in lib/story/types.ts
-- [ ] T049 [US5] Add mirrorHorizontal property to TeleprompterSlide in lib/story/types.ts
-- [ ] T050 [US5] Add mirrorVertical property to TeleprompterSlide in lib/story/types.ts
-- [ ] T051 [US5] Add backgroundColor property to TeleprompterSlide in lib/story/types.ts
-- [ ] T052 [US5] Add backgroundOpacity property to TeleprompterSlide in lib/story/types.ts
-- [ ] T053 [US5] Add safeAreaPadding property to TeleprompterSlide in lib/story/types.ts
+- [x] T045 [US5] Add textAlign property to TeleprompterSlide in lib/story/types.ts
+- [x] T046 [US5] Add lineHeight property to TeleprompterSlide in lib/story/types.ts
+- [x] T047 [US5] Add letterSpacing property to TeleprompterSlide in lib/story/types.ts
+- [x] T048 [US5] Add scrollSpeed property to TeleprompterSlide in lib/story/types.ts
+- [x] T049 [US5] Add mirrorHorizontal property to TeleprompterSlide in lib/story/types.ts
+- [x] T050 [US5] Add mirrorVertical property to TeleprompterSlide in lib/story/types.ts
+- [x] T051 [US5] Add backgroundColor property to TeleprompterSlide in lib/story/types.ts
+- [x] T052 [US5] Add backgroundOpacity property to TeleprompterSlide in lib/story/types.ts
+- [x] T053 [US5] Add safeAreaPadding property to TeleprompterSlide in lib/story/types.ts
 
 ### Implementation for User Story 5 - Store Defaults
 
-- [ ] T054 [US5] Add textAlign: 'left' default to slide creation in lib/story-builder/store.ts
-- [ ] T055 [US5] Add lineHeight: 1.4 default to slide creation in lib/story-builder/store.ts
-- [ ] T056 [US5] Add letterSpacing: 0 default to slide creation in lib/story-builder/store.ts
-- [ ] T057 [US5] Add scrollSpeed: 'medium' default to slide creation in lib/story-builder/store.ts
-- [ ] T058 [US5] Add mirrorHorizontal: false default to slide creation in lib/story-builder/store.ts
-- [ ] T059 [US5] Add mirrorVertical: false default to slide creation in lib/story-builder/store.ts
-- [ ] T060 [US5] Add backgroundColor: '#000000' default to slide creation in lib/story-builder/store.ts
-- [ ] T061 [US5] Add backgroundOpacity: 100 default to slide creation in lib/story-builder/store.ts
-- [ ] T062 [US5] Add safeAreaPadding: {top:0,right:0,bottom:0,left:0} default to slide creation in lib/story-builder/store.ts
+- [x] T054 [US5] Add textAlign: 'left' default to slide creation in lib/story-builder/store.ts
+- [x] T055 [US5] Add lineHeight: 1.4 default to slide creation in lib/story-builder/store.ts
+- [x] T056 [US5] Add letterSpacing: 0 default to slide creation in lib/story-builder/store.ts
+- [x] T057 [US5] Add scrollSpeed: 'medium' default to slide creation in lib/story-builder/store.ts
+- [x] T058 [US5] Add mirrorHorizontal: false default to slide creation in lib/story-builder/store.ts
+- [x] T059 [US5] Add mirrorVertical: false default to slide creation in lib/story-builder/store.ts
+- [x] T060 [US5] Add backgroundColor: '#000000' default to slide creation in lib/story-builder/store.ts
+- [x] T061 [US5] Add backgroundOpacity: 100 default to slide creation in lib/story-builder/store.ts
+- [x] T062 [US5] Add safeAreaPadding: {top:0,right:0,bottom:0,left:0} default to slide creation in lib/story-builder/store.ts
 
 ### Implementation for User Story 5 - Validation
 
-- [ ] T063 [P] [US5] Add clampLineHeight function in lib/story/validation.ts
-- [ ] T064 [P] [US5] Add clampLetterSpacing function in lib/story/validation.ts
-- [ ] T065 [P] [US5] Add clampBackgroundOpacity function in lib/story/validation.ts
-- [ ] T066 [P] [US5] Add clampSafeAreaPadding function in lib/story/validation.ts
-- [ ] T067 [P] [US5] Add isValidHexColor function in lib/story/validation.ts
+- [x] T063 [P] [US5] Add clampLineHeight function in lib/story/validation.ts
+- [x] T064 [P] [US5] Add clampLetterSpacing function in lib/story/validation.ts
+- [x] T065 [P] [US5] Add clampBackgroundOpacity function in lib/story/validation.ts
+- [x] T066 [P] [US5] Add clampSafeAreaPadding function in lib/story/validation.ts
+- [x] T067 [P] [US5] Add isValidHexColor function in lib/story/validation.ts
 
 ### Implementation for User Story 5 - Control Components
 
-- [ ] T068 [P] [US5] Create TypographyControls component in app/story-builder/components/slides/editors/controls/TypographyControls.tsx
-- [ ] T069 [P] [US5] Create DisplayControls component in app/story-builder/components/slides/editors/controls/DisplayControls.tsx
-- [ ] T070 [P] [US5] Create StylingControls component in app/story-builder/components/slides/editors/controls/StylingControls.tsx
-- [ ] T071 [P] [US5] Create LayoutControls component in app/story-builder/components/slides/editors/controls/LayoutControls.tsx
+- [x] T068 [P] [US5] Create TypographyControls component in app/story-builder/components/slides/editors/controls/TypographyControls.tsx
+- [x] T069 [P] [US5] Create DisplayControls component in app/story-builder/components/slides/editors/controls/DisplayControls.tsx
+- [x] T070 [P] [US5] Create StylingControls component in app/story-builder/components/slides/editors/controls/StylingControls.tsx
+- [x] T071 [P] [US5] Create LayoutControls component in app/story-builder/components/slides/editors/controls/LayoutControls.tsx
 
 ### Implementation for User Story 5 - Conversion & Sync
 
-- [ ] T072 [US5] Update convertBuilderSlideToStorySlide to preserve all enhanced settings in app/story-preview/page.tsx
-- [ ] T073 [US5] Verify usePreviewSync includes all enhanced settings in postMessage in lib/story-builder/hooks/usePreviewSync.ts
+- [x] T072 [US5] Update convertBuilderSlideToStorySlide to preserve all enhanced settings in app/story-preview/page.tsx
+- [x] T073 [US5] Verify usePreviewSync includes all enhanced settings in postMessage in lib/story-builder/hooks/usePreviewSync.ts
 
 ### Implementation for User Story 5 - Preview Rendering
 
-- [ ] T074 [US5] Add textAlign prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
-- [ ] T075 [US5] Add lineHeight prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
-- [ ] T076 [US5] Add letterSpacing prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
-- [ ] T077 [US5] Add scrollSpeed prop and logic to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
-- [ ] T078 [US5] Add mirrorHorizontal prop and transform to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
-- [ ] T079 [US5] Add mirrorVertical prop and transform to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
-- [ ] T080 [US5] Add backgroundColor prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
-- [ ] T081 [US5] Add backgroundOpacity prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
-- [ ] T082 [US5] Add safeAreaPadding prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T074 [US5] Add textAlign prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T075 [US5] Add lineHeight prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T076 [US5] Add letterSpacing prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T077 [US5] Add scrollSpeed prop and logic to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T078 [US5] Add mirrorHorizontal prop and transform to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T079 [US5] Add mirrorVertical prop and transform to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T080 [US5] Add backgroundColor prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T081 [US5] Add backgroundOpacity prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
+- [x] T082 [US5] Add safeAreaPadding prop and styling to TeleprompterContent in components/story/Teleprompter/TeleprompterContent.tsx
 
 ### Implementation for User Story 5 - Editor Integration
 
-- [ ] T083 [US5] Import all control components in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
-- [ ] T084 [US5] Add state for all 9 enhanced settings in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
-- [ ] T085 [US5] Initialize enhanced settings from slide props in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
-- [ ] T086 [US5] Wire up change handlers for all enhanced settings in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
-- [ ] T087 [US5] Organize controls into sections (tabs/accordions) in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
+- [x] T083 [US5] Import all control components in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
+- [x] T084 [US5] Add state for all 9 enhanced settings in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
+- [x] T085 [US5] Initialize enhanced settings from slide props in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
+- [x] T086 [US5] Wire up change handlers for all enhanced settings in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
+- [x] T087 [US5] Organize controls into sections (tabs/accordions) in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
 
 **Checkpoint**: All enhanced settings sync to preview in <100ms - User Story 5 fully functional
 
@@ -235,12 +235,12 @@ This is a Next.js 14+ application with TypeScript:
 
 **Purpose**: Enhanced visual clarity for focal point indicator
 
-- [ ] T088 [P] [US4] Add dashed line style to FocalPointIndicator in components/story/Teleprompter/FocalPointIndicator.tsx
-- [ ] T089 [P] [US4] Add glow effect or animation to FocalPointIndicator in components/story/Teleprompter/FocalPointIndicator.tsx
-- [ ] T090 [P] [US4] Add position label (percentage) when near indicator in components/story/Teleprompter/FocalPointIndicator.tsx
-- [ ] T091 [P] [US4] Ensure contrast with various backgrounds in components/story/Teleprompter/FocalPointIndicator.tsx
-- [ ] T092 [US4] Add help icon next to focal point slider in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
-- [ ] T093 [US4] Add popover with explanation and diagram in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
+- [x] T088 [P] [US4] Add dashed line style to FocalPointIndicator in components/story/Teleprompter/FocalPointIndicator.tsx
+- [x] T089 [P] [US4] Add glow effect or animation to FocalPointIndicator in components/story/Teleprompter/FocalPointIndicator.tsx
+- [x] T090 [P] [US4] Add position label (percentage) when near indicator in components/story/Teleprompter/FocalPointIndicator.tsx
+- [x] T091 [P] [US4] Ensure contrast with various backgrounds in components/story/Teleprompter/FocalPointIndicator.tsx
+- [x] T092 [US4] Add help icon next to focal point slider in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
+- [x] T093 [US4] Add popover with explanation and diagram in TeleprompterSlideEditor in app/story-builder/components/slides/editors/TeleprompterSlideEditor.tsx
 
 **Checkpoint**: Visual indicators clear and user education added
 
@@ -250,14 +250,14 @@ This is a Next.js 14+ application with TypeScript:
 
 **Purpose**: Final testing, documentation, and quality assurance
 
-- [ ] T094 [P] Run comprehensive test suite (unit, integration, E2E) with npm test
-- [ ] T095 [P] Verify 95%+ code coverage for modified files
-- [ ] T096 [P] Run linting with npm run lint and fix issues
-- [ ] T097 [P] Verify backward compatibility with existing stories
-- [ ] T098 [P] Performance test for <100ms sync requirement
-- [ ] T099 [P] Visual regression tests for all settings combinations
-- [ ] T100 Update changelog with feature changes
-- [ ] T101 Update component documentation for new props
+- [x] T094 [P] Run comprehensive test suite (unit, integration, E2E) with npm test
+- [x] T095 [P] Verify 95%+ code coverage for modified files
+- [x] T096 [P] Run linting with npm run lint and fix issues
+- [x] T097 [P] Verify backward compatibility with existing stories
+- [x] T098 [P] Performance test for <100ms sync requirement
+- [x] T099 [P] Visual regression tests for all settings combinations
+- [x] T100 Update changelog with feature changes
+- [x] T101 Update component documentation for new props
 
 ---
 

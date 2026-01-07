@@ -49,7 +49,10 @@ export function FocalPointIndicator({
   return (
     <div
       className={`absolute left-0 right-0 h-0.5 bg-yellow-400 opacity-80 group ${className}`}
-      style={{ top: `${focalPointVh}vh` }}
+      style={{
+        top: `${focalPointVh}vh`,
+        backgroundImage: 'linear-gradient(to right, transparent, #facc15 10%, #facc15 90%, transparent)',
+      }}
       role="presentation"
       aria-label="Focal point indicator"
       onMouseEnter={() => !hideTooltip && setShowTooltip(true)}
@@ -58,8 +61,14 @@ export function FocalPointIndicator({
       onBlur={() => setShowTooltip(false)}
       tabIndex={hideTooltip ? -1 : 0}
     >
-      {/* Glow effect */}
-      <div className="absolute inset-0 bg-yellow-400 blur-sm opacity-50" />
+      {/* Animated glow effect */}
+      <div className="absolute inset-0 bg-yellow-400 blur-sm opacity-50 animate-pulse" />
+      
+      {/* Dashed line overlay for enhanced visibility */}
+      <div
+        className="absolute inset-0 border-t border-dashed border-yellow-300 opacity-60"
+        style={{ backgroundSize: '20px 1px' }}
+      />
       
       {/* Tooltip */}
       {!hideTooltip && showTooltip && (
