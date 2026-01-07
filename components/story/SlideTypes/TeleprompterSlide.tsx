@@ -92,7 +92,7 @@ export function TeleprompterSlide({
 
   return (
     <div
-      className={`relative w-full h-full bg-black ${className}`}
+      className={`relative w-full h-full ${className}`}
       onClick={handleTap}
       role="article"
       aria-label={`Teleprompter slide ${slideIndex + 1} of ${totalSlides}`}
@@ -103,6 +103,17 @@ export function TeleprompterSlide({
         onScrollProgress={handleScrollProgress}
         onScrollComplete={handleScrollComplete}
         className="absolute inset-0"
+        focalPoint={slide.focalPoint}
+        fontSize={slide.fontSize}
+        textAlign={slide.textAlign}
+        lineHeight={slide.lineHeight}
+        letterSpacing={slide.letterSpacing}
+        scrollSpeed={slide.scrollSpeed}
+        mirrorHorizontal={slide.mirrorHorizontal}
+        mirrorVertical={slide.mirrorVertical}
+        backgroundColor={slide.backgroundColor}
+        backgroundOpacity={slide.backgroundOpacity}
+        safeAreaPadding={slide.safeAreaPadding}
       />
 
       {/* Floating control panel */}

@@ -109,8 +109,23 @@ const createDefaultSlide = (type: BuilderSlideType): BuilderSlide => {
         id: uuidv4(),
         type: 'teleprompter',
         duration: 'manual',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#000000', // Use teleprompter default (black)
         content: 'Your scrolling text here',
+        focalPoint: 50,        // Center position (0-100)
+        fontSize: 24,          // Default font size in pixels (16-72)
+        textAlign: 'left',     // Default text alignment
+        lineHeight: 1.4,       // Default line height multiplier
+        letterSpacing: 0,      // Default letter spacing in pixels
+        scrollSpeed: 'medium', // Default scroll speed preset
+        mirrorHorizontal: false, // No horizontal mirroring by default
+        mirrorVertical: false,   // No vertical mirroring by default
+        backgroundOpacity: 100,    // Full opacity by default
+        safeAreaPadding: {         // No padding by default
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+        },
       } as BuilderSlide;
 
     case 'poll':

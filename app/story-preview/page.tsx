@@ -15,7 +15,7 @@ type PreviewMessage = {
   };
 };
 
-function convertBuilderSlideToStorySlide(slide: BuilderSlide): AnySlide {
+export function convertBuilderSlideToStorySlide(slide: BuilderSlide): AnySlide {
   const baseSlide = {
     id: slide.id,
     type: slide.type,
@@ -66,6 +66,23 @@ function convertBuilderSlideToStorySlide(slide: BuilderSlide): AnySlide {
         type: 'teleprompter',
         content: sanitizeText((slide as any).content || ''),
         duration: 'manual' as const,
+        // Preserve all teleprompter settings with fallbacks for backward compatibility
+        focalPoint: (slide as any).focalPoint ?? 50,           // Default to center
+        fontSize: (slide as any).fontSize ?? 24,              // Default to 24px
+        textAlign: (slide as any).textAlign ?? 'left',        // Default to left
+        lineHeight: (slide as any).lineHeight ?? 1.4,         // Default to 1.4
+        letterSpacing: (slide as any).letterSpacing ?? 0,      // Default to 0
+        scrollSpeed: (slide as any).scrollSpeed ?? 'medium',  // Default to medium
+        mirrorHorizontal: (slide as any).mirrorHorizontal ?? false,  // Default to false
+        mirrorVertical: (slide as any).mirrorVertical ?? false,      // Default to false
+        backgroundColor: (slide as any).backgroundColor ?? '#000000', // Default to black
+        backgroundOpacity: (slide as any).backgroundOpacity ?? 100,   // Default to 100%
+        safeAreaPadding: (slide as any).safeAreaPadding ?? {         // Default to no padding
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+        },
       };
 
     default:

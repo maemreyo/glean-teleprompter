@@ -143,6 +143,144 @@ function formatValidationMessage(message: string, path: string): string {
   return `${path}: ${message}`;
 }
 
+// ============================================================================
+// Teleprompter Validation Utilities
+// ============================================================================
+
+/**
+ * Clamp focal point value to valid range (0-100)
+ *
+ * @param value - The focal point value to clamp
+ * @returns Clamped value between 0 and 100
+ *
+ * @example
+ * ```ts
+ * clampFocalPoint(150) // returns 100
+ * clampFocalPoint(-10) // returns 0
+ * clampFocalPoint(50)  // returns 50
+ * ```
+ */
+export function clampFocalPoint(value: number): number {
+  return Math.max(0, Math.min(100, value));
+}
+
+/**
+ * Clamp font size value to valid range (16-72)
+ *
+ * @param value - The font size value to clamp
+ * @returns Clamped value between 16 and 72
+ *
+ * @example
+ * ```ts
+ * clampFontSize(100) // returns 72
+ * clampFontSize(10)  // returns 16
+ * clampFontSize(24)  // returns 24
+ * ```
+ */
+export function clampFontSize(value: number): number {
+  return Math.max(16, Math.min(72, value));
+}
+
+/**
+ * Clamp line height value to valid range (1.0-3.0)
+ *
+ * @param value - The line height value to clamp
+ * @returns Clamped value between 1.0 and 3.0
+ *
+ * @example
+ * ```ts
+ * clampLineHeight(0.5) // returns 1.0
+ * clampLineHeight(4.0) // returns 3.0
+ * clampLineHeight(1.6) // returns 1.6
+ * ```
+ */
+export function clampLineHeight(value: number): number {
+  return Math.max(1.0, Math.min(3.0, value));
+}
+
+/**
+ * Clamp letter spacing value to valid range (-5 to 20 pixels)
+ *
+ * @param value - The letter spacing value to clamp in pixels
+ * @returns Clamped value between -5 and 20
+ *
+ * @example
+ * ```ts
+ * clampLetterSpacing(-10) // returns -5
+ * clampLetterSpacing(30)  // returns 20
+ * clampLetterSpacing(2)   // returns 2
+ * ```
+ */
+export function clampLetterSpacing(value: number): number {
+  return Math.max(-5, Math.min(20, value));
+}
+
+/**
+ * Clamp background opacity value to valid range (0-100)
+ *
+ * @param value - The background opacity value to clamp
+ * @returns Clamped value between 0 and 100
+ *
+ * @example
+ * ```ts
+ * clampBackgroundOpacity(-10) // returns 0
+ * clampBackgroundOpacity(150) // returns 100
+ * clampBackgroundOpacity(75)  // returns 75
+ * ```
+ */
+export function clampBackgroundOpacity(value: number): number {
+  return Math.max(0, Math.min(100, value));
+}
+
+/**
+ * Clamp safe area padding values to valid range (0-200 pixels)
+ *
+ * @param padding - The padding object with optional top, right, bottom, left values
+ * @returns Clamped padding object with all values between 0 and 200
+ *
+ * @example
+ * ```ts
+ * clampSafeAreaPadding({ top: -10, right: 250, bottom: 50, left: 0 })
+ * // returns { top: 0, right: 200, bottom: 50, left: 0 }
+ * ```
+ */
+export function clampSafeAreaPadding(padding: {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+}): { top: number; right: number; bottom: number; left: number } {
+  const clamp = (value?: number) => {
+    if (value === undefined) return 0;
+    return Math.max(0, Math.min(200, value));
+  };
+
+  return {
+    top: clamp(padding.top),
+    right: clamp(padding.right),
+    bottom: clamp(padding.bottom),
+    left: clamp(padding.left),
+  };
+}
+
+/**
+ * Check if a string is a valid hex color
+ *
+ * @param color - The color string to validate
+ * @returns True if the color is a valid hex color
+ *
+ * @example
+ * ```ts
+ * isValidHexColor('#000000') // returns true
+ * isValidHexColor('#FFF')     // returns true
+ * isValidHexColor('red')      // returns false
+ * isValidHexColor('#GGGGGG')  // returns false
+ * ```
+ */
+export function isValidHexColor(color: string): boolean {
+  return /^#([0-9A-F]{3}){1,2}$/i.test(color);
+}
+
 /**
  * Type guard to check if data is a valid StoryScript
  * 

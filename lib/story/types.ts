@@ -120,6 +120,33 @@ export interface TeleprompterSlide extends Slide {
   type: 'teleprompter';
   content: string;
   duration: 'manual'; // Always manual for teleprompter
+  /** Focal point position for optimal reading area (0-100, where 50 is center) */
+  focalPoint?: number;
+  /** Font size in pixels for teleprompter text (16-72, default: 24) */
+  fontSize?: number;
+  /** Text alignment for teleprompter content (default: 'left') */
+  textAlign?: 'left' | 'center' | 'right';
+  /** Line height multiplier for teleprompter text (default: 1.4) */
+  lineHeight?: number;
+  /** Letter spacing in pixels (default: 0) */
+  letterSpacing?: number;
+  /** Scroll speed preset (default: 'medium') */
+  scrollSpeed?: 'slow' | 'medium' | 'fast';
+  /** Horizontal mirror mode for teleprompter display (default: false) */
+  mirrorHorizontal?: boolean;
+  /** Vertical mirror mode for teleprompter display (default: false) */
+  mirrorVertical?: boolean;
+  /** Background color for teleprompter (default: '#000000') */
+  backgroundColor?: string;
+  /** Background opacity percentage (0-100, default: 100) */
+  backgroundOpacity?: number;
+  /** Safe area padding for teleprompter content in pixels */
+  safeAreaPadding?: {
+    top?: number;
+    right?: number;
+    bottom?: number;
+    left?: number;
+  };
 }
 
 // Union type for all slide types

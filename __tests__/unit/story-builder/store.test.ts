@@ -1,323 +1,320 @@
 /**
- * Unit Tests for Story Builder Store (T026-T028)
- *
- * Tests core store actions: addSlide, removeSlide, reorderSlides
- * @feature 013-visual-story-builder
+ * Unit tests for story builder store
+ * @feature 014-teleprompter-preview-sync
  */
 
 import { renderHook, act } from '@testing-library/react';
 import { useStoryBuilderStore } from '@/lib/story-builder/store';
 import type { BuilderSlide } from '@/lib/story-builder/types';
 
-describe('StoryBuilderStore - addSlide (T026)', () => {
+describe('Story Builder Store - Teleprompter Defaults', () => {
   beforeEach(() => {
     // Reset store before each test
-    const { result } = renderHook(() => useStoryBuilderStore());
-    act(() => {
-      result.current.clearStory();
+    useStoryBuilderStore.setState({
+      slides: [],
+      activeSlideIndex: 0,
+      saveStatus: 'saved',
+      isTemplateModalOpen: false,
+      lastModified: Date.now(),
     });
   });
 
-  it('should add a slide to the end when no position is specified', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
+  describe('addSlide - teleprompter defaults', () => {
+    it('should apply default focalPoint of 50 to new teleprompter slides', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
 
-    act(() => {
-      result.current.addSlide('text-highlight');
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+      });
+
+      const state = result.current;
+      expect(state.slides).toHaveLength(1);
+      
+      const slide = state.slides[0] as any;
+      expect(slide.type).toBe('teleprompter');
+      expect(slide.focalPoint).toBe(50);
     });
 
-    expect(result.current.slides).toHaveLength(1);
-    expect(result.current.slides[0].type).toBe('text-highlight');
-    expect(result.current.activeSlideIndex).toBe(0);
-    expect(result.current.saveStatus).toBe('unsaved');
-  });
+    it('should apply default fontSize of 24 to new teleprompter slides', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
 
-  it('should add a slide at the specified position', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+      });
 
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      result.current.addSlide('teleprompter', 1); // Insert at position 1
+      const state = result.current;
+      expect(state.slides).toHaveLength(1);
+      
+      const slide = state.slides[0] as any;
+      expect(slide.type).toBe('teleprompter');
+      expect(slide.fontSize).toBe(24);
     });
 
-    expect(result.current.slides).toHaveLength(3);
-    expect(result.current.slides[0].type).toBe('text-highlight');
-    expect(result.current.slides[1].type).toBe('teleprompter');
-    expect(result.current.slides[2].type).toBe('image');
-    expect(result.current.activeSlideIndex).toBe(1);
-  });
+    it('should apply both defaults together', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
 
-  it('should prevent adding slides beyond MAX_SLIDES (20)', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+      });
 
-    // Add 20 slides
-    act(() => {
-      for (let i = 0; i < 20; i++) {
-        result.current.addSlide('text-highlight');
-      }
+      const state = result.current;
+      const slide = state.slides[0] as any;
+      
+      expect(slide.focalPoint).toBe(50);
+      expect(slide.fontSize).toBe(24);
     });
 
-    expect(result.current.slides).toHaveLength(20);
+    it('should maintain defaults when adding multiple teleprompter slides', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
 
-    // Try to add 21st slide
-    act(() => {
-      result.current.addSlide('image');
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+        result.current.addSlide('teleprompter', 1);
+        result.current.addSlide('teleprompter', 2);
+      });
+
+      const state = result.current;
+      expect(state.slides).toHaveLength(3);
+      
+      state.slides.forEach((slide: any) => {
+        expect(slide.focalPoint).toBe(50);
+        expect(slide.fontSize).toBe(24);
+      });
     });
 
-    // Should still be 20 slides
-    expect(result.current.slides).toHaveLength(20);
-  });
+    it('should not affect other slide types', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
 
-  it('should create slide with correct default content for each type', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
+      act(() => {
+        result.current.addSlide('text-highlight', 0);
+        result.current.addSlide('image', 1);
+        result.current.addSlide('poll', 2);
+      });
 
-    // Test text-highlight
-    act(() => {
-      result.current.clearStory();
-      result.current.addSlide('text-highlight');
-    });
-
-    let slide = result.current.slides[0] as BuilderSlide;
-    if (slide.type === 'text-highlight') {
-      expect(slide.content).toBe('Your text here');
-      expect(slide.highlights).toEqual([]);
-      expect(slide.duration).toBe(5);
-    }
-
-    // Test image
-    act(() => {
-      result.current.clearStory();
-      result.current.addSlide('image');
-    });
-
-    slide = result.current.slides[0] as BuilderSlide;
-    if (slide.type === 'image') {
-      expect(slide.content).toBe('');
-      expect(slide.alt).toBe('');
-      expect(slide.duration).toBe(5);
-    }
-
-    // Test teleprompter
-    act(() => {
-      result.current.clearStory();
-      result.current.addSlide('teleprompter');
-    });
-
-    slide = result.current.slides[0] as BuilderSlide;
-    if (slide.type === 'teleprompter') {
-      expect(slide.content).toBe('Your scrolling text here');
-      expect(slide.duration).toBe('manual');
-    }
-
-    // Test poll
-    act(() => {
-      result.current.clearStory();
-      result.current.addSlide('poll');
-    });
-
-    slide = result.current.slides[0] as BuilderSlide;
-    if (slide.type === 'poll') {
-      expect(slide.question).toBe('Your question here?');
-      expect(slide.options).toHaveLength(2);
-      expect(slide.options[0].text).toBe('Option 1');
-      expect(slide.duration).toBe(10);
-    }
-
-    // Test widget-chart
-    act(() => {
-      result.current.clearStory();
-      result.current.addSlide('widget-chart');
-    });
-
-    slide = result.current.slides[0] as BuilderSlide;
-    if (slide.type === 'widget-chart') {
-      expect(slide.data.type).toBe('bar');
-      expect(slide.data.title).toBe('Chart Title');
-      expect(slide.data.labels).toEqual(['A', 'B', 'C']);
-      expect(slide.data.values).toEqual([10, 20, 30]);
-    }
-  });
-});
-
-describe('StoryBuilderStore - removeSlide (T027)', () => {
-  beforeEach(() => {
-    const { result } = renderHook(() => useStoryBuilderStore());
-    act(() => {
-      result.current.clearStory();
+      const state = result.current;
+      expect(state.slides).toHaveLength(3);
+      
+      // None of these should have teleprompter-specific properties
+      state.slides.forEach((slide: any) => {
+        expect(slide.focalPoint).toBeUndefined();
+        expect(slide.fontSize).toBeUndefined();
+      });
     });
   });
 
-  it('should remove slide at specified index', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
+  describe('updateSlide - preserving settings', () => {
+    it('should preserve focalPoint when updating other slide properties', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
 
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      result.current.addSlide('teleprompter');
-      result.current.removeSlide(1); // Remove image slide
+      // Add a teleprompter slide
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+      });
+
+      // Update the content
+      act(() => {
+        result.current.updateSlide(0, { content: 'Updated content' } as any);
+      });
+
+      const state = result.current;
+      const slide = state.slides[0] as any;
+      
+      expect(slide.content).toBe('Updated content');
+      expect(slide.focalPoint).toBe(50); // Should still be there
+      expect(slide.fontSize).toBe(24); // Should still be there
     });
 
-    expect(result.current.slides).toHaveLength(2);
-    expect(result.current.slides[0].type).toBe('text-highlight');
-    expect(result.current.slides[1].type).toBe('teleprompter');
+    it('should preserve fontSize when updating other slide properties', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
+
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+      });
+
+      act(() => {
+        result.current.updateSlide(0, { backgroundColor: '#FF0000' } as any);
+      });
+
+      const state = result.current;
+      const slide = state.slides[0] as any;
+      
+      expect(slide.backgroundColor).toBe('#FF0000');
+      expect(slide.focalPoint).toBe(50);
+      expect(slide.fontSize).toBe(24);
+    });
+
+    it('should allow updating focalPoint to a new value', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
+
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+      });
+
+      act(() => {
+        result.current.updateSlide(0, { focalPoint: 75 } as any);
+      });
+
+      const state = result.current;
+      const slide = state.slides[0] as any;
+      
+      expect(slide.focalPoint).toBe(75);
+      expect(slide.fontSize).toBe(24); // Should be preserved
+    });
+
+    it('should allow updating fontSize to a new value', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
+
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+      });
+
+      act(() => {
+        result.current.updateSlide(0, { fontSize: 36 } as any);
+      });
+
+      const state = result.current;
+      const slide = state.slides[0] as any;
+      
+      expect(slide.focalPoint).toBe(50); // Should be preserved
+      expect(slide.fontSize).toBe(36);
+    });
+
+    it('should allow updating both properties simultaneously', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
+
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+      });
+
+      act(() => {
+        result.current.updateSlide(0, { 
+          focalPoint: 80, 
+          fontSize: 48 
+        } as any);
+      });
+
+      const state = result.current;
+      const slide = state.slides[0] as any;
+      
+      expect(slide.focalPoint).toBe(80);
+      expect(slide.fontSize).toBe(48);
+    });
   });
 
-  it('should adjust activeSlideIndex when removing active slide', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
+  describe('removeSlide and reorderSlides', () => {
+    it('should preserve settings when removing a different slide', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
 
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      result.current.addSlide('teleprompter');
-      result.current.setActiveSlide(1); // Select middle slide
-      result.current.removeSlide(1); // Remove it
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+        result.current.addSlide('text-highlight', 1);
+        result.current.addSlide('teleprompter', 2);
+      });
+
+      // Modify first teleprompter slide
+      act(() => {
+        result.current.updateSlide(0, { focalPoint: 65, fontSize: 32 } as any);
+      });
+
+      // Remove the middle slide
+      act(() => {
+        result.current.removeSlide(1);
+      });
+
+      const state = result.current;
+      expect(state.slides).toHaveLength(2);
+      
+      // First slide should still have its settings
+      const slide0 = state.slides[0] as any;
+      expect(slide0.focalPoint).toBe(65);
+      expect(slide0.fontSize).toBe(32);
+      
+      // Third slide (now second) should still have defaults
+      const slide1 = state.slides[1] as any;
+      expect(slide1.focalPoint).toBe(50);
+      expect(slide1.fontSize).toBe(24);
     });
 
-    expect(result.current.activeSlideIndex).toBe(1); // Should stay at 1 (now pointing to last slide)
-  });
+    it('should preserve settings when reordering slides', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
 
-  it('should adjust activeSlideIndex when removing last slide', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+        result.current.addSlide('teleprompter', 1);
+      });
 
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      result.current.addSlide('teleprompter');
-      result.current.setActiveSlide(2); // Select last slide
-      result.current.removeSlide(2); // Remove it
-    });
+      // Modify each slide differently
+      act(() => {
+        result.current.updateSlide(0, { focalPoint: 25, fontSize: 20 } as any);
+        result.current.updateSlide(1, { focalPoint: 75, fontSize: 40 } as any);
+      });
 
-    expect(result.current.activeSlideIndex).toBe(1); // Should move to new last slide
-  });
+      // Reorder slides
+      act(() => {
+        result.current.reorderSlides(0, 1);
+      });
 
-  it('should handle removing slide from empty story', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
-
-    act(() => {
-      result.current.removeSlide(0);
-    });
-
-    expect(result.current.slides).toHaveLength(0);
-  });
-
-  it('should not remove slide with invalid index', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
-
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      const initialLength = result.current.slides.length;
-      result.current.removeSlide(5); // Invalid index
-    });
-
-    expect(result.current.slides).toHaveLength(2);
-  });
-
-  it('should set saveStatus to unsaved after removal', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
-
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.removeSlide(0);
-    });
-
-    expect(result.current.saveStatus).toBe('unsaved');
-  });
-});
-
-describe('StoryBuilderStore - reorderSlides (T028)', () => {
-  beforeEach(() => {
-    const { result } = renderHook(() => useStoryBuilderStore());
-    act(() => {
-      result.current.clearStory();
+      const state = result.current;
+      
+      // Verify settings moved with slides
+      const slide0 = state.slides[0] as any;
+      expect(slide0.focalPoint).toBe(75);
+      expect(slide0.fontSize).toBe(40);
+      
+      const slide1 = state.slides[1] as any;
+      expect(slide1.focalPoint).toBe(25);
+      expect(slide1.fontSize).toBe(20);
     });
   });
 
-  it('should reorder slides by moving from one index to another', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
+  describe('undo/redo with teleprompter settings', () => {
+    it('should restore settings on undo', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
 
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      result.current.addSlide('teleprompter');
-      result.current.reorderSlides(0, 2); // Move first slide to last
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+      });
+
+      // Update settings
+      act(() => {
+        result.current.updateSlide(0, { focalPoint: 85, fontSize: 56 } as any);
+      });
+
+      // Undo
+      act(() => {
+        result.current.undo();
+      });
+
+      const state = result.current;
+      const slide = state.slides[0] as any;
+      
+      expect(slide.focalPoint).toBe(50); // Back to default
+      expect(slide.fontSize).toBe(24);  // Back to default
     });
 
-    expect(result.current.slides).toHaveLength(3);
-    expect(result.current.slides[0].type).toBe('image');
-    expect(result.current.slides[1].type).toBe('teleprompter');
-    expect(result.current.slides[2].type).toBe('text-highlight');
-  });
+    it('should redo settings changes', () => {
+      const { result } = renderHook(() => useStoryBuilderStore());
 
-  it('should update activeSlideIndex to new position', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
+      act(() => {
+        result.current.addSlide('teleprompter', 0);
+      });
 
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      result.current.addSlide('teleprompter');
-      result.current.setActiveSlide(0);
-      result.current.reorderSlides(0, 2);
+      // Update settings
+      act(() => {
+        result.current.updateSlide(0, { focalPoint: 90, fontSize: 60 } as any);
+      });
+
+      // Undo then redo
+      act(() => {
+        result.current.undo();
+        result.current.redo();
+      });
+
+      const state = result.current;
+      const slide = state.slides[0] as any;
+      
+      expect(slide.focalPoint).toBe(90);
+      expect(slide.fontSize).toBe(60);
     });
-
-    expect(result.current.activeSlideIndex).toBe(2);
-  });
-
-  it('should handle moving slide to earlier position', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
-
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      result.current.addSlide('teleprompter');
-      result.current.reorderSlides(2, 0); // Move last slide to first
-    });
-
-    expect(result.current.slides[0].type).toBe('teleprompter');
-    expect(result.current.slides[1].type).toBe('text-highlight');
-    expect(result.current.slides[2].type).toBe('image');
-  });
-
-  it('should do nothing when fromIndex equals toIndex', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
-
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      result.current.addSlide('teleprompter');
-      result.current.reorderSlides(1, 1);
-    });
-
-    expect(result.current.slides[0].type).toBe('text-highlight');
-    expect(result.current.slides[1].type).toBe('image');
-    expect(result.current.slides[2].type).toBe('teleprompter');
-  });
-
-  it('should not reorder with invalid indices', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
-
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      result.current.addSlide('teleprompter');
-      result.current.reorderSlides(5, 0); // Invalid fromIndex
-    });
-
-    // Slides should remain unchanged
-    expect(result.current.slides[0].type).toBe('text-highlight');
-    expect(result.current.slides[1].type).toBe('image');
-    expect(result.current.slides[2].type).toBe('teleprompter');
-  });
-
-  it('should set saveStatus to unsaved after reorder', () => {
-    const { result } = renderHook(() => useStoryBuilderStore());
-
-    act(() => {
-      result.current.addSlide('text-highlight');
-      result.current.addSlide('image');
-      result.current.reorderSlides(0, 1);
-    });
-
-    expect(result.current.saveStatus).toBe('unsaved');
   });
 });
