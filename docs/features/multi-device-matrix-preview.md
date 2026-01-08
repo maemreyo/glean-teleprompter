@@ -127,8 +127,8 @@ function GridConfigExample() {
 
 ### Memory Management
 
-- **Warning Threshold**: 50MB
-- **Hard Limit**: 100MB
+- **Warning Threshold**: 250MB
+- **Hard Limit**: 350MB
 - **Max Devices**: 6 (3x2 grid)
 
 ### Content Sync

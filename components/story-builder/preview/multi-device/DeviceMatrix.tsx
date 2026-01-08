@@ -111,6 +111,7 @@ export function DeviceMatrix({ previewUrl, className, showConfig = false }: Devi
             previewUrl={previewUrl}
             frameId={`${device.id}-${Date.now()}`}
             isDragEnabled={true}
+            onIframeRef={registerIframe}
           />
         ))}
         {/* Empty slots */}

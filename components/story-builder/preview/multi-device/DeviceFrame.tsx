@@ -35,6 +35,8 @@ export interface DeviceFrameProps {
   showChrome?: boolean;
   /** Whether drag-and-drop is enabled (default: false) */
   isDragEnabled?: boolean;
+  /** Callback to register iframe with parent */
+  onIframeRef?: (deviceId: string, iframe: HTMLIFrameElement | null) => void;
 }
 
 type FrameState = 'loading' | 'ready' | 'error';
@@ -56,11 +58,24 @@ export function DeviceFrame({
   className,
   showChrome = true,
   isDragEnabled = false,
+  onIframeRef,
 }: DeviceFrameProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [frameState, setFrameState] = useState<FrameState>('loading');
   const [error, setError] = useState<string>('');
   const [retryCount, setRetryCount] = useState(0);
+
+  // Register iframe with parent when ref changes
+  useEffect(() => {
+    if (onIframeRef && iframeRef.current) {
+      onIframeRef(device.id, iframeRef.current);
+    }
+    return () => {
+      if (onIframeRef) {
+        onIframeRef(device.id, null);
+      }
+    };
+  }, [device.id, onIframeRef]);
 
   // Setup drag-and-drop if enabled
   const {
@@ -104,13 +119,13 @@ export function DeviceFrame({
     }
   }, [device.id]);
 
-  // Track iframe load timeout
+  // Track iframe load timeout (increased to 30 seconds for slower connections)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (frameState === 'loading') {
         handleError('Preview load timeout. Please check your connection.');
       }
-    }, 10000); // 10 second timeout
+    }, 30000); // 30 second timeout
 
     return () => clearTimeout(timeoutId);
   }, [frameState, handleError]);
@@ -163,7 +178,6 @@ export function DeviceFrame({
         onLoad={handleLoad}
         onError={() => handleError('Failed to load preview')}
         sandbox="allow-same-origin allow-scripts allow-forms"
-        loading="lazy"
         aria-label={`${device.name} teleprompter preview`}
       />
     );

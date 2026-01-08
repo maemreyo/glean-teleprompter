@@ -31,9 +31,8 @@ export interface DeviceChromeProps {
 export function DeviceChrome({ device, className, children }: DeviceChromeProps) {
   const { width, height, scale, category } = device;
 
-  // Calculate display size accounting for scale
-  const displayWidth = width * scale;
-  const displayHeight = height * scale;
+  // Calculate aspect ratio for responsive sizing
+  const aspectRatio = `${width}/${height}`;
 
   // Category-specific styling
   const isMobile = category === 'mobile';
@@ -46,12 +45,21 @@ export function DeviceChrome({ device, className, children }: DeviceChromeProps)
   // Padding (bezel size)
   const padding = isMobile ? '12px' : isTablet ? '16px' : '8px';
 
+  // Max width for display to prevent devices from being too large
+  const getMaxWidth = () => {
+    if (isDesktop) return '100%'; // Desktop fills container
+    if (isTablet) return `${width * scale}px`; // Tablet uses scaled width
+    return `${Math.min(width * scale, 320)}px`; // Mobile capped at 320px
+  };
+
   return (
     <div
       className={cn(
         // Base frame styles
         'relative bg-neutral-900 shadow-2xl',
         'border border-neutral-800',
+        // Responsive sizing
+        'w-full',
         // Device-specific styling
         isMobile && 'rounded-[40px]',
         isTablet && 'rounded-3xl',
@@ -60,8 +68,8 @@ export function DeviceChrome({ device, className, children }: DeviceChromeProps)
         className
       )}
       style={{
-        width: displayWidth,
-        height: displayHeight,
+        maxWidth: getMaxWidth(),
+        aspectRatio,
         // Add device-specific padding for bezel effect
         padding,
       }}
